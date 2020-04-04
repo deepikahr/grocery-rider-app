@@ -77,17 +77,19 @@ class _HomeState extends State<Home> {
           SizedBox(height: 10,),
           Row(
             children: <Widget>[
-              Container(
-                height: 51,
-                child: GFButton(
-                  onPressed: () {
-                        Navigator.push( context, MaterialPageRoute(builder: (context) => Tracking()), );
-                  },
-                  size: GFSize.LARGE,
-                  text: '     REJECT     ',
-                  textStyle: titleGPB(),
-                  color: greyB,
-                  type: GFButtonType.outline2x,
+              Expanded(
+                child: Container(
+                  height: 51,
+                  child: GFButton(
+                    onPressed: () {
+                          Navigator.push( context, MaterialPageRoute(builder: (context) => Tracking()), );
+                    },
+                    size: GFSize.LARGE,
+                    text: '     REJECT     ',
+                    textStyle: titleGPB(),
+                    color: greyB,
+                    type: GFButtonType.outline2x,
+                  ),
                 ),
               ),
               SizedBox(width: 12,),
@@ -99,7 +101,7 @@ class _HomeState extends State<Home> {
                         Navigator.push( context, MaterialPageRoute(builder: (context) => Tracking()), );
                     },
                     size: GFSize.LARGE,
-                    text: 'ACCEPT & TRACK',
+                    text: 'ACCEPT',
                     textStyle: titleSPB(),
                     type: GFButtonType.outline2x,
                     color: secondary,
