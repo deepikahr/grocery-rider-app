@@ -1,0 +1,64 @@
+name: grocerydelivery
+description: A new Flutter application
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^0.1.2
+  flutter_svg: ^0.17.3+1
+  getflutter: ^1.0.11
+  google_maps_flutter: ^0.5.25+3
+  solid_bottom_sheet: ^0.1.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - lib/assets/icons/history.svg
+    - lib/assets/icons/home.svg
+    - lib/assets/icons/profile.svg
+    - lib/assets/logo/logo.png
+    - lib/assets/icons/logo_outline.png
+    - lib/assets/icons/back_arrow.png
+    - lib/assets/icons/hash.svg
+    - lib/assets/icons/location.svg
+    - lib/assets/icons/customer.svg
+    - lib/assets/icons/phone.png
+    - lib/assets/icons/locate.png
+    - lib/assets/icons/timer.png
+
+  fonts:
+    - family: PoppinsBold
+      fonts:
+        - asset: lib/assets/fonts/poppinsBold.ttf
+          weight: 400
+
+    - family: PoppinsRegular
+      fonts:
+        - asset: lib/assets/fonts/poppinsRegular.ttf
+          weight: 400
+
+    - family: PoppinsMedium
+      fonts:
+        - asset: lib/assets/fonts/poppinsMedium.ttf
+          weight: 400
+
+    - family: PoppinsSemiBold
+      fonts:
+        - asset: lib/assets/fonts/poppinsSemiBold.ttf
+          weight: 400
+
+    - family: SFProTextSemiBold
+      fonts:
+        - asset: lib/assets/fonts/SFProTextSemibold.ttf
+          weight: 400
+
