@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'historyDetails.dart';
+import 'order_details.dart';
 
 class History extends StatefulWidget {
   @override
@@ -11,12 +11,13 @@ class History extends StatefulWidget {
 
 class _HistoryState extends State<History> {
   @override
-
   Widget build(BuildContext context) {
-
     Widget card = InkWell(
-      onTap:(){
-        Navigator.push( context, MaterialPageRoute(builder: (context) => HistoryDetails()), );
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => OrderDetails()),
+        );
       },
       child: GFCard(
         padding: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
@@ -34,14 +35,25 @@ class _HistoryState extends State<History> {
                         'lib/assets/icons/customer.svg',
                       ),
                     ),
-                    Text('Customer: ', style: titleXSmallBPR(),),
-                    Text('John Deep', style: titleXSmallBBPR(),)
+                    Text(
+                      'Customer: ',
+                      style: titleXSmallBPR(),
+                    ),
+                    Text(
+                      'John Deep',
+                      style: titleXSmallBBPR(),
+                    )
                   ],
                 ),
-                Text('02/04/2020', style: titleXSmallBPR(),)
+                Text(
+                  '02/04/2020',
+                  style: titleXSmallBPR(),
+                )
               ],
             ),
-            SizedBox(height: 5,),
+            SizedBox(
+              height: 5,
+            ),
             Row(
               children: <Widget>[
                 Container(
@@ -50,11 +62,19 @@ class _HistoryState extends State<History> {
                     'lib/assets/icons/hash.svg',
                   ),
                 ),
-                Text('Order ID: ', style: titleXSmallBPR(),),
-                Text('242424',style: titleXSmallBBPR(),)
+                Text(
+                  'Order ID: ',
+                  style: titleXSmallBPR(),
+                ),
+                Text(
+                  '242424',
+                  style: titleXSmallBBPR(),
+                )
               ],
             ),
-            SizedBox(height: 5,),
+            SizedBox(
+              height: 5,
+            ),
           ],
         ),
       ),
@@ -63,15 +83,24 @@ class _HistoryState extends State<History> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primary,
-        title: Text('History', style: titleWPS(),),
+        title: Text(
+          'History',
+          style: titleWPS(),
+        ),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       body: ListView(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(top: 20, left: 16, ),
-            child: Text('Completed requests', style: titleBPS(),),
+            padding: const EdgeInsets.only(
+              top: 20,
+              left: 16,
+            ),
+            child: Text(
+              'Completed requests',
+              style: titleBPS(),
+            ),
           ),
           card,
           card

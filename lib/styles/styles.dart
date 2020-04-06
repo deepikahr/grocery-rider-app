@@ -9,10 +9,6 @@ final greyB = const Color(0xFFC2C0C0);
 final red = const Color(0xFFDF1616);
 final green = const Color(0xFF20C978);
 
-
-
-
-
 //..................................poppins semi bold....................................
 
 TextStyle titleWPS() {
@@ -43,6 +39,15 @@ TextStyle titleXLargeBPSB() {
 }
 
 //..................................poppins bold....................................
+
+TextStyle titleVerySamllPPB() {
+  return new TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 10.0,
+    color: secondary,
+    fontFamily: 'PoppinsBold',
+  );
+}
 
 TextStyle titleLargePPB() {
   return new TextStyle(

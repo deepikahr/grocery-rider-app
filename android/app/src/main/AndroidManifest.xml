@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.grocery.grocerydelivery">
+    package="com.ionicfirebaseapp.grocerydelivery">
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
@@ -14,7 +14,7 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="grocerydelivery"
         android:icon="@mipmap/ic_launcher">
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyD6Q4UgAYOL203nuwNeBr4j_-yAd1U1gko"/>
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDXxt_aIn5HWQZg3gFYOqcuf8hjUuzmvKg"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
