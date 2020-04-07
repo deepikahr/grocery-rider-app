@@ -152,11 +152,11 @@ TextStyle titleWPM() {
   );
 }
 
-TextStyle titleRPM() {
+TextStyle titleRPM(color) {
   return new TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 15.0,
-    color: red,
+    color: color,
     fontFamily: 'PoppinsMedium',
   );
 }
@@ -174,6 +174,15 @@ TextStyle titleLargeBPM() {
   return new TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 18.0,
+    color: Colors.black,
+    fontFamily: 'PoppinsMedium',
+  );
+}
+
+TextStyle subTitleSmallBPM() {
+  return new TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 12.0,
     color: Colors.black,
     fontFamily: 'PoppinsMedium',
   );

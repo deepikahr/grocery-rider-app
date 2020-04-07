@@ -1,14 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:grocerydelivery/models/order.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 import 'package:getflutter/getflutter.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class OrderDetails extends StatefulWidget {
+  final String orderID;
+  OrderDetails({Key key, this.orderID}) : super(key: key);
   @override
   _OrderDetailsState createState() => _OrderDetailsState();
 }
 
 class _OrderDetailsState extends State<OrderDetails> {
+  Map<String, dynamic> order;
+
+  Map<String, dynamic> findOrderByID(List orders, String orderID) =>
+      orders.firstWhere((element) => element['_id'] == orderID);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,102 +31,151 @@ class _OrderDetailsState extends State<OrderDetails> {
         centerTitle: true,
       ),
       backgroundColor: greyA,
-      body: ListView(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Text(
-                      '# Order ID: ',
-                      style: subTitleLargeBPM(),
-                    ),
-                    Text(
-                      '242424',
-                      style: subTitleLargeBPM(),
-                    )
-                  ],
-                ),
-                Text(
-                  '02/04/2020',
-                  style: subTitleLargeBPM(),
-                )
-              ],
-            ),
-          ),
-          GFCard(
-            padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            content: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'John Doe',
-                  style: titleXLargeBPSB(),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  'Address',
-                  style: titleXSmallBPR(),
-                ),
-                Text(
-                  '176/18 , 22nd main road, Agara, HSR layout, Bangalore',
-                  style: titleLargeBPM(),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  'Items',
-                  style: titleXSmallBPR(),
-                ),
-                Text(
-                  'Broccoli (250 gms), Cheese (200gm) X1',
-                  style: titleLargeBPM(),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        alignment: AlignmentDirectional.center,
-                        height: 64,
-                        decoration: BoxDecoration(
-                            border: Border.all(color: greyB),
-                            borderRadius: BorderRadius.circular(10),
-                            color: greyA),
-                        child: Text('Order delivered at 11:30'),
+      body: Consumer<OrderModel>(builder: (context, data, child) {
+        order = findOrderByID(data.deliveredOrders, widget.orderID);
+        String firstName = '',
+            lastName = '',
+            fullName = '',
+            deliveryAddress = '';
+        if (order['user'] != null && order['user']['firstName'] != null) {
+          firstName = order['user']['firstName'];
+        }
+        if (order['user'] != null && order['user']['lastName'] != null) {
+          lastName = order['user']['lastName'];
+        }
+        fullName = '$firstName $lastName';
+        if (order['deliveryAddress'] != null) {
+          deliveryAddress =
+              '${order['deliveryAddress']['flatNo']}, ${order['deliveryAddress']['apartmentName']}, ${order['deliveryAddress']['address']}';
+        }
+        return ListView(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        '# Order ID: ',
+                        style: subTitleLargeBPM(),
                       ),
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          'Total',
-                          style: titleXSmallBPR(),
-                        ),
-                        Text(
-                          '\$65',
-                          style: titleXLargeGPB(),
-                        )
-                      ],
-                    )
-                  ],
-                )
-              ],
+                      Text(
+                        order['orderID'],
+                        style: subTitleSmallBPM(),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
-          )
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        DateFormat("HH:MM a, dd/MM/yyyy")
+                            .format(DateTime.parse(order['createdAt']))
+                            .toString(),
+                        style: subTitleSmallBPM(),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            buildDescriptionCard(fullName, deliveryAddress),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget buildDescriptionCard(fullName, deliveryAddress) {
+    return GFCard(
+      padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      content: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            fullName,
+            style: titleXLargeBPSB(),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            'Address',
+            style: titleXSmallBPR(),
+          ),
+          Text(
+            deliveryAddress,
+            style: titleLargeBPM(),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            'Items',
+            style: titleXSmallBPR(),
+          ),
+          ListView.builder(
+              physics: ScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: order['cart']['cart'].length,
+              itemBuilder: (BuildContext context, int index) {
+                List products = order['cart']['cart'];
+                return Text(
+                  "${products[index]['productName']} (${products[index]['unit']}) X ${products[index]['quantity']}",
+                  style: titleLargeBPM(),
+                );
+              }),
+          SizedBox(
+            height: 40,
+          ),
+          buildFinalTotalBlock(),
         ],
       ),
+    );
+  }
+
+  Widget buildFinalTotalBlock() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Container(
+            alignment: AlignmentDirectional.center,
+            height: 64,
+            decoration: BoxDecoration(
+                border: Border.all(color: greyB),
+                borderRadius: BorderRadius.circular(10),
+                color: greyA),
+            child: Text(DateFormat("HH:MM a, dd/MM/yyyy")
+                .format(DateTime.parse(order['updatedAt']))
+                .toString()),
+          ),
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        Column(
+          children: <Widget>[
+            Text(
+              'Total',
+              style: titleXSmallBPR(),
+            ),
+            Text(
+              '\$${order['grandTotal']}',
+              style: titleXLargeGPB(),
+            )
+          ],
+        )
+      ],
     );
   }
 }

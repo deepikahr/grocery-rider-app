@@ -8,10 +8,15 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grocerydelivery/models/admin_info.dart';
 import 'package:grocerydelivery/models/location.dart';
 import 'package:grocerydelivery/models/order.dart';
+import 'package:grocerydelivery/models/socket.dart';
+import 'package:grocerydelivery/services/common.dart';
+import 'package:grocerydelivery/services/socket.dart';
 import 'package:grocerydelivery/styles/styles.dart';
+import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Tracking extends StatefulWidget {
   final String orderID;
@@ -21,6 +26,8 @@ class Tracking extends StatefulWidget {
 }
 
 class _TrackingState extends State<Tracking> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   static BitmapDescriptor agentIcon, customerIcon, storeIcon;
   final String googleAPIKey = 'AIzaSyDXxt_aIn5HWQZg3gFYOqcuf8hjUuzmvKg';
   static const double CAMERA_ZOOM = 12;
@@ -35,12 +42,19 @@ class _TrackingState extends State<Tracking> {
   final List<LatLng> polylineCoordinatesForAgentToStore = [];
   final List<LatLng> polylineCoordinatesForStoreToCustomer = [];
   LocationData location;
+  String fullName = '', deliveryAddress = '';
+  SocketService socket;
+  String startButtonText = 'START';
 
   @override
   void initState() {
     setSourceAndDestinationIcons();
     location = Provider.of<LocationModel>(context, listen: false).getLocation;
-    if (location != null) print('----------------------${location.latitude}');
+    if (location != null) {
+      agentLocation = LatLng(location.latitude, location.longitude);
+    } else {
+      agentLocation = LatLng(12.8718, 77.6022);
+    }
     super.initState();
   }
 
@@ -54,20 +68,18 @@ class _TrackingState extends State<Tracking> {
   void setSourceAndDestinationIcons() async {
     agentIcon = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: 2.5),
-        'lib/assets/icons/current.png');
+        'lib/assets/icons/agentpin.png');
     storeIcon = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: 2.5),
-        'lib/assets/icons/current.png');
+        'lib/assets/icons/storepin.png');
     customerIcon = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: 2.5),
-        'lib/assets/icons/locate.png');
+        'lib/assets/icons/homepin.png');
     setLatLng();
   }
 
   void setLatLng() {
-    agentLocation = LatLng(12.8718, 77.6022);
     storeLocation = LatLng(adminLocation['lat'], adminLocation['long']);
-    storeLocation = LatLng(10.8718, 77.6022);
     customerLocation = LatLng(order['deliveryAddress']['location']['lat'],
         order['deliveryAddress']['location']['long']);
     setMapPins();
@@ -147,13 +159,52 @@ class _TrackingState extends State<Tracking> {
     }
   }
 
+  void _initCall(number) async {
+    await canLaunch('tel:$number')
+        ? launch('tel:$number')
+        : Common.showSnackbar(_scaffoldKey, '$number dialing failed');
+  }
+
+  void _launchURL(url) async {
+    await canLaunch(url)
+        ? launch(url)
+        : Common.showSnackbar(_scaffoldKey, '$url lauch failed');
+  }
+
+  void _launchMap(LatLng location) async {
+    var mapSchema = 'geo:${location.latitude},${location.longitude}';
+    if (await canLaunch(mapSchema)) {
+      await launch(mapSchema);
+    } else {
+      _launchURL(
+          'https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    socket = Provider.of<SocketModel>(context, listen: false).getSocketInstance;
     return Scaffold(
+      key: _scaffoldKey,
       body: Consumer<AdminModel>(builder: (context, admin, child) {
         adminLocation = admin.adminLocation;
         return Consumer<OrderModel>(builder: (context, data, child) {
           order = findOrderByID(data.orders, widget.orderID);
+          if (order['orderStatus'] == 'Out for delivery') {
+            startButtonText = 'STARTED';
+          }
+          String firstName = '', lastName = '';
+          if (order['user'] != null && order['user']['firstName'] != null) {
+            firstName = order['user']['firstName'];
+          }
+          if (order['user'] != null && order['user']['lastName'] != null) {
+            lastName = order['user']['lastName'];
+          }
+          fullName = '$firstName $lastName';
+          if (order['deliveryAddress'] != null) {
+            deliveryAddress =
+                '${order['deliveryAddress']['flatNo']}, ${order['deliveryAddress']['apartmentName']}, ${order['deliveryAddress']['address']}';
+          }
           return Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
@@ -173,273 +224,361 @@ class _TrackingState extends State<Tracking> {
                       zoom: CAMERA_ZOOM,
                       bearing: CAMERA_BEARING,
                       tilt: CAMERA_TILT,
-                      target: agentLocation ?? LatLng(11.8718, 77.6022),
+                      target: agentLocation ?? LatLng(12.8718, 77.6022),
                     ),
                   ),
           );
         });
       }),
-      bottomSheet: SolidBottomSheet(
-        headerBar: Container(
-            height: 216,
-            decoration: BoxDecoration(
-              borderRadius: new BorderRadius.only(
-                  topLeft: const Radius.circular(50),
-                  topRight: const Radius.circular(50)),
-              color: primary,
-            ),
-            child: Column(
+      bottomSheet: Consumer<OrderModel>(builder: (context, data, child) {
+        return SolidBottomSheet(
+          headerBar: Container(
+              height: 299,
+              decoration: BoxDecoration(
+                borderRadius: new BorderRadius.only(
+                    topLeft: const Radius.circular(50),
+                    topRight: const Radius.circular(50)),
+                color: primary,
+              ),
+              child: Column(
+                children: <Widget>[
+                  buildTimingInfoBlock(),
+                  buildDirectionBlock(),
+                  buildUserDetailsBlock(),
+                ],
+              )),
+          body: Container(
+            color: Colors.white,
+            child: ListView(
+              shrinkWrap: true,
+              physics: ScrollPhysics(),
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(width: 8),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Date: 02/04/2020',
-                            style: titleWPM(),
-                          ),
-                          Text(
-                            'Time slot: 11 am to 12 pm',
-                            style: titleWPM(),
-                          )
-                        ],
-                      ),
-                    ),
-                    GFButton(
-                      onPressed: () {},
-                      text: '00:30:59',
-                      textStyle: titleRPM(),
-                      icon: Icon(
-                        Icons.timer,
-                        color: Colors.red,
-                      ),
-                      color: Colors.white,
-                      size: GFSize.LARGE,
-                      borderShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ],
-                ),
-                Container(
-                  height: 142,
-                  decoration: BoxDecoration(
-                    borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(50),
-                        topRight: const Radius.circular(50)),
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 18, bottom: 6),
-                        child: Text(
-                          'Order ID: 242424',
-                          style: titleXSmallBPR(),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 16),
-                        height: 78,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: greyB),
-                          color: greyA,
-                        ),
-                        alignment: AlignmentDirectional.center,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    'John Doe',
-                                    style: titleXLargeBPSB(),
-                                  ),
-                                  Text(
-                                    '9765883412',
-                                    style: titleSmallBPR(),
-                                  )
-                                ],
-                              ),
-                              InkWell(
-                                onTap: () {},
-                                child: Container(
-                                  height: 56,
-                                  width: 76,
-                                  decoration: BoxDecoration(
-                                      color: secondary,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  padding: EdgeInsets.all(10),
-                                  child: Image.asset(
-                                    'lib/assets/icons/phone.png',
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                buildAddressBox(),
+                SizedBox(height: 16),
+                buildItemsBlock(),
+                SizedBox(height: 16),
+                buildPaymentInfoBlock(),
+                SizedBox(height: 20),
+                buildDeliveredButton(),
               ],
-            )),
-        body: Container(
-          color: Colors.white,
-          child: ListView(
-            shrinkWrap: true,
-            physics: ScrollPhysics(),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget buildTimingInfoBlock() {
+    return Row(
+      children: <Widget>[
+        Container(width: 8),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 18, bottom: 6),
-                    child: Text(
-                      'Address',
-                      style: titleXSmallBPR(),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16),
-                    height: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: greyB),
-                      color: greyA,
-                    ),
-                    alignment: AlignmentDirectional.center,
-                    child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Text(
-                          "176/18 , 22nd main road, Agara, HSR layout, Bangalore",
-                          style: titleLargeBPM(),
-                        )),
-                  )
-                ],
+              Text(
+                'Date: ${DateFormat("HH:MM a, dd/MM/yyyy").format(DateTime.parse(order['createdAt'])).toString()}',
+                style: titleWPM(),
               ),
-              SizedBox(
-                height: 16,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 18, bottom: 6),
-                    child: Text(
-                      'Items',
-                      style: titleXSmallBPR(),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16),
-                    height: 90,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: greyB),
-                      color: greyA,
-                    ),
-                    alignment: AlignmentDirectional.centerStart,
-                    child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Broccoli (250 gms) X1",
-                              style: titleLargeBPM(),
-                            ),
-                            Text(
-                              "Cheese (200gm) X1",
-                              style: titleLargeBPM(),
-                            )
-                          ],
-                        )),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 18, bottom: 6),
-                    child: Text(
-                      'Payment',
-                      style: titleXSmallBPR(),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16),
-                    height: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: greyB),
-                      color: greyA,
-                    ),
-                    alignment: AlignmentDirectional.center,
-                    child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              "\$65",
-                              style: titleXLargeGPB(),
-                            ),
-                            Container(
-                                height: 50,
-                                child: VerticalDivider(
-                                    color: Colors.black.withOpacity(0.1))),
-                            Text(
-                              "Cash on delivery",
-                              style: titleLargeBPB(),
-                            )
-                          ],
-                        )),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                height: 51,
-                child: GFButton(
-                  onPressed: () {
-//                    Navigator.push( context, MaterialPageRoute(builder: (context) => Entry()), );
-                  },
-                  size: GFSize.LARGE,
-                  text: 'ORDER DELIVERED',
-                  textStyle: titleXLargeWPB(),
-                  color: secondary,
-                  blockButton: true,
-                ),
-              ),
+              Text(
+                'Time slot: ${order['deliveryTime']}',
+                style: titleWPM(),
+              )
             ],
           ),
         ),
+        GFButton(
+          onPressed: () {
+            if (order['orderStatus'] == 'Confirmed') {
+              startButtonText = 'STARTED';
+              Common.showSnackbar(
+                  _scaffoldKey, 'You have updated status to: Out for delivery');
+              socket.updateOrderStatus(
+                  socket.getSocket(), 'Out for delivery', widget.orderID);
+            }
+          },
+          text: startButtonText,
+          textStyle: titleRPM(startButtonText == 'START' ? red : primary),
+          icon: Icon(
+            Icons.timer,
+            color: startButtonText == 'START' ? red : primary,
+          ),
+          color: Colors.white,
+          size: GFSize.LARGE,
+          borderShape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+      ],
+    );
+  }
+
+  Widget buildDirectionBlock() {
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 25, top: 0),
+            child: Text(
+              'Directions: ',
+              style: titleWPM(),
+            ),
+          ),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                GFButton(
+                  onPressed: () {
+                    _launchMap(storeLocation);
+                  },
+                  text: 'TO STORE',
+                  textStyle: titleRPM(red),
+                  icon: Icon(
+                    Icons.directions,
+                    color: red,
+                  ),
+                  color: Colors.white,
+                  size: GFSize.LARGE,
+                  borderShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                ),
+                GFButton(
+                  onPressed: () {
+                    _launchMap(customerLocation);
+                  },
+                  text: 'TO CUSTOMER',
+                  textStyle: titleRPM(red),
+                  icon: Icon(
+                    Icons.directions,
+                    color: Colors.red,
+                  ),
+                  color: Colors.white,
+                  size: GFSize.LARGE,
+                  borderShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                ),
+              ]),
+          SizedBox(height: 10),
+        ]);
+  }
+
+  Widget buildUserDetailsBlock() {
+    return Container(
+      height: 142,
+      decoration: BoxDecoration(
+        borderRadius: new BorderRadius.only(
+            topLeft: const Radius.circular(50),
+            topRight: const Radius.circular(50)),
+        color: Colors.white,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(left: 18, bottom: 6),
+            child: Text(
+              'Order ID: ${order['orderID']}',
+              style: titleXSmallBPR(),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+            height: 78,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: greyB),
+              color: greyA,
+            ),
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        '$fullName',
+                        style: titleXLargeBPSB(),
+                      ),
+                      Text(
+                        order['user']['mobileNumber'] ?? '',
+                        style: titleSmallBPR(),
+                      )
+                    ],
+                  ),
+                  InkWell(
+                    onTap: () {
+                      _initCall(order['user']['mobileNumber'] ?? 0);
+                    },
+                    child: Container(
+                      height: 56,
+                      width: 76,
+                      decoration: BoxDecoration(
+                          color: secondary,
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: EdgeInsets.all(10),
+                      child: Image.asset(
+                        'lib/assets/icons/phone.png',
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
+  }
+
+  Widget buildAddressBox() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 18, bottom: 6),
+          child: Text(
+            'Address',
+            style: titleXSmallBPR(),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 16),
+          // height: 100,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: greyB),
+            color: greyA,
+          ),
+          alignment: AlignmentDirectional.center,
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                "$deliveryAddress",
+                style: titleLargeBPM(),
+              )),
+        )
+      ],
+    );
+  }
+
+  Widget buildItemsBlock() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 18, bottom: 6),
+          child: Text(
+            'Items',
+            style: titleXSmallBPR(),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: greyB),
+            color: greyA,
+          ),
+          alignment: AlignmentDirectional.centerStart,
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  ListView.builder(
+                      physics: ScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: order['cart']['cart'].length,
+                      itemBuilder: (BuildContext context, int index) {
+                        List products = order['cart']['cart'];
+                        return Text(
+                          "${products[index]['productName']} (${products[index]['unit']}) X ${products[index]['quantity']}",
+                          style: titleLargeBPM(),
+                        );
+                      }),
+                ],
+              )),
+        )
+      ],
+    );
+  }
+
+  Widget buildPaymentInfoBlock() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 18, bottom: 6),
+          child: Text(
+            'Payment',
+            style: titleXSmallBPR(),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 16),
+          // height: 80,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: greyB),
+            color: greyA,
+          ),
+          alignment: AlignmentDirectional.center,
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "\$${order['grandTotal']}",
+                    style: titleXLargeGPB(),
+                  ),
+                  Container(
+                      // height: 50,
+                      child: VerticalDivider(
+                          color: Colors.black.withOpacity(0.1))),
+                  Text(
+                    order['paymentType'] == 'COD'
+                        ? 'Cash on delivery'
+                        : 'Stripe',
+                    style: titleLargeBPB(),
+                  )
+                ],
+              )),
+        )
+      ],
+    );
+  }
+
+  Widget buildDeliveredButton() {
+    return order['orderStatus'] == 'Out for delivery'
+        ? Container(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            // height: 51,
+            child: GFButton(
+              onPressed: () {
+                socket.updateOrderStatus(
+                    socket.getSocket(), 'DELIVERED', widget.orderID);
+                Navigator.of(context).pop();
+              },
+              size: GFSize.LARGE,
+              text: 'ORDER DELIVERED',
+              textStyle: titleXLargeWPB(),
+              color: secondary,
+              blockButton: true,
+            ),
+          )
+        : Container();
   }
 }

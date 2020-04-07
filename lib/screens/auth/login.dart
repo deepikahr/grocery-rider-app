@@ -54,7 +54,7 @@ class _LoginState extends State<Login> {
           Common.showSnackbar(_scaffoldKey, onValue['response_data']);
         } else if (onValue['response_code'] == 200 &&
             onValue['response_data']['token'] != null) {
-          if (onValue['response_data']['role'] == 'Staff') {
+          if (onValue['response_data']['role'] == 'Delivery Boy') {
             Common.setToken(onValue['response_data']['token']).then((_) {
               Common.setAccountID(onValue['response_data']['_id']).then((_) {
                 if (mounted) {

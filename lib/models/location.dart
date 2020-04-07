@@ -25,7 +25,6 @@ class LocationModel extends ChangeNotifier {
   void onLocationChange() {
     location.onLocationChanged.listen((LocationData currentLocation) {
       _locationData = currentLocation;
-      print('i am here');
       notifyListeners();
     });
   }
