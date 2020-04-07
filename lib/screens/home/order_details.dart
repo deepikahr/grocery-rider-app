@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:grocerydelivery/models/order.dart';
-import 'package:grocerydelivery/styles/styles.dart';
+import '../../models/order.dart';
+import '../../styles/styles.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';

@@ -1,4 +1,4 @@
-# grocerydelivery
+# Readymade grocery delivery app
 
 A new Flutter application.
 

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:grocerydelivery/services/socket.dart';
+import '../services/socket.dart';
 
 class SocketModel extends ChangeNotifier {
   SocketService _socket;
@@ -8,6 +8,5 @@ class SocketModel extends ChangeNotifier {
 
   void setSocketInstance(SocketService skt) {
     _socket = skt;
-    // notifyListeners();
   }
 }

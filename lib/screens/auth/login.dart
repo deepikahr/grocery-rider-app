@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
-import 'package:grocerydelivery/services/common.dart';
+import '../../services/common.dart';
 import '../../services/auth.dart';
 import '../home/tabs.dart';
 import '../../styles/styles.dart';

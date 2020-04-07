@@ -1,5 +1,5 @@
-import 'package:grocerydelivery/services/common.dart';
-import 'package:grocerydelivery/services/constants.dart';
+import '../services/common.dart';
+import '../services/constants.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {

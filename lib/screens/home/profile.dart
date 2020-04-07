@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:grocerydelivery/models/order.dart';
-import 'package:grocerydelivery/models/socket.dart';
-import 'package:grocerydelivery/screens/auth/login.dart';
-import 'package:grocerydelivery/services/api_service.dart';
-import 'package:grocerydelivery/services/common.dart';
-import 'package:grocerydelivery/services/socket.dart';
-import 'package:grocerydelivery/styles/styles.dart';
+import '../../models/order.dart';
+import '../../models/socket.dart';
+import '../../screens/auth/login.dart';
+import '../../services/api_service.dart';
+import '../../services/common.dart';
+import '../../services/socket.dart';
+import '../../styles/styles.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:provider/provider.dart';
 
