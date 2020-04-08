@@ -279,7 +279,7 @@ class Home extends StatelessWidget {
                 !order['isAcceptedByDeliveryBoy']
             ? GFLoader(type: GFLoaderType.ios)
             : Text(
-                'VIEW DETAILS',
+                'TRACK',
                 style: titleGPB(),
               ),
         textStyle: titleSPB(),
@@ -318,7 +318,7 @@ class Home extends StatelessWidget {
                   order['isAcceptedByDeliveryBoy']
               ? GFLoader(type: GFLoaderType.ios)
               : Text(
-                  'ACCEPT',
+                  'ACCEPT & TRACK',
                   style: titleGPB(),
                 ),
           textStyle: titleSPB(),

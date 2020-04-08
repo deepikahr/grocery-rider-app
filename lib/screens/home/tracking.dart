@@ -302,7 +302,7 @@ class _TrackingState extends State<Tracking> {
           text: startButtonText,
           textStyle: titleRPM(startButtonText == 'START' ? red : primary),
           icon: Icon(
-            Icons.timer,
+            startButtonText == 'START' ? Icons.play_arrow : Icons.check,
             color: startButtonText == 'START' ? red : primary,
           ),
           color: Colors.white,

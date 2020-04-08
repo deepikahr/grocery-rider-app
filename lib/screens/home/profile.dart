@@ -211,8 +211,11 @@ class _ProfileState extends State<Profile> {
           });
         },
         size: GFSize.LARGE,
-        text: 'LOGOUT',
-        textStyle: titleXLargeWPB(),
+        child: Text(
+          'LOGOUT',
+          style: titleGPBSec(),
+        ),
+        type: GFButtonType.outline2x,
         color: secondary,
         blockButton: true,
       ),

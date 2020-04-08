@@ -103,6 +103,15 @@ TextStyle titleGPB() {
   );
 }
 
+TextStyle titleGPBSec() {
+  return new TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 15.0,
+    color: secondary,
+    fontFamily: 'PoppinsBold',
+  );
+}
+
 //..................................poppins regular....................................
 
 TextStyle titleSmallBPR() {
