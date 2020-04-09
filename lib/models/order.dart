@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 
 class OrderModel extends ChangeNotifier {
-  List _orders = [];
+  List _orders;
+  List _delieveredOrders;
 
-  int get ordersLength => _orders.length;
   List get orders => _orders;
+  List get deliveredOrders => _delieveredOrders;
+  int get lengthOfDeliveredOrders => _delieveredOrders.length;
 
   void addOrders(dynamic order) {
     if (order is Map) {
@@ -16,18 +18,18 @@ class OrderModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void add(Map order) {
-    _orders.add(order);
+  void addDelieveredOrders(dynamic order) {
+    if (order is Map) {
+      _delieveredOrders.add(order);
+    }
+    if (order is List) {
+      _delieveredOrders = order;
+    }
     notifyListeners();
   }
 
   void updateOrder(Map order, index) {
     _orders[index] = order;
-    notifyListeners();
-  }
-
-  void removeAll() {
-    _orders.clear();
     notifyListeners();
   }
 }

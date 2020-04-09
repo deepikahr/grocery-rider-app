@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:grocerydelivery/models/admin_info.dart';
-import 'package:grocerydelivery/models/location.dart';
-import 'package:grocerydelivery/models/order.dart';
-import 'package:grocerydelivery/models/socket.dart';
+import 'models/admin_info.dart';
+import 'models/location.dart';
+import 'models/order.dart';
+import 'models/socket.dart';
 import 'package:provider/provider.dart';
 import './styles/styles.dart';
 import './screens/auth/login.dart';
@@ -31,7 +31,7 @@ class _DeliveryAppState extends State<DeliveryApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Grocery-delivery',
+      title: 'Readymade grocery delivery app',
       theme: ThemeData(
         primaryColor: primary,
         accentColor: primary,

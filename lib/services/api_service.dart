@@ -19,4 +19,17 @@ class APIService {
     });
     return json.decode(response.body);
   }
+
+  static Future<Map<String, dynamic>> getUserInfo() async {
+    String token;
+    await Common.getToken().then((onValue) {
+      token = onValue;
+    });
+    final response = await client.get(Constants.BASE_URL + 'users/me',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'bearer $token'
+        });
+    return json.decode(response.body);
+  }
 }

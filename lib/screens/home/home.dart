@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
-import 'package:grocerydelivery/models/location.dart';
-import 'package:grocerydelivery/models/order.dart';
-import 'package:grocerydelivery/models/socket.dart';
-import 'package:grocerydelivery/styles/styles.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:location/location.dart';
-import 'package:provider/provider.dart';
+import '../../models/location.dart';
+import '../../models/order.dart';
+import '../../models/socket.dart';
 import '../../styles/styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'tracking.dart';
 
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Provider.of<LocationModel>(context, listen: false).requestLocation();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primary,
@@ -39,6 +37,15 @@ class Home extends StatelessWidget {
           ),
           Consumer<OrderModel>(
             builder: (context, data, child) {
+              if (data.orders == null) {
+                return Padding(
+                  padding: EdgeInsets.only(top: 50),
+                  child: GFLoader(
+                    type: GFLoaderType.ios,
+                    size: 100,
+                  ),
+                );
+              }
               if (data.orders.length > 0) {
                 return ListView.builder(
                     physics: ScrollPhysics(),
@@ -49,10 +56,19 @@ class Home extends StatelessWidget {
                     });
               } else {
                 return Padding(
-                  padding: EdgeInsets.only(top: 50),
-                  child: GFLoader(
-                    type: GFLoaderType.ios,
-                    size: 100,
+                  padding: EdgeInsets.only(top: 100),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.hourglass_empty,
+                        size: 100,
+                        color: greyB,
+                      ),
+                      Text(
+                        'No active requests found!',
+                        style: titleBPS(),
+                      ),
+                    ],
                   ),
                 );
               }
@@ -102,13 +118,29 @@ class Home extends StatelessWidget {
                   )
                 ],
               ),
+            ],
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Row(
+            children: <Widget>[
+              Container(
+                  height: 15,
+                  child: Icon(
+                    Icons.timer,
+                    color: greyB,
+                    size: 15,
+                  )),
               Text(
-                order['createdAt']
-                    .substring(0, 10)
-                    .split('-')
-                    .reversed
-                    .join('/'),
+                ' Time/Date: ',
                 style: titleXSmallBPR(),
+              ),
+              Text(
+                DateFormat("HH:MM a, dd/MM/yyyy")
+                    .format(DateTime.parse(order['createdAt']))
+                    .toString(),
+                style: titleXSmallBBPR(),
               )
             ],
           ),
@@ -250,7 +282,7 @@ class Home extends StatelessWidget {
                 !order['isAcceptedByDeliveryBoy']
             ? GFLoader(type: GFLoaderType.ios)
             : Text(
-                'VIEW DETAILS',
+                'TRACK',
                 style: titleGPB(),
               ),
         textStyle: titleSPB(),
@@ -289,7 +321,7 @@ class Home extends StatelessWidget {
                   order['isAcceptedByDeliveryBoy']
               ? GFLoader(type: GFLoaderType.ios)
               : Text(
-                  'ACCEPT',
+                  'ACCEPT & TRACK',
                   style: titleGPB(),
                 ),
           textStyle: titleSPB(),
