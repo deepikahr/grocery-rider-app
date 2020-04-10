@@ -79,6 +79,9 @@ class _TrackingState extends State<Tracking> {
   }
 
   void setLatLng() {
+    print(adminLocation);
+    print(order['deliveryAddress']['location']);
+    print(agentLocation);
     storeLocation = LatLng(adminLocation['lat'], adminLocation['long']);
     customerLocation = LatLng(order['deliveryAddress']['location']['lat'],
         order['deliveryAddress']['location']['long']);
@@ -187,7 +190,7 @@ class _TrackingState extends State<Tracking> {
     return Scaffold(
       key: _scaffoldKey,
       body: Consumer<AdminModel>(builder: (context, admin, child) {
-        adminLocation = admin.adminLocation;
+        adminLocation = admin.storeLocation;
         return Consumer<OrderModel>(builder: (context, data, child) {
           order = findOrderByID(data.orders, widget.orderID);
           if (order['orderStatus'] == 'Out for delivery') {
