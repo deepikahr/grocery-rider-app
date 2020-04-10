@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/admin_info.dart';
 import '../../models/location.dart';
 import '../../models/order.dart';
@@ -42,7 +43,7 @@ class _TrackingState extends State<Tracking> {
   final List<LatLng> polylineCoordinatesForAgentToStore = [];
   final List<LatLng> polylineCoordinatesForStoreToCustomer = [];
   LocationData location;
-  String fullName = '', deliveryAddress = '';
+  String fullName = '', deliveryAddress = '', currency;
   SocketService socket;
   String startButtonText = 'START';
 
@@ -66,6 +67,9 @@ class _TrackingState extends State<Tracking> {
       orders.firstWhere((element) => element['_id'] == orderID);
 
   void setSourceAndDestinationIcons() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    currency = prefs.getString('currency');
+
     agentIcon = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: 2.5),
         'lib/assets/icons/agentpin.png');
@@ -538,27 +542,26 @@ class _TrackingState extends State<Tracking> {
           ),
           alignment: AlignmentDirectional.center,
           child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "\$${order['grandTotal']}",
-                    style: titleXLargeGPB(),
-                  ),
-                  Container(
-                      // height: 50,
-                      child: VerticalDivider(
-                          color: Colors.black.withOpacity(0.1))),
-                  Text(
-                    order['paymentType'] == 'COD'
-                        ? 'Cash on delivery'
-                        : 'Stripe',
-                    style: titleLargeBPB(),
-                  )
-                ],
-              )),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "$currency${order['grandTotal']}",
+                  style: titleXLargeGPB(),
+                ),
+                Container(
+                    // height: 50,
+                    child:
+                        VerticalDivider(color: Colors.black.withOpacity(0.1))),
+                Text(
+                  order['paymentType'] == 'COD' ? 'Cash on delivery' : 'Stripe',
+                  style: titleLargeBPB(),
+                )
+              ],
+            ),
+          ),
         )
       ],
     );

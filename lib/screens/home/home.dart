@@ -56,8 +56,9 @@ class Home extends StatelessWidget {
                     });
               } else {
                 return Padding(
-                    padding: EdgeInsets.only(top: 100),
-                    child: Column(children: [
+                  padding: EdgeInsets.only(top: 100),
+                  child: Column(
+                    children: [
                       Icon(
                         Icons.hourglass_empty,
                         size: 100,
@@ -67,7 +68,9 @@ class Home extends StatelessWidget {
                         'No active requests found!',
                         style: titleBPS(),
                       ),
-                    ]));
+                    ],
+                  ),
+                );
               }
             },
           ),
