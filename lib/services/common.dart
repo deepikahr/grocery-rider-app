@@ -42,6 +42,18 @@ class Common {
     return prefs.remove('accountID');
   }
 
+  // save playerId on storage
+  static Future<bool> setPlayerID(String playerId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString('playerId', playerId);
+  }
+
+  // retrive playerId from storage
+  static Future<String> getPlayerId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return Future(() => prefs.getString('playerId'));
+  }
+
   /// Show toaster by passing message and scaffoldkey
   static void showSnackbar(scaffoldKey, message) {
     final snackBar = SnackBar(

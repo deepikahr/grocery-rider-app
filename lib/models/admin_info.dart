@@ -8,15 +8,16 @@ class AdminModel extends ChangeNotifier {
       if (_info['response_data']['location'] != null) {
         print('adm loc ${_info['response_data']['location']}');
         return {
-          'lat': _info['response_data']['location']['coordinates'][0],
-          'long': _info['response_data']['location']['coordinates'][1]
+          'lat': _info['response_data']['location']['lat'],
+          'long': _info['response_data']['location']['lng']
         };
       }
     }
     return {'lat': 12.8718, 'long': 77.6022};
   }
 
-  void update(Map locationInfo) {
+  void updateInfo(Map locationInfo) {
+    print(_info);
     _info = locationInfo;
     notifyListeners();
   }

@@ -48,7 +48,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   void getAdminInfo() async {
     await APIService.getLocationformation().then((info) {
-      Provider.of<AdminModel>(context, listen: false).update(info);
+      print('loc info');
+      print(info);
+      Provider.of<AdminModel>(context, listen: false).updateInfo(info);
     });
   }
 
