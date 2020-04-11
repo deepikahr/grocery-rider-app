@@ -33,23 +33,29 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   void initSocket() async {
     SocketService socket = SocketService();
-    Provider.of<SocketModel>(context, listen: false).setSocketInstance(socket);
-    await Common.getAccountID().then((id) {
-      socket.getSocket().on('assigned-orders$id', (data) {
-        Provider.of<OrderModel>(context, listen: false)
-            .addOrders(data['assignedOrders']);
-      });
-      socket.getSocket().on('delivered-orders$id', (data) {
-        Provider.of<OrderModel>(context, listen: false)
-            .addDelieveredOrders(data['orders']);
+    APIService.getGlobalSettings().then((onValue) async {
+      if (onValue['response_data']['currency'] != null &&
+          onValue['response_data']['currency'][0]['currencySign'] != null) {
+        Provider.of<OrderModel>(context, listen: false).updateCurrency(
+            onValue['response_data']['currency'][0]['currencySign']);
+      }
+      Provider.of<SocketModel>(context, listen: false)
+          .setSocketInstance(socket);
+      await Common.getAccountID().then((id) {
+        socket.getSocket().on('assigned-orders$id', (data) {
+          Provider.of<OrderModel>(context, listen: false)
+              .addOrders(data['assignedOrders']);
+        });
+        socket.getSocket().on('delivered-orders$id', (data) {
+          Provider.of<OrderModel>(context, listen: false)
+              .addDelieveredOrders(data['orders']);
+        });
       });
     });
   }
 
   void getAdminInfo() async {
     await APIService.getLocationformation().then((info) {
-      print('loc info');
-      print(info);
       Provider.of<AdminModel>(context, listen: false).updateInfo(info);
     });
   }

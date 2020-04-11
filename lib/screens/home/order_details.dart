@@ -68,7 +68,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                         style: subTitleLargeBPM(),
                       ),
                       Text(
-                        order['orderID'],
+                        order['orderID'].toString(),
                         style: subTitleSmallBPM(),
                       )
                     ],

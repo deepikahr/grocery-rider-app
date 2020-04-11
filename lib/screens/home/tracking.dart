@@ -79,9 +79,6 @@ class _TrackingState extends State<Tracking> {
   }
 
   void setLatLng() {
-    print(adminLocation);
-    print(order['deliveryAddress']['location']);
-    print(agentLocation);
     storeLocation = LatLng(adminLocation['lat'], adminLocation['long']);
     customerLocation = LatLng(order['deliveryAddress']['location']['lat'],
         order['deliveryAddress']['location']['long']);

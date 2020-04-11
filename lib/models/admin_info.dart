@@ -6,7 +6,6 @@ class AdminModel extends ChangeNotifier {
   Map<String, dynamic> get storeLocation {
     if (_info != null && _info['response_code'] == 200) {
       if (_info['response_data']['location'] != null) {
-        print('adm loc ${_info['response_data']['location']}');
         return {
           'lat': _info['response_data']['location']['lat'],
           'long': _info['response_data']['location']['lng']
@@ -17,7 +16,6 @@ class AdminModel extends ChangeNotifier {
   }
 
   void updateInfo(Map locationInfo) {
-    print(_info);
     _info = locationInfo;
     notifyListeners();
   }

@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
-import 'package:grocerydelivery/models/order.dart';
-import 'package:grocerydelivery/services/api_service.dart';
-import 'package:provider/provider.dart';
 import '../../services/common.dart';
 import '../../services/auth.dart';
 import '../home/tabs.dart';
@@ -25,18 +22,8 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     checkAUthentication();
-    getCurrentInfo();
-    super.initState();
-  }
 
-  getCurrentInfo() async {
-    APIService.getGlobalSettings().then((onValue) {
-      if (onValue['response_data']['currency'] != null &&
-          onValue['response_data']['currency'][0]['currencySign'] != null) {
-        Provider.of<OrderModel>(context, listen: false).updateCurrency(
-            onValue['response_data']['currency'][0]['currencySign']);
-      }
-    });
+    super.initState();
   }
 
   void checkAUthentication() async {
