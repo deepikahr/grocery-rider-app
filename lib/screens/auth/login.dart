@@ -185,6 +185,7 @@ class _LoginState extends State<Login> {
 
   Widget buildEmailTextFormField() {
     return TextFormField(
+      initialValue: "delivery1@ionicfirebaseapp.com",
       cursorColor: primary,
       decoration: InputDecoration(
         filled: true,
@@ -216,6 +217,7 @@ class _LoginState extends State<Login> {
 
   Widget buildPasswordextFormField() {
     return TextFormField(
+      initialValue: "123456",
       cursorColor: primary,
       decoration: InputDecoration(
         filled: true,

@@ -84,8 +84,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                   Row(
                     children: <Widget>[
                       Text(
-                        DateFormat("HH:MM a, dd/MM/yyyy")
-                            .format(DateTime.parse(order['createdAt']))
+                        DateFormat('hh:mm a, dd/MM/yyyy')
+                            .format(DateTime.fromMillisecondsSinceEpoch(
+                                order['appTimestamp']))
                             .toString(),
                         style: subTitleSmallBPM(),
                       )
