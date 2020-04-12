@@ -280,7 +280,7 @@ class _TrackingState extends State<Tracking> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Date: ${DateFormat("HH:MM a, dd/MM/yyyy").format(DateTime.parse(order['createdAt'])).toString()}',
+                'Date: ${DateFormat('hh:mm a, dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(order['appTimestamp'])).toString()}',
                 style: titleWPM(),
               ),
               Text(
