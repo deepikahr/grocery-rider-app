@@ -23,6 +23,7 @@ dependencies:
   url_launcher: ^5.4.2
   intl: ^0.16.1
   onesignal_flutter: ^2.3.4
+  flutter_i18n: ^0.13.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -46,6 +47,9 @@ flutter:
     - lib/assets/icons/agentpin.png
     - lib/assets/icons/storepin.png
     - lib/assets/icons/timer.png
+    - lib/assets/i18n/en.json
+    - lib/assets/i18n/ar.json
+    - lib/assets/i18n/fr.json
 
   fonts:
     - family: PoppinsBold

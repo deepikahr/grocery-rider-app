@@ -11,3 +11,5 @@ class Constants {
   // URL for socket usage
   static final String socketUrl = BASE_URL.substring(0, BASE_URL.length - 1);
 }
+
+List<String> languages = ['en', 'fr', 'ar'];

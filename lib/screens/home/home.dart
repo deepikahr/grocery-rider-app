@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
+import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/location.dart';
 import '../../models/order.dart';
 import '../../models/socket.dart';
@@ -10,6 +12,10 @@ import 'package:provider/provider.dart';
 import 'tracking.dart';
 
 class Home extends StatelessWidget {
+  final Map<String, Map<String, String>> localizedValues;
+  final String locale;
+  Home({Key key, this.localizedValues, this.locale}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     Provider.of<LocationModel>(context, listen: false).requestLocation();
@@ -17,7 +23,7 @@ class Home extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          'Home',
+          MyLocalizations.of(context).home,
           style: titleWPS(),
         ),
         centerTitle: true,
@@ -31,7 +37,7 @@ class Home extends StatelessWidget {
               left: 16,
             ),
             child: Text(
-              'Active requests',
+              MyLocalizations.of(context).activeRequests,
               style: titleBPS(),
             ),
           ),
@@ -40,10 +46,7 @@ class Home extends StatelessWidget {
               if (data == null || data.orders == null) {
                 return Padding(
                   padding: EdgeInsets.only(top: 50),
-                  child: GFLoader(
-                    type: GFLoaderType.ios,
-                    size: 100,
-                  ),
+                  child: SquareLoader()
                 );
               } else if (data.orders.length > 0) {
                 return ListView.builder(
@@ -51,7 +54,7 @@ class Home extends StatelessWidget {
                     shrinkWrap: true,
                     itemCount: data.orders.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return buildOrderCard(data.orders[index], index);
+                      return buildOrderCard(data.orders[index], index, context);
                     });
               } else {
                 return Padding(
@@ -64,7 +67,7 @@ class Home extends StatelessWidget {
                         color: greyB,
                       ),
                       Text(
-                        'No active requests found!',
+                        MyLocalizations.of(context).noActiveRequests,
                         style: titleBPS(),
                       ),
                     ],
@@ -78,7 +81,7 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget buildOrderCard(order, index) {
+  Widget buildOrderCard(order, index, context) {
     String fullName = '', firstName = '', lastName = '', deliveryAddress = '';
     if (order['user'] != null && order['user']['firstName'] != null) {
       firstName = order['user']['firstName'];
@@ -108,7 +111,7 @@ class Home extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Customer: ',
+                    MyLocalizations.of(context).customer,
                     style: titleXSmallBPR(),
                   ),
                   Text(
@@ -132,7 +135,7 @@ class Home extends StatelessWidget {
                     size: 15,
                   )),
               Text(
-                ' Time/Date: ',
+                MyLocalizations.of(context).timeDate,
                 style: titleXSmallBPR(),
               ),
               Text(
@@ -156,7 +159,7 @@ class Home extends StatelessWidget {
                 ),
               ),
               Text(
-                'Order ID: ',
+                MyLocalizations.of(context).orderId,
                 style: titleXSmallBPR(),
               ),
               Text(
@@ -178,7 +181,7 @@ class Home extends StatelessWidget {
               ),
               Row(children: [
                 Text(
-                  'Address: ',
+                  MyLocalizations.of(context).address,
                   style: titleXSmallBPR(),
                 ),
                 SizedBox(width: 20),
@@ -251,9 +254,9 @@ class Home extends StatelessWidget {
           child: order['isLoading'] != null &&
                   order['isLoading'] &&
                   !order['isAcceptedByDeliveryBoy']
-              ? GFLoader(type: GFLoaderType.ios)
+              ? SquareLoader()
               : Text(
-                  'REJECT',
+            MyLocalizations.of(context).REJECT,
                   style: titleGPB(),
                 ),
           color: greyB,
@@ -280,9 +283,9 @@ class Home extends StatelessWidget {
         child: order['isLoading'] != null &&
                 order['isLoading'] &&
                 !order['isAcceptedByDeliveryBoy']
-            ? GFLoader(type: GFLoaderType.ios)
+            ? SquareLoader()
             : Text(
-                'TRACK',
+          MyLocalizations.of(context).TRACK,
                 style: titleGPB(),
               ),
         textStyle: titleSPB(),
@@ -319,9 +322,9 @@ class Home extends StatelessWidget {
           child: order['isLoading'] != null &&
                   order['isLoading'] &&
                   order['isAcceptedByDeliveryBoy']
-              ? GFLoader(type: GFLoaderType.ios)
+              ? SquareLoader()
               : Text(
-                  'ACCEPT & TRACK',
+            MyLocalizations.of(context).ACCEPTTRACK,
                   style: titleGPB(),
                 ),
           textStyle: titleSPB(),
