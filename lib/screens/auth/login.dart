@@ -1,12 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
+import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/loader.dart';
 import '../../services/common.dart';
 import '../../services/auth.dart';
 import '../home/tabs.dart';
 import '../../styles/styles.dart';
 
 class Login extends StatefulWidget {
+  final Map<String, Map<String, String>> localizedValues;
+  final String locale;
+  Login({Key key, this.localizedValues, this.locale}) : super(key: key);
   @override
   _LoginState createState() => _LoginState();
 }
@@ -22,7 +27,6 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     checkAUthentication();
-
     super.initState();
   }
 
@@ -32,7 +36,10 @@ class _LoginState extends State<Login> {
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-              builder: (BuildContext context) => Tabs(),
+              builder: (BuildContext context) => Tabs(
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues
+              ),
             ),
             (Route<dynamic> route) => false);
       } else {
@@ -67,7 +74,10 @@ class _LoginState extends State<Login> {
                     Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (BuildContext context) => Tabs(),
+                          builder: (BuildContext context) => Tabs(
+                              locale: widget.locale,
+                              localizedValues: widget.localizedValues
+                          ),
                         ),
                         (Route<dynamic> route) => false);
                   }
@@ -75,11 +85,11 @@ class _LoginState extends State<Login> {
               });
             } else {
               Common.showSnackbar(_scaffoldKey,
-                  '$email is not authorised to login to Delivery App.');
+                  '$email ${MyLocalizations.of(context).authorizationError}');
             }
           } else {
             Common.showSnackbar(_scaffoldKey,
-                'Something went wrong!, Received Data was in wrong format!');
+                MyLocalizations.of(context).wrongFormat);
           }
           setState(() {
             isLoading = false;
@@ -119,17 +129,14 @@ class _LoginState extends State<Login> {
                 )),
                 Center(
                   child: Text(
-                    'Grocery Delivery',
+                    MyLocalizations.of(context).groceryDelivery,
                     style: titleLargePPB(),
                   ),
                 ),
                 SizedBox(height: 50),
                 Padding(
                   padding: EdgeInsets.only(top: 50),
-                  child: GFLoader(
-                    type: GFLoaderType.ios,
-                    size: 70,
-                  ),
+                  child: SquareLoader()
                 )
               ],
             )
@@ -154,18 +161,18 @@ class _LoginState extends State<Login> {
                                 height: 60,
                               )),
                               Center(
-                                  child: Text('Grocery Delivery',
+                                  child: Text(MyLocalizations.of(context).groceryDelivery,
                                       style: titleLargePPB())),
                               SizedBox(height: 50),
                               Text(
-                                'Email',
+                                MyLocalizations.of(context).emailId,
                                 style: titleSmallBPR(),
                               ),
                               SizedBox(height: 10),
                               buildEmailTextFormField(),
                               SizedBox(height: 25),
                               Text(
-                                'Password',
+                                MyLocalizations.of(context).password,
                                 style: titleSmallBPR(),
                               ),
                               SizedBox(height: 10),
@@ -205,7 +212,7 @@ class _LoginState extends State<Login> {
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty || !RegExp(Common.emailPattern).hasMatch(value)) {
-          return 'Please enter a valid email';
+          return MyLocalizations.of(context).errorEmail;
         } else
           return null;
       },
@@ -238,7 +245,7 @@ class _LoginState extends State<Login> {
       obscureText: true,
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
-          return 'Password should be atleast 6 char long';
+          return MyLocalizations.of(context).errorPassword;
         } else
           return null;
       },
@@ -259,11 +266,9 @@ class _LoginState extends State<Login> {
           },
           size: GFSize.LARGE,
           child: isLoading
-              ? GFLoader(
-                  type: GFLoaderType.ios,
-                )
+              ? SquareLoader()
               : Text(
-                  'LOGIN',
+            MyLocalizations.of(context).LOGIN,
                   style: titleXLargeWPB(),
                 ),
           color: secondary,

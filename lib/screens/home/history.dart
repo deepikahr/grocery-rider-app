@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
+import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/order.dart';
 import '../../styles/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,13 +10,17 @@ import 'package:provider/provider.dart';
 import 'order_details.dart';
 
 class History extends StatelessWidget {
+  final Map<String, Map<String, String>> localizedValues;
+  final String locale;
+  History({Key key, this.localizedValues, this.locale}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          'History',
+          MyLocalizations.of(context).history,
           style: titleWPS(),
         ),
         centerTitle: true,
@@ -28,7 +34,7 @@ class History extends StatelessWidget {
               left: 16,
             ),
             child: Text(
-              'Completed requests',
+              MyLocalizations.of(context).completedRequests,
               style: titleBPS(),
             ),
           ),
@@ -37,10 +43,7 @@ class History extends StatelessWidget {
               if (data.deliveredOrders == null) {
                 return Padding(
                   padding: EdgeInsets.only(top: 50),
-                  child: GFLoader(
-                    type: GFLoaderType.ios,
-                    size: 100,
-                  ),
+                  child: SquareLoader(),
                 );
               }
               if (data.deliveredOrders.length > 0) {
@@ -62,7 +65,7 @@ class History extends StatelessWidget {
                         color: greyB,
                       ),
                       Text(
-                        'No delivered orders found!',
+                        MyLocalizations.of(context).noDeliveredOrders,
                         style: titleBPS(),
                       ),
                     ]));
@@ -110,7 +113,7 @@ class History extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Customer: ',
+                      MyLocalizations.of(context).customer,
                       style: titleXSmallBPR(),
                     ),
                     Text(
@@ -133,7 +136,7 @@ class History extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Order ID: ',
+                  MyLocalizations.of(context).orderId,
                   style: titleXSmallBPR(),
                 ),
                 Text(
@@ -155,7 +158,7 @@ class History extends StatelessWidget {
                       size: 15,
                     )),
                 Text(
-                  ' Time/Date: ',
+                  MyLocalizations.of(context).timeDate,
                   style: titleXSmallBPR(),
                 ),
                 Text(

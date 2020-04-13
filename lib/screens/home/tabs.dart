@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
+import 'package:grocerydelivery/services/localizations.dart';
 import '../../models/admin_info.dart';
 import '../../models/order.dart';
 import '../../models/socket.dart';
@@ -14,6 +15,9 @@ import 'history.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Tabs extends StatefulWidget {
+  final Map<String, Map<String, String>> localizedValues;
+  final String locale;
+  Tabs({Key key, this.localizedValues, this.locale}) : super(key: key);
   @override
   _TabsState createState() => _TabsState();
 }
@@ -66,9 +70,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       body: GFTabBarView(
         controller: tabController,
         children: <Widget>[
-          Home(),
-          Profile(),
-          History(),
+          Home( locale: widget.locale, localizedValues: widget.localizedValues),
+          Profile( locale: widget.locale, localizedValues: widget.localizedValues),
+          History( locale: widget.locale, localizedValues: widget.localizedValues),
         ],
       ),
       bottomNavigationBar: GFTabBar(
@@ -87,21 +91,21 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               'lib/assets/icons/home.svg',
               color: primary,
             ),
-            text: 'Home',
+            text: MyLocalizations.of(context).home,
           ),
           Tab(
             icon: SvgPicture.asset(
               'lib/assets/icons/profile.svg',
               color: primary,
             ),
-            text: 'Profile',
+            text: MyLocalizations.of(context).profile,
           ),
           Tab(
             icon: SvgPicture.asset(
               'lib/assets/icons/history.svg',
               color: primary,
             ),
-            text: 'History',
+            text: MyLocalizations.of(context).history,
           ),
         ],
       ),

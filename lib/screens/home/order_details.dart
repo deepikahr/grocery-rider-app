@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:grocerydelivery/services/localizations.dart';
 import '../../models/order.dart';
 import '../../styles/styles.dart';
 import 'package:getflutter/getflutter.dart';
@@ -30,7 +31,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          'Order Details',
+          MyLocalizations.of(context).orderDetails,
           style: titleWPS(),
         ),
         centerTitle: true,
@@ -64,7 +65,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   Row(
                     children: <Widget>[
                       Text(
-                        '# Order ID: ',
+                        '# ${MyLocalizations.of(context).orderId}',
                         style: subTitleLargeBPM(),
                       ),
                       Text(
@@ -117,7 +118,7 @@ class _OrderDetailsState extends State<OrderDetails> {
             height: 20,
           ),
           Text(
-            'Address',
+            MyLocalizations.of(context).address,
             style: titleXSmallBPR(),
           ),
           Text(
@@ -128,7 +129,7 @@ class _OrderDetailsState extends State<OrderDetails> {
             height: 20,
           ),
           Text(
-            'Items',
+            MyLocalizations.of(context).items,
             style: titleXSmallBPR(),
           ),
           ListView.builder(
@@ -145,13 +146,13 @@ class _OrderDetailsState extends State<OrderDetails> {
           SizedBox(
             height: 40,
           ),
-          buildFinalTotalBlock(),
+          buildFinalTotalBlock(context),
         ],
       ),
     );
   }
 
-  Widget buildFinalTotalBlock() {
+  Widget buildFinalTotalBlock(context) {
     return Row(
       children: <Widget>[
         Expanded(
@@ -173,7 +174,7 @@ class _OrderDetailsState extends State<OrderDetails> {
         Column(
           children: <Widget>[
             Text(
-              'Total',
+              MyLocalizations.of(context).total,
               style: titleXSmallBPR(),
             ),
             Text(

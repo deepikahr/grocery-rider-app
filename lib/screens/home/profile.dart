@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:grocerydelivery/main.dart';
+import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/order.dart';
 import '../../models/socket.dart';
 import '../../screens/auth/login.dart';
@@ -8,8 +11,12 @@ import '../../services/socket.dart';
 import '../../styles/styles.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
+  final Map<String, Map<String, String>> localizedValues;
+  final String locale;
+  Profile({Key key, this.localizedValues, this.locale}) : super(key: key);
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -22,11 +29,43 @@ class _ProfileState extends State<Profile> {
   TextEditingController emailController = TextEditingController();
   SocketService socket;
 
+  var dropdownValue;
+
+  String getLang;
+  Map<String, Map<String, String>> localizedValues;
+
+  String selectedLanguages, selectedLang;
+
+  List<String> languages = [
+    'English',
+    'French',
+    'Arabic'
+  ];
+
+  var selectedLanguage, selectedLocale;
+
   @override
   void initState() {
     socket = Provider.of<SocketModel>(context, listen: false).getSocketInstance;
     getProfileInfo();
+    getLanguages();
     super.initState();
+  }
+
+  getLanguages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        selectedLanguage = prefs.getString('selectedLanguage');
+      });
+    }
+    if (selectedLanguage == 'en') {
+      selectedLocale = 'English';
+    } else if (selectedLanguage == 'fr') {
+      selectedLocale = 'French';
+    }else if (selectedLanguage == 'ar') {
+      selectedLocale = 'Arabic';
+    }
   }
 
   void getProfileInfo() {
@@ -61,7 +100,7 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          'Profile',
+          MyLocalizations.of(context).profile,
           style: titleWPS(),
         ),
         centerTitle: true,
@@ -73,10 +112,7 @@ class _ProfileState extends State<Profile> {
           profileInfo == null
               ? Padding(
                   padding: EdgeInsets.only(top: 50),
-                  child: GFLoader(
-                    type: GFLoaderType.ios,
-                    size: 100,
-                  ),
+                  child: SquareLoader(),
                 )
               : profileInfo == {}
                   ? buildLogoutButton()
@@ -96,7 +132,7 @@ class _ProfileState extends State<Profile> {
                           ),
                           SizedBox(height: 30),
                           Text(
-                            'Username',
+                            MyLocalizations.of(context).userName,
                             style: titleSmallBPR(),
                           ),
                           SizedBox(
@@ -124,7 +160,7 @@ class _ProfileState extends State<Profile> {
                             height: 25,
                           ),
                           Text(
-                            'Email ID',
+                            MyLocalizations.of(context).emailId,
                             style: titleSmallBPR(),
                           ),
                           SizedBox(
@@ -152,7 +188,7 @@ class _ProfileState extends State<Profile> {
                             height: 25,
                           ),
                           Text(
-                            'Mobile Number',
+                            MyLocalizations.of(context).mobileNumber,
                             style: titleSmallBPR(),
                           ),
                           SizedBox(
@@ -178,7 +214,7 @@ class _ProfileState extends State<Profile> {
                           ),
                           SizedBox(height: 25),
                           Text(
-                            'Orders completed',
+                            MyLocalizations.of(context).ordersCompleted,
                             style: titleSmallBPR(),
                           ),
                           SizedBox(
@@ -202,6 +238,86 @@ class _ProfileState extends State<Profile> {
                               ),
                             ),
                           ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                MyLocalizations.of(context).selectLanguages,
+                                style: titleSmallBPR(),
+                              ),
+                              DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                  hint: Text(selectedLocale == null
+                                      ? 'English'
+                                      : selectedLocale),
+                                  value: selectedLanguages,
+                                  onChanged: (newValue) async {
+                                    if (newValue == 'English') {
+                                      SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                      if (mounted) {
+                                        setState(() {
+                                          prefs.setString('selectedLanguage', 'en');
+                                        });
+                                      }
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (BuildContext context) => DeliveryApp(
+                                              widget.locale,
+                                              widget.localizedValues,
+                                            ),
+                                          ),
+                                              (Route<dynamic> route) => false);
+                                    }else if (newValue == 'Arabic') {
+                                      SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                      if (mounted) {
+                                        setState(() {
+                                          prefs.setString('selectedLanguage', 'ar');
+                                        });
+                                      }
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (BuildContext context) => DeliveryApp(
+                                              widget.locale,
+                                              widget.localizedValues,
+                                            ),
+                                          ),
+                                              (Route<dynamic> route) => false);
+                                    }else {
+                                      SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                      if (mounted) {
+                                        setState(() {
+                                          prefs.setString('selectedLanguage', 'fr');
+                                        });
+                                      }
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (BuildContext context) => DeliveryApp(
+                                              widget.locale,
+                                              widget.localizedValues,
+                                            ),
+                                          ),
+                                              (Route<dynamic> route) => false);
+                                    }
+                                  },
+                                  items: languages.map((lang) {
+                                    return DropdownMenuItem(
+                                      child: new Text(lang),
+                                      value: lang,
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          ),
                           SizedBox(height: 30),
                           buildLogoutButton(),
                         ],
@@ -223,7 +339,10 @@ class _ProfileState extends State<Profile> {
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => Login(),
+                    builder: (BuildContext context) => Login(
+                        locale: widget.locale,
+                        localizedValues: widget.localizedValues
+                    ),
                   ),
                   (Route<dynamic> route) => false);
             });
@@ -231,7 +350,7 @@ class _ProfileState extends State<Profile> {
         },
         size: GFSize.LARGE,
         child: Text(
-          'LOGOUT',
+          MyLocalizations.of(context).LOGOUT,
           style: titleGPBSec(),
         ),
         type: GFButtonType.outline2x,

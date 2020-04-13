@@ -6,6 +6,8 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grocerydelivery/services/constants.dart';
+import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/admin_info.dart';
 import '../../models/location.dart';
 import '../../models/order.dart';
@@ -210,9 +212,7 @@ class _TrackingState extends State<Tracking> {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             child: data == null
-                ? GFLoader(
-                    type: GFLoaderType.ios,
-                  )
+                ? SquareLoader()
                 : GoogleMap(
                     onMapCreated: _onMapCreated,
                     myLocationEnabled: true,
@@ -280,11 +280,11 @@ class _TrackingState extends State<Tracking> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Date: ${DateFormat('hh:mm a, dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(order['appTimestamp'])).toString()}',
+                '${MyLocalizations.of(context).date} ${DateFormat('hh:mm a, dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(order['appTimestamp'])).toString()}',
                 style: titleWPM(),
               ),
               Text(
-                'Time slot: ${order['deliveryTime']}',
+                '${MyLocalizations.of(context).timeSlot} ${order['deliveryTime']}',
                 style: titleWPM(),
               )
             ],
@@ -323,7 +323,7 @@ class _TrackingState extends State<Tracking> {
           Padding(
             padding: EdgeInsets.only(left: 25, top: 0),
             child: Text(
-              'Directions: ',
+              MyLocalizations.of(context).directions,
               style: titleWPM(),
             ),
           ),
@@ -334,7 +334,7 @@ class _TrackingState extends State<Tracking> {
                   onPressed: () {
                     _launchMap(storeLocation);
                   },
-                  text: 'TO STORE',
+                  text: MyLocalizations.of(context).toStore,
                   textStyle: titleRPM(red),
                   icon: Icon(
                     Icons.directions,
@@ -349,7 +349,7 @@ class _TrackingState extends State<Tracking> {
                   onPressed: () {
                     _launchMap(customerLocation);
                   },
-                  text: 'TO CUSTOMER',
+                  text: MyLocalizations.of(context).toCustomer,
                   textStyle: titleRPM(red),
                   icon: Icon(
                     Icons.directions,
@@ -381,7 +381,7 @@ class _TrackingState extends State<Tracking> {
           Padding(
             padding: const EdgeInsets.only(left: 18, bottom: 6),
             child: Text(
-              'Order ID: ${order['orderID']}',
+              '${MyLocalizations.of(context).orderId} ${order['orderID']}',
               style: titleXSmallBPR(),
             ),
           ),
@@ -446,7 +446,7 @@ class _TrackingState extends State<Tracking> {
         Padding(
           padding: const EdgeInsets.only(left: 18, bottom: 6),
           child: Text(
-            'Address',
+            MyLocalizations.of(context).address,
             style: titleXSmallBPR(),
           ),
         ),
@@ -478,7 +478,7 @@ class _TrackingState extends State<Tracking> {
         Padding(
           padding: const EdgeInsets.only(left: 18, bottom: 6),
           child: Text(
-            'Items',
+            MyLocalizations.of(context).items,
             style: titleXSmallBPR(),
           ),
         ),
@@ -522,7 +522,7 @@ class _TrackingState extends State<Tracking> {
         Padding(
           padding: const EdgeInsets.only(left: 18, bottom: 6),
           child: Text(
-            'Payment',
+            MyLocalizations.of(context).payment,
             style: titleXSmallBPR(),
           ),
         ),
@@ -573,7 +573,7 @@ class _TrackingState extends State<Tracking> {
                 Navigator.of(context).pop();
               },
               size: GFSize.LARGE,
-              text: 'ORDER DELIVERED',
+              text: MyLocalizations.of(context).orderDelivered,
               textStyle: titleXLargeWPB(),
               color: secondary,
               blockButton: true,
