@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:grocerydelivery/services/common.dart';
+import 'package:grocerydelivery/services/constants.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'models/admin_info.dart';
 import 'models/location.dart';
 import 'models/order.dart';
@@ -8,6 +11,8 @@ import './styles/styles.dart';
 import './screens/auth/login.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  initPlatformPlayerState();
   runApp(
     MultiProvider(
       providers: [
@@ -19,6 +24,25 @@ void main() {
       child: DeliveryApp(),
     ),
   );
+}
+
+void initPlatformPlayerState() async {
+  var settings = {
+    OSiOSSettings.autoPrompt: true,
+    OSiOSSettings.promptBeforeOpeningPushUrl: true
+  };
+  OneSignal.shared
+      .setNotificationReceivedHandler((OSNotification notification) {});
+  OneSignal.shared
+      .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
+  await OneSignal.shared.init(Constants.ONE_SIGNAL_KEY, iOSSettings: settings);
+  OneSignal.shared
+      .promptUserForPushNotificationPermission(fallbackToSettings: true);
+  OneSignal.shared
+      .setInFocusDisplayType(OSNotificationDisplayType.notification);
+  var status = await OneSignal.shared.getPermissionSubscriptionState();
+  String playerId = status.subscriptionStatus.userId;
+  await Common.setPlayerID(playerId).then((onValue) {});
 }
 
 class DeliveryApp extends StatefulWidget {

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:grocerydelivery/services/constants.dart';
 import '../../models/admin_info.dart';
 import '../../models/location.dart';
 import '../../models/order.dart';
@@ -30,7 +30,6 @@ class _TrackingState extends State<Tracking> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   static BitmapDescriptor agentIcon, customerIcon, storeIcon;
-  final String googleAPIKey = 'AIzaSyDXxt_aIn5HWQZg3gFYOqcuf8hjUuzmvKg';
   static const double CAMERA_ZOOM = 12;
   static const double CAMERA_TILT = 0;
   static const double CAMERA_BEARING = 30;
@@ -67,9 +66,6 @@ class _TrackingState extends State<Tracking> {
       orders.firstWhere((element) => element['_id'] == orderID);
 
   void setSourceAndDestinationIcons() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    currency = prefs.getString('currency');
-
     agentIcon = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: 2.5),
         'lib/assets/icons/agentpin.png');
@@ -115,7 +111,7 @@ class _TrackingState extends State<Tracking> {
   void setPolylines() async {
     List<PointLatLng> agentToStore =
         await polylinePoints?.getRouteBetweenCoordinates(
-      googleAPIKey,
+      Constants.GOOGLE_API_KEY,
       agentLocation.latitude,
       agentLocation.longitude,
       storeLocation.latitude,
@@ -129,7 +125,7 @@ class _TrackingState extends State<Tracking> {
     }
     List<PointLatLng> storeToCustomer =
         await polylinePoints?.getRouteBetweenCoordinates(
-      googleAPIKey,
+      Constants.GOOGLE_API_KEY,
       storeLocation.latitude,
       storeLocation.longitude,
       customerLocation.latitude,
@@ -191,9 +187,10 @@ class _TrackingState extends State<Tracking> {
     return Scaffold(
       key: _scaffoldKey,
       body: Consumer<AdminModel>(builder: (context, admin, child) {
-        adminLocation = admin.adminLocation;
+        adminLocation = admin.storeLocation;
         return Consumer<OrderModel>(builder: (context, data, child) {
           order = findOrderByID(data.orders, widget.orderID);
+          currency = data.currency;
           if (order['orderStatus'] == 'Out for delivery') {
             startButtonText = 'STARTED';
           }
@@ -283,7 +280,7 @@ class _TrackingState extends State<Tracking> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Date: ${DateFormat("HH:MM a, dd/MM/yyyy").format(DateTime.parse(order['createdAt'])).toString()}',
+                'Date: ${DateFormat('hh:mm a, dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(order['appTimestamp'])).toString()}',
                 style: titleWPM(),
               ),
               Text(

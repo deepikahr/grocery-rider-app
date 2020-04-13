@@ -43,6 +43,15 @@ class _ProfileState extends State<Profile> {
           emailController.text = profileInfo['email'] ?? '';
         });
       }
+      if (value['statusCode'] == 401) {
+        setState(() {
+          profileInfo = {};
+        });
+      }
+    }).catchError((e) {
+      setState(() {
+        profileInfo = {};
+      });
     });
   }
 
@@ -69,125 +78,135 @@ class _ProfileState extends State<Profile> {
                     size: 100,
                   ),
                 )
-              : Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      SizedBox(height: 30),
-                      Center(
-                        child: GFAvatar(
-                          backgroundImage: NetworkImage(profileInfo[
-                                  'profilePic'] ??
-                              'https://cdn.pixabay.com/photo/2020/03/12/19/55/northern-gannet-4926108__340.jpg'),
-                          radius: 60,
-                        ),
-                      ),
-                      SizedBox(height: 30),
-                      Text(
-                        'Username',
-                        style: titleSmallBPR(),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        enabled: false,
-                        controller: nameController,
-                        cursorColor: primary,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: greyA,
-                          contentPadding: EdgeInsets.all(15),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: greyA, width: 1.0),
+              : profileInfo == {}
+                  ? buildLogoutButton()
+                  : Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(height: 30),
+                          Center(
+                            child: GFAvatar(
+                              backgroundImage: NetworkImage(profileInfo[
+                                      'profilePic'] ??
+                                  'https://cdn.pixabay.com/photo/2020/03/12/19/55/northern-gannet-4926108__340.jpg'),
+                              radius: 60,
+                            ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: greyA, width: 1.0),
+                          SizedBox(height: 30),
+                          Text(
+                            'Username',
+                            style: titleSmallBPR(),
                           ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 25,
-                      ),
-                      Text(
-                        'Email ID',
-                        style: titleSmallBPR(),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        cursorColor: primary,
-                        controller: emailController,
-                        enabled: false,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: greyA,
-                          contentPadding: EdgeInsets.all(15),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: greyA, width: 1.0),
+                          SizedBox(
+                            height: 10,
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: greyA, width: 1.0),
+                          TextFormField(
+                            enabled: false,
+                            controller: nameController,
+                            cursorColor: primary,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: greyA,
+                              contentPadding: EdgeInsets.all(15),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: greyA, width: 1.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: greyA, width: 1.0),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 25,
-                      ),
-                      Text(
-                        'Mobile Number',
-                        style: titleSmallBPR(),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        cursorColor: primary,
-                        controller: numberController,
-                        enabled: false,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: greyA,
-                          contentPadding: EdgeInsets.all(15),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: greyA, width: 1.0),
+                          SizedBox(
+                            height: 25,
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: greyA, width: 1.0),
+                          Text(
+                            'Email ID',
+                            style: titleSmallBPR(),
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      Text(
-                        'Orders completed',
-                        style: titleSmallBPR(),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      TextFormField(
-                        cursorColor: primary,
-                        enabled: false,
-                        controller: countController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: greyA,
-                          contentPadding: EdgeInsets.all(15),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: greyA, width: 1.0),
+                          SizedBox(
+                            height: 10,
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: greyA, width: 1.0),
+                          TextFormField(
+                            cursorColor: primary,
+                            controller: emailController,
+                            enabled: false,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: greyA,
+                              contentPadding: EdgeInsets.all(15),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: greyA, width: 1.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: greyA, width: 1.0),
+                              ),
+                            ),
                           ),
-                        ),
+                          SizedBox(
+                            height: 25,
+                          ),
+                          Text(
+                            'Mobile Number',
+                            style: titleSmallBPR(),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          TextFormField(
+                            cursorColor: primary,
+                            controller: numberController,
+                            enabled: false,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: greyA,
+                              contentPadding: EdgeInsets.all(15),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: greyA, width: 1.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: greyA, width: 1.0),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 25),
+                          Text(
+                            'Orders completed',
+                            style: titleSmallBPR(),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          TextFormField(
+                            cursorColor: primary,
+                            enabled: false,
+                            controller: countController,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: greyA,
+                              contentPadding: EdgeInsets.all(15),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: greyA, width: 1.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: greyA, width: 1.0),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          buildLogoutButton(),
+                        ],
                       ),
-                      SizedBox(height: 30),
-                      buildLogoutButton(),
-                    ],
-                  ),
-                ),
+                    ),
         ],
       ),
     );

@@ -37,7 +37,7 @@ class Home extends StatelessWidget {
           ),
           Consumer<OrderModel>(
             builder: (context, data, child) {
-              if (data.orders == null) {
+              if (data == null || data.orders == null) {
                 return Padding(
                   padding: EdgeInsets.only(top: 50),
                   child: GFLoader(
@@ -45,8 +45,7 @@ class Home extends StatelessWidget {
                     size: 100,
                   ),
                 );
-              }
-              if (data.orders.length > 0) {
+              } else if (data.orders.length > 0) {
                 return ListView.builder(
                     physics: ScrollPhysics(),
                     shrinkWrap: true,
@@ -137,8 +136,9 @@ class Home extends StatelessWidget {
                 style: titleXSmallBPR(),
               ),
               Text(
-                DateFormat("HH:MM a, dd/MM/yyyy")
-                    .format(DateTime.parse(order['createdAt']))
+                DateFormat('hh:mm a, dd/MM/yyyy')
+                    .format(DateTime.fromMillisecondsSinceEpoch(
+                        order['appTimestamp']))
                     .toString(),
                 style: titleXSmallBBPR(),
               )
@@ -160,7 +160,7 @@ class Home extends StatelessWidget {
                 style: titleXSmallBPR(),
               ),
               Text(
-                order['orderID'],
+                order['orderID'].toString(),
                 style: titleXSmallBBPR(),
               )
             ],
@@ -272,7 +272,7 @@ class Home extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (context) => Tracking(
-                      orderID: order['_id'],
+                      orderID: order['_id'].toString(),
                     )),
           );
         },
@@ -310,7 +310,7 @@ class Home extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => Tracking(
-                          orderID: order['_id'],
+                          orderID: order['_id'].toString(),
                         )),
               );
             }

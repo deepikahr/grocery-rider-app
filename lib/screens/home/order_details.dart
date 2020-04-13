@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/order.dart';
 import '../../styles/styles.dart';
 import 'package:getflutter/getflutter.dart';
@@ -16,33 +15,13 @@ class OrderDetails extends StatefulWidget {
 
 class _OrderDetailsState extends State<OrderDetails> {
   Map<String, dynamic> order;
+  String currency;
 
   Map<String, dynamic> findOrderByID(List orders, String orderID) =>
       orders.firstWhere((element) => element['_id'] == orderID);
-  String currency;
-  bool currencyLoading = false;
   @override
   void initState() {
-    getCurrency();
     super.initState();
-  }
-
-  getCurrency() async {
-    if (mounted) {
-      setState(() {
-        currencyLoading = true;
-      });
-    }
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    currency = prefs.getString('currency');
-    print(currency);
-    if (currency != null) {
-      if (mounted) {
-        setState(() {
-          currencyLoading = false;
-        });
-      }
-    }
   }
 
   @override
@@ -57,73 +36,69 @@ class _OrderDetailsState extends State<OrderDetails> {
         centerTitle: true,
       ),
       backgroundColor: greyA,
-      body: currencyLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : Consumer<OrderModel>(builder: (context, data, child) {
-              order = findOrderByID(data.deliveredOrders, widget.orderID);
-              String firstName = '',
-                  lastName = '',
-                  fullName = '',
-                  deliveryAddress = '';
-              if (order['user'] != null && order['user']['firstName'] != null) {
-                firstName = order['user']['firstName'];
-              }
-              if (order['user'] != null && order['user']['lastName'] != null) {
-                lastName = order['user']['lastName'];
-              }
-              fullName = '$firstName $lastName';
-              if (order['deliveryAddress'] != null) {
-                deliveryAddress =
-                    '${order['deliveryAddress']['flatNo']}, ${order['deliveryAddress']['apartmentName']}, ${order['deliveryAddress']['address']}';
-              }
-              return ListView(
+      body: Consumer<OrderModel>(builder: (context, data, child) {
+        order = findOrderByID(data.deliveredOrders, widget.orderID);
+        currency = data.currency;
+        String firstName = '',
+            lastName = '',
+            fullName = '',
+            deliveryAddress = '';
+        if (order['user'] != null && order['user']['firstName'] != null) {
+          firstName = order['user']['firstName'];
+        }
+        if (order['user'] != null && order['user']['lastName'] != null) {
+          lastName = order['user']['lastName'];
+        }
+        fullName = '$firstName $lastName';
+        if (order['deliveryAddress'] != null) {
+          deliveryAddress =
+              '${order['deliveryAddress']['flatNo']}, ${order['deliveryAddress']['apartmentName']}, ${order['deliveryAddress']['address']}';
+        }
+        return ListView(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 16, right: 16, top: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              '# Order ID: ',
-                              style: subTitleLargeBPM(),
-                            ),
-                            Text(
-                              order['orderID'],
-                              style: subTitleSmallBPM(),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        '# Order ID: ',
+                        style: subTitleLargeBPM(),
+                      ),
+                      Text(
+                        order['orderID'].toString(),
+                        style: subTitleSmallBPM(),
+                      )
+                    ],
                   ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              DateFormat("HH:MM a, dd/MM/yyyy")
-                                  .format(DateTime.parse(order['createdAt']))
-                                  .toString(),
-                              style: subTitleSmallBPM(),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  buildDescriptionCard(fullName, deliveryAddress),
                 ],
-              );
-            }),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        DateFormat('hh:mm a, dd/MM/yyyy')
+                            .format(DateTime.fromMillisecondsSinceEpoch(
+                                order['appTimestamp']))
+                            .toString(),
+                        style: subTitleSmallBPM(),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            buildDescriptionCard(fullName, deliveryAddress),
+          ],
+        );
+      }),
     );
   }
 

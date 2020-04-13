@@ -38,7 +38,6 @@ class SocketService {
         'orderId': orderID,
         'status': status
       };
-      print(body);
       skt.emit('order-update-status', body);
     });
   }
