@@ -52,7 +52,11 @@ void initPlatformPlayerState() async {
       .setInFocusDisplayType(OSNotificationDisplayType.notification);
   var status = await OneSignal.shared.getPermissionSubscriptionState();
   String playerId = status.subscriptionStatus.userId;
-  await Common.setPlayerID(playerId).then((onValue) {});
+  if (playerId == null) {
+    status = await OneSignal.shared.getPermissionSubscriptionState();
+  } else {
+    await Common.setPlayerID(playerId).then((onValue) {});
+  }
 }
 
 class DeliveryApp extends StatefulWidget {
@@ -85,7 +89,8 @@ class _DeliveryAppState extends State<DeliveryApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      locale: Locale(selectedLanguage == null ? widget.locale : selectedLanguage),
+      locale:
+          Locale(selectedLanguage == null ? widget.locale : selectedLanguage),
       localizationsDelegates: [
         MyLocalizationsDelegate(widget.localizedValues),
         GlobalMaterialLocalizations.delegate,
@@ -100,9 +105,7 @@ class _DeliveryAppState extends State<DeliveryApp> {
       ),
       home: Login(
           locale: selectedLanguage == null ? widget.locale : selectedLanguage,
-          localizedValues: widget.localizedValues
-      ),
+          localizedValues: widget.localizedValues),
     );
   }
 }
-

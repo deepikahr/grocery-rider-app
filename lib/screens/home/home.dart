@@ -45,9 +45,7 @@ class Home extends StatelessWidget {
             builder: (context, data, child) {
               if (data == null || data.orders == null) {
                 return Padding(
-                  padding: EdgeInsets.only(top: 50),
-                  child: SquareLoader()
-                );
+                    padding: EdgeInsets.only(top: 50), child: SquareLoader());
               } else if (data.orders.length > 0) {
                 return ListView.builder(
                     physics: ScrollPhysics(),
@@ -256,7 +254,7 @@ class Home extends StatelessWidget {
                   !order['isAcceptedByDeliveryBoy']
               ? SquareLoader()
               : Text(
-            MyLocalizations.of(context).REJECT,
+                  MyLocalizations.of(context).REJECT,
                   style: titleGPB(),
                 ),
           color: greyB,
@@ -285,7 +283,7 @@ class Home extends StatelessWidget {
                 !order['isAcceptedByDeliveryBoy']
             ? SquareLoader()
             : Text(
-          MyLocalizations.of(context).TRACK,
+                MyLocalizations.of(context).TRACK,
                 style: titleGPB(),
               ),
         textStyle: titleSPB(),
@@ -324,7 +322,7 @@ class Home extends StatelessWidget {
                   order['isAcceptedByDeliveryBoy']
               ? SquareLoader()
               : Text(
-            MyLocalizations.of(context).ACCEPTTRACK,
+                  MyLocalizations.of(context).accptRejest,
                   style: titleGPB(),
                 ),
           textStyle: titleSPB(),

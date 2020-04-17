@@ -1,6 +1,6 @@
 name: grocerydelivery
 description: A new Flutter application
-version: 1.0.6+7
+version: 1.1.0+1
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
@@ -24,6 +24,9 @@ dependencies:
   intl: ^0.16.1
   onesignal_flutter: ^2.3.4
   flutter_i18n: ^0.13.0
+  flutter_localizations:
+    sdk: flutter
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -11,6 +11,7 @@
   "REJECT": "REJECT",
   "TRACK": "TRACK",
   "ACCEPTTRACK": "ACCEPT & TRACK",
+  "accptRejest": "ACCEPT & TRACK",
   "completedRequests": "Completed requests",
   "noDeliveredOrders": "No delivered orders found!",
   "userName": "Username",

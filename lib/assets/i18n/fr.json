@@ -1,5 +1,4 @@
 {
-
     "home": "Accueil",
     "profile": "Profil",
     "history": "Histoire",
@@ -12,6 +11,7 @@
     "REJECT": "REJETER",
     "TRACK": "Piste",
     "ACCEPTTRACK": "accepter et suivre ",
+    "accptRejest": "accepter et suivre ",
     "completedRequests": "Demandes traitées ",
     "noDeliveredOrders": "Aucune commande livrée trouvée!",
     "userName": "Nom d'utilisateur",
@@ -38,43 +38,3 @@
     "payment": "Paiement",
     "orderDelivered": "COMMANDE LIVRÉE"
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
