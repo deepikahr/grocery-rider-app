@@ -11,6 +11,7 @@
     "REJECT": "رفض",
     "TRACK": "المسار",
     "ACCEPTTRACK": "قبول وتتبع ",
+    "accptRejest": "قبول وتتبع ",
     "completedRequests": "الطلبات المكتملة ",
     "noDeliveredOrders": "لم يتم العثور على أوامر تسليم! ",
     "userName": "اسم المستخدم",
@@ -37,36 +38,3 @@
     "payment": "دفع",
     "orderDelivered": "أجل تسليم"
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
