@@ -53,7 +53,7 @@ void initPlatformPlayerState() async {
   var status = await OneSignal.shared.getPermissionSubscriptionState();
   String playerId = status.subscriptionStatus.userId;
   if (playerId == null) {
-    status = await OneSignal.shared.getPermissionSubscriptionState();
+    initPlatformPlayerState() ;
   } else {
     await Common.setPlayerID(playerId).then((onValue) {});
   }
