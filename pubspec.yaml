@@ -22,7 +22,7 @@ dependencies:
   provider: ^4.0.4
   url_launcher: ^5.4.2
   intl: ^0.16.1
-  onesignal_flutter: ^2.3.4
+  onesignal_flutter: ^2.4.0
   flutter_i18n: ^0.13.0
   flutter_localizations:
     sdk: flutter
