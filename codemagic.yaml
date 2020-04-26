@@ -6,8 +6,8 @@ workflows:
     name: Default Workflow
     environment:
       flutter: beta
-      xcode: latest
-      cocoapods: 1.9.1
+      xcode: edge
+      cocoapods: 1.8.4
     
     triggering:
       events:
