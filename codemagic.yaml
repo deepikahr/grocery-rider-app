@@ -7,7 +7,16 @@ workflows:
     environment:
       flutter: beta
       xcode: edge
-      cocoapods: 1.8.0
+      cocoapods: 1.8.4
+    
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
+          
     scripts:
       - cd . && flutter packages pub get
       - find . -name "Podfile" -execdir pod install \;
