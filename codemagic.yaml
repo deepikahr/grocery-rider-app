@@ -19,12 +19,9 @@ workflows:
           
     scripts:
       - cd . && flutter packages pub get
-      - find . -name "Podfile" -execdir pod install \;
       - cd . && flutter clean
-      - cd ios
-      - pod update
-      - pod install
-      - cd ..
+      - find . -name "Podfile" -execdir pod update \;
+      - find . -name "Podfile" -execdir pod install \;
       - cd . && flutter build ios --release -t lib/main.dart --no-codesign
     artifacts:
       - build/ios/ipa/*.ipa
