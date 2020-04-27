@@ -19,7 +19,6 @@ workflows:
           
     scripts:
       - cd . && flutter packages pub get
-      - cd . && flutter clean
       - find . -name "Podfile" -execdir pod update \;
       - find . -name "Podfile" -execdir pod install \;
       - cd . && flutter build ios --release -t lib/main.dart --no-codesign
