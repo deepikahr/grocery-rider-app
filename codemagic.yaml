@@ -21,7 +21,11 @@ workflows:
       - cd . && flutter packages pub get
       - find . -name "Podfile" -execdir pod install \;
       - cd . && flutter clean
-      - cd . && flutter build ios --debug -t lib/main.dart --no-codesign
+      - cd ios
+      - pod update
+      - pod install
+      - cd ..
+      - cd . && flutter build ios --release -t lib/main.dart --no-codesign
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
