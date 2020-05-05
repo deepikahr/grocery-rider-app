@@ -34,7 +34,7 @@ class APIService {
   }
 
   static Future<dynamic> getGlobalSettings() async {
-    final response = await client.get(Constants.BASE_URL + 'setting/currency',
+    final response = await client.get(Constants.BASE_URL + 'setting/user/App',
         headers: {'Content-Type': 'application/json'});
     return json.decode(response.body);
   }

@@ -38,10 +38,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   void initSocket() async {
     SocketService socket = SocketService();
     APIService.getGlobalSettings().then((onValue) async {
-      if (onValue['response_data']['currency'] != null &&
-          onValue['response_data']['currency'][0]['currencySign'] != null) {
-        Provider.of<OrderModel>(context, listen: false).updateCurrency(
-            onValue['response_data']['currency'][0]['currencySign']);
+      print(onValue);
+      if (onValue['response_data'] != null &&
+          onValue['response_data']['currencyCode'] != null) {
+        Provider.of<OrderModel>(context, listen: false)
+            .updateCurrency(onValue['response_data']['currencyCode']);
       }
       Provider.of<SocketModel>(context, listen: false)
           .setSocketInstance(socket);
@@ -70,9 +71,11 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
       body: GFTabBarView(
         controller: tabController,
         children: <Widget>[
-          Home( locale: widget.locale, localizedValues: widget.localizedValues),
-          Profile( locale: widget.locale, localizedValues: widget.localizedValues),
-          History( locale: widget.locale, localizedValues: widget.localizedValues),
+          Home(locale: widget.locale, localizedValues: widget.localizedValues),
+          Profile(
+              locale: widget.locale, localizedValues: widget.localizedValues),
+          History(
+              locale: widget.locale, localizedValues: widget.localizedValues),
         ],
       ),
       bottomNavigationBar: GFTabBar(
