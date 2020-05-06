@@ -3,7 +3,7 @@ class Constants {
   // static const BASE_URL = "http://162.243.171.81:3000/";
 
   // delopy url testing
-  static const BASE_URL = "http://2b60baaf.ngrok.io/";
+  static const BASE_URL = "http://162.243.171.81:4000/";
   // ONE_SIGNAL_KEY
   static const ONE_SIGNAL_KEY = "a76b6867-bf12-440f-8bc2-30946c652af8";
   // Google API key
