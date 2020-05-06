@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
+import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import '../../services/common.dart';
@@ -22,12 +23,50 @@ class _LoginState extends State<Login> {
 
   String email, password;
   bool isLoading = false;
-  bool isLoggedIn;
+  bool isLoggedIn, isAboutUsData = false;
+  Map<String, dynamic> aboutUsDatails;
 
   @override
   void initState() {
     checkAUthentication();
+    getAboutUsData();
     super.initState();
+  }
+
+  void getAboutUsData() {
+    print('getAboutUsData');
+    if (mounted) {
+      setState(() {
+        isAboutUsData = true;
+      });
+    }
+    APIService.aboutUs().then((value) {
+      print('getAboutUsData $value');
+      try {
+        if (value['response_code'] == 200) {
+          if (mounted) {
+            setState(() {
+              aboutUsDatails = value['response_data'][0];
+              print(
+                  'getAboutUsData ${aboutUsDatails['deliveryAppLogo']['imageUrl']}');
+              isAboutUsData = false;
+            });
+          }
+        }
+      } catch (error, _) {
+        if (mounted) {
+          setState(() {
+            isAboutUsData = false;
+          });
+        }
+      }
+    }).catchError((error) {
+      if (mounted) {
+        setState(() {
+          isAboutUsData = false;
+        });
+      }
+    });
   }
 
   void checkAUthentication() async {
@@ -38,8 +77,7 @@ class _LoginState extends State<Login> {
             MaterialPageRoute(
               builder: (BuildContext context) => Tabs(
                   locale: widget.locale,
-                  localizedValues: widget.localizedValues
-              ),
+                  localizedValues: widget.localizedValues),
             ),
             (Route<dynamic> route) => false);
       } else {
@@ -76,8 +114,7 @@ class _LoginState extends State<Login> {
                         MaterialPageRoute(
                           builder: (BuildContext context) => Tabs(
                               locale: widget.locale,
-                              localizedValues: widget.localizedValues
-                          ),
+                              localizedValues: widget.localizedValues),
                         ),
                         (Route<dynamic> route) => false);
                   }
@@ -88,8 +125,8 @@ class _LoginState extends State<Login> {
                   '$email ${MyLocalizations.of(context).authorizationError}');
             }
           } else {
-            Common.showSnackbar(_scaffoldKey,
-                MyLocalizations.of(context).wrongFormat);
+            Common.showSnackbar(
+                _scaffoldKey, MyLocalizations.of(context).wrongFormat);
           }
           setState(() {
             isLoading = false;
@@ -123,21 +160,27 @@ class _LoginState extends State<Login> {
               children: [
                 SizedBox(height: 90),
                 Center(
-                    child: Image.asset(
-                  'lib/assets/icons/logo_outline.png',
-                  height: 60,
-                )),
-                Center(
-                  child: Text(
-                    MyLocalizations.of(context).groceryDelivery,
-                    style: titleLargePPB(),
-                  ),
+                  child: isAboutUsData
+                      ? SquareLoader()
+                      : aboutUsDatails['deliveryAppLogo'] != null
+                          ? Image.network(
+                              aboutUsDatails['deliveryAppLogo']['imageUrl'],
+                              height: 100,
+                            )
+                          : Image.asset(
+                              'lib/assets/icons/logo_outline.png',
+                              height: 60,
+                            ),
                 ),
+                // Center(
+                //   child: Text(
+                //     MyLocalizations.of(context).groceryDelivery,
+                //     style: titleLargePPB(),
+                //   ),
+                // ),
                 SizedBox(height: 50),
                 Padding(
-                  padding: EdgeInsets.only(top: 50),
-                  child: SquareLoader()
-                )
+                    padding: EdgeInsets.only(top: 50), child: SquareLoader())
               ],
             )
           : ListView(
@@ -156,13 +199,24 @@ class _LoginState extends State<Login> {
                             children: <Widget>[
                               SizedBox(height: 90),
                               Center(
-                                  child: Image.asset(
-                                'lib/assets/icons/logo_outline.png',
-                                height: 60,
-                              )),
-                              Center(
-                                  child: Text(MyLocalizations.of(context).groceryDelivery,
-                                      style: titleLargePPB())),
+                                child: isAboutUsData
+                                    ? SquareLoader()
+                                    : aboutUsDatails['deliveryAppLogo'] != null
+                                        ? Image.network(
+                                            aboutUsDatails['deliveryAppLogo']
+                                                ['imageUrl'],
+                                            height: 100,
+                                          )
+                                        : Image.asset(
+                                            'lib/assets/icons/logo_outline.png',
+                                            height: 60,
+                                          ),
+                              ),
+                              // Center(
+                              //     child: Text(
+                              //         MyLocalizations.of(context)
+                              //             .groceryDelivery,
+                              //         style: titleLargePPB())),
                               SizedBox(height: 50),
                               Text(
                                 MyLocalizations.of(context).emailId,
@@ -268,7 +322,7 @@ class _LoginState extends State<Login> {
           child: isLoading
               ? SquareLoader()
               : Text(
-            MyLocalizations.of(context).LOGIN,
+                  MyLocalizations.of(context).LOGIN,
                   style: titleXLargeWPB(),
                 ),
           color: secondary,

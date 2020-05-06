@@ -1,6 +1,6 @@
 name: grocerydelivery
 description: A new Flutter application
-version: 1.1.0+1
+version: 1.2.0+3
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
@@ -51,8 +51,14 @@ flutter:
     - lib/assets/icons/storepin.png
     - lib/assets/icons/timer.png
     - lib/assets/i18n/en.json
-    - lib/assets/i18n/ar.json
     - lib/assets/i18n/fr.json
+    - lib/assets/i18n/zh.json
+    - lib/assets/i18n/ar.json
+    - lib/assets/i18n/it.json
+    - lib/assets/i18n/ru.json
+    - lib/assets/i18n/ja.json
+    - lib/assets/i18n/pt.json
+    - lib/assets/i18n/es.json
 
   fonts:
     - family: PoppinsBold

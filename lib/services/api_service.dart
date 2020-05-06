@@ -38,4 +38,12 @@ class APIService {
         headers: {'Content-Type': 'application/json'});
     return json.decode(response.body);
   }
+
+  static Future<Map<String, dynamic>> aboutUs() async {
+    final response = await client
+        .get(Constants.BASE_URL + "business/business/about/us", headers: {
+      'Content-Type': 'application/json',
+    });
+    return json.decode(response.body);
+  }
 }
