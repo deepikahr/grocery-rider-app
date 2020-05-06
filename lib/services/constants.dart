@@ -12,4 +12,4 @@ class Constants {
   static final String socketUrl = BASE_URL.substring(0, BASE_URL.length - 1);
 }
 
-List<String> languages = ['en', 'fr', 'ar'];
+List<String> languages = ['en', 'fr', 'zh', 'ar', 'ru', 'ja', 'it', 'pt', 'es'];
