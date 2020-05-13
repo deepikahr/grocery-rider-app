@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 class OrderModel extends ChangeNotifier {
   List _orders;
-  List _delieveredOrders;
+  List _delieveredOrders = [];
   String _currency = 'Rs';
 
   List get orders => _orders;
