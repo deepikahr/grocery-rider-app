@@ -53,7 +53,7 @@ void initPlatformPlayerState() async {
   var status = await OneSignal.shared.getPermissionSubscriptionState();
   String playerId = status.subscriptionStatus.userId;
   if (playerId == null) {
-    initPlatformPlayerState() ;
+    initPlatformPlayerState();
   } else {
     await Common.setPlayerID(playerId).then((onValue) {});
   }
@@ -82,7 +82,6 @@ class _DeliveryAppState extends State<DeliveryApp> {
       setState(() {
         selectedLanguage = prefs.getString('selectedLanguage');
       });
-      print('selected language $selectedLanguage');
     }
   }
 
