@@ -59,7 +59,7 @@ flutter:
     - lib/assets/i18n/ja.json
     - lib/assets/i18n/pt.json
     - lib/assets/i18n/es.json
-
+    - lib/assets/splash.png
   fonts:
     - family: PoppinsBold
       fonts:

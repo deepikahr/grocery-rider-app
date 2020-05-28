@@ -8,9 +8,9 @@
     "timeDate": "時間/日付：",
     "orderId": "注文ID：",
     "address": "住所：",
-    "REJECT": "拒否",
-    "TRACK": "追跡",
-    "ACCEPTTRACK": "同意して追跡",
+    "rEJECT": "拒否",
+    "tRACK": "追跡",
+    "aCCEPTtRACK": "同意して追跡",
     "accptRejest": "同意して追跡",
     "completedRequests": "完了したリクエスト",
     "noDeliveredOrders": "配送済みの注文は見つかりませんでした！",
@@ -20,8 +20,8 @@
     "ordersCompleted": "完了した注文",
     "selectLanguages": "言語を選択：",
     "password": "パスワード",
-    "LOGIN": "ログインする",
-    "LOGOUT": "ログアウト",
+    "lOGIN": "ログインする",
+    "lOGOUT": "ログアウト",
     "errorPassword": "パスワードは6文字以上にしてください",
     "errorEmail": "正しいメールアドレスを入力してください",
     "authorizationError": "配信アプリへのログインは許可されていません。",
@@ -36,5 +36,8 @@
     "toStore": "保存する",
     "toCustomer": "お客様へ",
     "payment": "支払い",
-    "orderDelivered": "配信された注文"
+    "orderDelivered": "配信された注文",
+    "cashOnDelivery": "代金引換",
+    "tap": "タップ",
+    "youhaveupdatedstatustoOutfordelivery": "ステータスを次のように更新しました：配送中"
 }

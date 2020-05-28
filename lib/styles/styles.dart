@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-final primary = const Color(0xFF363062);
+final primary = const Color(0xFF016370);
 final secondary = const Color(0xFFFE9801);
 
 final greyA = const Color(0xFFF9F9F9);
@@ -61,7 +61,7 @@ TextStyle titleLargePPB() {
 TextStyle titleLargeBPB() {
   return new TextStyle(
     fontWeight: FontWeight.w500,
-    fontSize: 20.0,
+    fontSize: 18.0,
     color: Colors.black,
     fontFamily: 'PoppinsBold',
   );
@@ -79,7 +79,7 @@ TextStyle titleXLargeWPB() {
 TextStyle titleXLargeGPB() {
   return new TextStyle(
     fontWeight: FontWeight.w500,
-    fontSize: 25.0,
+    fontSize: 20.0,
     color: green,
     fontFamily: 'PoppinsBold',
   );
@@ -155,7 +155,7 @@ TextStyle titleBPM() {
 TextStyle titleWPM() {
   return new TextStyle(
     fontWeight: FontWeight.w500,
-    fontSize: 15.0,
+    fontSize: 13.0,
     color: Colors.white,
     fontFamily: 'PoppinsMedium',
   );
@@ -182,7 +182,7 @@ TextStyle titlePPM() {
 TextStyle titleLargeBPM() {
   return new TextStyle(
     fontWeight: FontWeight.w500,
-    fontSize: 18.0,
+    fontSize: 15.0,
     color: Colors.black,
     fontFamily: 'PoppinsMedium',
   );

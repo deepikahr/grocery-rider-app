@@ -8,9 +8,9 @@
     "timeDate": "Hora Fecha:",
     "orderId": "Solicitar ID:",
     "address": "Habla a:",
-    "REJECT": "RECHAZAR",
-    "TRACK": "PISTA",
-    "ACCEPTTRACK": "ACEPTAR Y PISTA",
+    "rEJECT": "RECHAZAR",
+    "tRACK": "PISTA",
+    "aCCEPTtRACK": "ACEPTAR Y PISTA",
     "accptRejest": "ACEPTAR Y PISTA",
     "completedRequests": "Solicitudes completadas",
     "noDeliveredOrders": "¡No se encontraron pedidos entregados!",
@@ -20,8 +20,8 @@
     "ordersCompleted": "Pedidos completados",
     "selectLanguages": "Seleccionar idiomas:",
     "password": "Contraseña",
-    "LOGIN": "INICIAR SESIÓN",
-    "LOGOUT": "CERRAR SESIÓN",
+    "lOGIN": "INICIAR SESIÓN",
+    "lOGOUT": "CERRAR SESIÓN",
     "errorPassword": "La contraseña debe tener al menos 6 caracteres de longitud",
     "errorEmail": "Por favor introduzca una dirección de correo electrónico válida",
     "authorizationError": "no está autorizado para iniciar sesión en la aplicación de entrega.",
@@ -36,5 +36,8 @@
     "toStore": "ALMACENAR",
     "toCustomer": "AL CLIENTE",
     "payment": "Pago",
-    "orderDelivered": "PEDIDO ENTREGADO"
+    "orderDelivered": "PEDIDO ENTREGADO",
+    "cashOnDelivery": "Contra reembolso",
+    "tap": "GRIFO",
+    "youhaveupdatedstatustoOutfordelivery": "Has actualizado el estado a: Fuera para entrega"
 }

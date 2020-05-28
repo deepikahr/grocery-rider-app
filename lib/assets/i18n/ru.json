@@ -8,9 +8,9 @@
     "timeDate": "Дата / время:",
     "orderId": "Номер заказа:",
     "address": "Адрес:",
-    "REJECT": "БРАК",
-    "TRACK": "TRACK",
-    "ACCEPTTRACK": "ПРИНЯТЬ И ПУТЬ",
+    "rEJECT": "БРАК",
+    "tRACK": "tRACK",
+    "aCCEPTtRACK": "ПРИНЯТЬ И ПУТЬ",
     "accptRejest": "ПРИНЯТЬ И ПУТЬ",
     "completedRequests": "Завершенные запросы",
     "noDeliveredOrders": "Доставленные заказы не найдены!",
@@ -20,8 +20,8 @@
     "ordersCompleted": "Заказы выполнены",
     "selectLanguages": "Выберите языки:",
     "password": "пароль",
-    "LOGIN": "АВТОРИЗОВАТЬСЯ",
-    "LOGOUT": "ВЫЙТИ",
+    "lOGIN": "АВТОРИЗОВАТЬСЯ",
+    "lOGOUT": "ВЫЙТИ",
     "errorPassword": "Пароль должен быть длиной не менее 6 символов",
     "errorEmail": "Пожалуйста, введите действительный адрес электронной почты",
     "authorizationError": "не авторизован для входа в приложение доставки.",
@@ -36,5 +36,8 @@
     "toStore": "ХРАНИТЬ",
     "toCustomer": "ЗАКАЗЧИКУ",
     "payment": "Оплата",
-    "orderDelivered": "ТОВАР ДОСТАВЛЕН"
+    "orderDelivered": "ТОВАР ДОСТАВЛЕН",
+    "cashOnDelivery": "Оплата при доставке",
+    "tap": "НАЖМИТЕ",
+    "youhaveupdatedstatustoOutfordelivery": "Вы обновили статус до: Out for delivery"
 }

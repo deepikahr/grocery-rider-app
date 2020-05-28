@@ -8,9 +8,9 @@
     "timeDate": "Ora dell'appuntamento:",
     "orderId": "ID ordine:",
     "address": "Indirizzo:",
-    "REJECT": "RIFIUTARE",
-    "TRACK": "TRACCIA",
-    "ACCEPTTRACK": "ACCETTA E TRACCIA",
+    "rEJECT": "RIFIUTARE",
+    "tRACK": "TRACCIA",
+    "aCCEPTtRACK": "ACCETTA E TRACCIA",
     "accptRejest": "ACCETTA E TRACCIA",
     "completedRequests": "Richieste completate",
     "noDeliveredOrders": "Non sono stati trovati ordini consegnati!",
@@ -20,8 +20,8 @@
     "ordersCompleted": "Ordini completati",
     "selectLanguages": "Seleziona le lingue:",
     "password": "Parola d'ordine",
-    "LOGIN": "ACCESSO",
-    "LOGOUT": "DISCONNETTERSI",
+    "lOGIN": "ACCESSO",
+    "lOGOUT": "DISCONNETTERSI",
     "errorPassword": "La password deve essere lunga almeno 6 caratteri",
     "errorEmail": "Inserisci una email valida",
     "authorizationError": "non è autorizzato ad accedere all'App di consegna.",
@@ -36,5 +36,8 @@
     "toStore": "IMMAGAZZINARE",
     "toCustomer": "AL CLIENTE",
     "payment": "Pagamento",
-    "orderDelivered": "ORDINE CONSEGNATO"
+    "orderDelivered": "ORDINE CONSEGNATO",
+    "cashOnDelivery": "Pagamento alla consegna",
+    "tap": "RUBINETTO",
+    "youhaveupdatedstatustoOutfordelivery": "Lo stato è aggiornato a: In uscita per la consegna"
 }
