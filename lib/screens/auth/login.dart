@@ -34,21 +34,17 @@ class _LOGINState extends State<LOGIN> {
   }
 
   void getAboutUsData() {
-    print('getAboutUsData');
     if (mounted) {
       setState(() {
         isAboutUsData = true;
       });
     }
     APIService.aboutUs().then((value) {
-      print('getAboutUsData $value');
       try {
         if (value['response_code'] == 200) {
           if (mounted) {
             setState(() {
               aboutUsDatails = value['response_data'][0];
-              print(
-                  'getAboutUsData ${aboutUsDatails['deliveryAppLogo']['imageUrl']}');
               isAboutUsData = false;
             });
           }
