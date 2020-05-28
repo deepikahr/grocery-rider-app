@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'order_details.dart';
 
 class History extends StatelessWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   History({Key key, this.localizedValues, this.locale}) : super(key: key);
 
@@ -29,10 +29,7 @@ class History extends StatelessWidget {
       body: ListView(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(
-              top: 20,
-              left: 16,
-            ),
+            padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
             child: Text(
               MyLocalizations.of(context).completedRequests,
               style: titleBPS(),
@@ -86,6 +83,7 @@ class History extends StatelessWidget {
       lastName = order['user']['lastName'];
     }
     fullName = '$firstName $lastName';
+    print(order);
     return InkWell(
       onTap: () {
         Navigator.push(

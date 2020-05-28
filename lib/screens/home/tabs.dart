@@ -15,7 +15,7 @@ import 'history.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Tabs extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   Tabs({Key key, this.localizedValues, this.locale}) : super(key: key);
   @override
@@ -92,6 +92,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             icon: SvgPicture.asset(
               'lib/assets/icons/home.svg',
               color: primary,
+              height: 20,
             ),
             text: MyLocalizations.of(context).home,
           ),
@@ -99,6 +100,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             icon: SvgPicture.asset(
               'lib/assets/icons/profile.svg',
               color: primary,
+              height: 20,
             ),
             text: MyLocalizations.of(context).profile,
           ),
@@ -106,6 +108,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             icon: SvgPicture.asset(
               'lib/assets/icons/history.svg',
               color: primary,
+              height: 20,
             ),
             text: MyLocalizations.of(context).history,
           ),

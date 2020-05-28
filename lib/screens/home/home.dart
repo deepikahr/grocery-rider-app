@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 import 'tracking.dart';
 
 class Home extends StatelessWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   Home({Key key, this.localizedValues, this.locale}) : super(key: key);
 
@@ -32,10 +32,7 @@ class Home extends StatelessWidget {
       body: ListView(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(
-              top: 20,
-              left: 16,
-            ),
+            padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
             child: Text(
               MyLocalizations.of(context).activeRequests,
               style: titleBPS(),
@@ -254,7 +251,7 @@ class Home extends StatelessWidget {
                   !order['isAcceptedByDeliveryBoy']
               ? SquareLoader()
               : Text(
-                  MyLocalizations.of(context).REJECT,
+                  MyLocalizations.of(context).rEJECT,
                   style: titleGPB(),
                 ),
           color: greyB,
@@ -283,7 +280,7 @@ class Home extends StatelessWidget {
                 !order['isAcceptedByDeliveryBoy']
             ? SquareLoader()
             : Text(
-                MyLocalizations.of(context).TRACK,
+                MyLocalizations.of(context).tRACK,
                 style: titleGPB(),
               ),
         textStyle: titleSPB(),
