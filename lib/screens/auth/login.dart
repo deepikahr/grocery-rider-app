@@ -45,7 +45,6 @@ class _LOGINState extends State<LOGIN> {
           if (mounted) {
             setState(() {
               aboutUsDatails = value['response_data'][0];
-
               isAboutUsData = false;
             });
           }
