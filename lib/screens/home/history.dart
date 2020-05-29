@@ -83,7 +83,6 @@ class History extends StatelessWidget {
       lastName = order['user']['lastName'];
     }
     fullName = '$firstName $lastName';
-    print(order);
     return InkWell(
       onTap: () {
         Navigator.push(

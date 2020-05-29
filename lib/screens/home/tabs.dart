@@ -38,7 +38,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   void initSocket() async {
     SocketService socket = SocketService();
     APIService.getGlobalSettings().then((onValue) async {
-      print(onValue);
       if (onValue['response_data'] != null &&
           onValue['response_data']['currencyCode'] != null) {
         Provider.of<OrderModel>(context, listen: false)

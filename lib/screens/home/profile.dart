@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:grocerydelivery/main.dart';
 import 'package:grocerydelivery/services/localizations.dart';
@@ -13,7 +11,6 @@ import '../../services/socket.dart';
 import '../../styles/styles.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
   final Map localizedValues;
@@ -51,18 +48,12 @@ class _ProfileState extends State<Profile> {
   }
 
   getLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        selectedLocale = prefs.getString('selectedLanguageName');
-        print(selectedLocale);
-        print("kk");
-        languages = json.decode(prefs.getString('alllanguageNames'));
-        print(languages);
-        languagesCodes = json.decode(prefs.getString('alllanguageCodes'));
-        print(languagesCodes);
-      });
-    }
+    await Common.getAllLanguageNames().then((value) {
+      languages = value;
+    });
+    await Common.getAllLanguageCodes().then((value) {
+      languagesCodes = value;
+    });
   }
 
   void getProfileInfo() {
@@ -89,6 +80,84 @@ class _ProfileState extends State<Profile> {
         profileInfo = {};
       });
     });
+  }
+
+  selectLanguagesMethod() async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Center(
+            child: Container(
+              height: 250,
+              width: MediaQuery.of(context).size.width * 0.7,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                borderRadius: new BorderRadius.all(
+                  new Radius.circular(24.0),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: ListView(
+                children: <Widget>[
+                  ListView.builder(
+                      padding: EdgeInsets.only(bottom: 25),
+                      physics: ScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount:
+                          languages.length == null ? 0 : languages.length,
+                      itemBuilder: (BuildContext context, int i) {
+                        return GFButton(
+                          onPressed: () async {
+                            await Common.setSelectedLanguage(languagesCodes[i]);
+                            Map localizedValues;
+                            String defaultLocale = '';
+                            await Common.getSelectedLanguage().then((value) {
+                              String locale = value ?? defaultLocale;
+                              APIService.getLanguageJson(locale)
+                                  .then((value) async {
+                                localizedValues =
+                                    value['response_data']['json'];
+                                if (locale == '') {
+                                  defaultLocale = value['response_data']
+                                      ['defaultCode']['languageCode'];
+                                  locale = defaultLocale;
+                                }
+                                await Common.setSelectedLanguage(locale);
+                                await Common.setAllLanguageCodes(
+                                    value['response_data']['langCode']);
+                                await Common.setAllLanguageNames(
+                                    value['response_data']['langName']);
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          DeliveryApp(
+                                        locale: locale,
+                                        localizedValues: localizedValues,
+                                      ),
+                                    ),
+                                    (Route<dynamic> route) => false);
+                              });
+                            });
+                          },
+                          type: GFButtonType.transparent,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                languages[i],
+                                style: titleSmallBPR(),
+                              ),
+                              Container()
+                            ],
+                          ),
+                        );
+                      }),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   @override
@@ -238,93 +307,33 @@ class _ProfileState extends State<Profile> {
                           SizedBox(
                             height: 20,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                MyLocalizations.of(context).selectLanguages,
-                                style: titleSmallBPR(),
+                          InkWell(
+                            onTap: () {
+                              selectLanguagesMethod();
+                            },
+                            child: Container(
+                              height: 55,
+                              decoration: BoxDecoration(
+                                color: Color(0xFFF7F7F7),
                               ),
-                              DropdownButtonHideUnderline(
-                                child: DropdownButton(
-                                  hint: Text(selectedLocale),
-                                  value: selectedLanguages,
-                                  onChanged: (newValue) async {
-                                    if (mounted) {
-                                      setState(() {
-                                        selectedLocale = newValue;
-                                      });
-                                    }
-
-                                    for (int i = 0; i < languages.length; i++) {
-                                      print(newValue);
-                                      print(languages[i]);
-                                      if (languages[i] == newValue) {
-                                        print("success");
-                                        SharedPreferences.getInstance()
-                                            .then((prefs) {
-                                          prefs.setString('selectedLanguage',
-                                              languagesCodes[i]);
-                                          Map localizedValues;
-                                          String defaultLocale = '';
-                                          String locale = prefs.getString(
-                                                  'selectedLanguage') ??
-                                              defaultLocale;
-                                          APIService.getLanguageJson(locale)
-                                              .then((value) {
-                                            print(value);
-                                            localizedValues =
-                                                value['response_data']['json'];
-                                            if (locale == '') {
-                                              defaultLocale =
-                                                  value['response_data']
-                                                          ['defaultCode']
-                                                      ['languageCode'];
-                                              locale = defaultLocale;
-                                            }
-                                            prefs.setString(
-                                                'selectedLanguageName',
-                                                newValue);
-                                            prefs.setString(
-                                                'selectedLanguage', locale);
-                                            prefs.setString(
-                                                'alllanguageNames',
-                                                json.encode(
-                                                    value['response_data']
-                                                        ['langName']));
-                                            prefs.setString(
-                                                'alllanguageCodes',
-                                                json.encode(
-                                                    value['response_data']
-                                                        ['langCode']));
-
-                                            Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (BuildContext context) =>
-                                                          DeliveryApp(
-                                                    locale: locale,
-                                                    localizedValues:
-                                                        localizedValues,
-                                                  ),
-                                                ),
-                                                (Route<dynamic> route) =>
-                                                    false);
-                                          });
-                                        });
-                                      }
-                                    }
-                                  },
-                                  items: languages.map((lang) {
-                                    return DropdownMenuItem(
-                                      child: new Text(lang),
-                                      value: lang,
-                                    );
-                                  }).toList(),
-                                ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0,
+                                        bottom: 10.0,
+                                        left: 20.0,
+                                        right: 20.0),
+                                    child: Text(
+                                      MyLocalizations.of(context)
+                                          .selectLanguages,
+                                      style: titleSmallBPR(),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                           SizedBox(height: 30),
                           buildlOGOUTButton(),

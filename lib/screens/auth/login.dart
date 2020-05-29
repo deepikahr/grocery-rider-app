@@ -34,21 +34,18 @@ class _LOGINState extends State<LOGIN> {
   }
 
   void getAboutUsData() {
-    print('getAboutUsData');
     if (mounted) {
       setState(() {
         isAboutUsData = true;
       });
     }
     APIService.aboutUs().then((value) {
-      print('getAboutUsData $value');
       try {
         if (value['response_code'] == 200) {
           if (mounted) {
             setState(() {
               aboutUsDatails = value['response_data'][0];
-              print(
-                  'getAboutUsData ${aboutUsDatails['deliveryAppLogo']['imageUrl']}');
+
               isAboutUsData = false;
             });
           }
@@ -101,7 +98,6 @@ class _LOGINState extends State<LOGIN> {
           "playerId": palyerId ?? 'no id found'
         };
         AuthService.lOGIN(body).then((onValue) {
-          print(onValue);
           if (onValue['response_code'] == 401) {
             Common.showSnackbar(_scaffoldKey, onValue['response_data']);
           } else if (onValue['response_code'] == 200 &&

@@ -112,9 +112,6 @@ class _TrackingState extends State<Tracking> {
   }
 
   void setPolylines() async {
-    print(agentLocation);
-    print(storeLocation);
-    print(customerLocation);
     List<PointLatLng> agentToStore =
         await polylinePoints?.getRouteBetweenCoordinates(
       Constants.GOOGLE_API_KEY,
