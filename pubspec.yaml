@@ -50,15 +50,6 @@ flutter:
     - lib/assets/icons/agentpin.png
     - lib/assets/icons/storepin.png
     - lib/assets/icons/timer.png
-    - lib/assets/i18n/en.json
-    - lib/assets/i18n/fr.json
-    - lib/assets/i18n/zh.json
-    - lib/assets/i18n/ar.json
-    - lib/assets/i18n/it.json
-    - lib/assets/i18n/ru.json
-    - lib/assets/i18n/ja.json
-    - lib/assets/i18n/pt.json
-    - lib/assets/i18n/es.json
     - lib/assets/splash.png
   fonts:
     - family: PoppinsBold

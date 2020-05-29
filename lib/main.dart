@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
@@ -15,38 +14,31 @@ import 'styles/styles.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'services/constants.dart';
 import 'services/localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initPlatformPlayerState();
-  // Map<String, Map<String, String>> localizedValues = await initializeI18n();
-  // String _locale = 'en';
   runApp(MaterialApp(
     home: AnimatedScreen(),
     debugShowCheckedModeBanner: false,
   ));
-  SharedPreferences.getInstance().then((prefs) {
+  Common.getSelectedLanguage().then((selectedLocale) {
     Map localizedValues;
     String defaultLocale = '';
-    String locale = prefs.getString('selectedLanguage') ?? defaultLocale;
+    String locale = selectedLocale ?? defaultLocale;
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.dark));
-    APIService.getLanguageJson(locale).then((value) {
-      print(value);
+
+    APIService.getLanguageJson(locale).then((value) async {
       localizedValues = value['response_data']['json'];
       if (locale == '') {
         defaultLocale = value['response_data']['defaultCode']['languageCode'];
         locale = defaultLocale;
       }
-      prefs.setString('selectedLanguage', locale);
-      prefs.setString('selectedLanguageName',
-          value['response_data']['defaultCode']['languageName']);
-      prefs.setString(
-          'alllanguageNames', json.encode(value['response_data']['langName']));
-      prefs.setString(
-          'alllanguageCodes', json.encode(value['response_data']['langCode']));
+      await Common.setSelectedLanguage(locale);
+      await Common.setAllLanguageNames(value['response_data']['langName']);
+      await Common.setAllLanguageCodes(value['response_data']['langCode']);
       runApp(
         MultiProvider(
           providers: [

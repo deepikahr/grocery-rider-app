@@ -97,7 +97,6 @@ class _LOGINState extends State<LOGIN> {
           "playerId": palyerId ?? 'no id found'
         };
         AuthService.lOGIN(body).then((onValue) {
-          print(onValue);
           if (onValue['response_code'] == 401) {
             Common.showSnackbar(_scaffoldKey, onValue['response_data']);
           } else if (onValue['response_code'] == 200 &&
