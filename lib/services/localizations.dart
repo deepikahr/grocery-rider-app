@@ -1,10 +1,9 @@
 import 'dart:async' show Future;
 import 'package:flutter/foundation.dart' show SynchronousFuture;
 import 'package:flutter/material.dart';
-import 'constants.dart' show languages;
 
 class MyLocalizations {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   MyLocalizations(this.locale, this.localizedValues);
 
   final Locale locale;
@@ -49,16 +48,16 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['address'];
   }
 
-  String get REJECT {
-    return localizedValues[locale.languageCode]['REJECT'];
+  String get rEJECT {
+    return localizedValues[locale.languageCode]['rEJECT'];
   }
 
-  String get TRACK {
-    return localizedValues[locale.languageCode]['TRACK'];
+  String get tRACK {
+    return localizedValues[locale.languageCode]['tRACK'];
   }
 
-  String get ACCEPTTRACK {
-    return localizedValues[locale.languageCode]['ACCEPT&TRACK'];
+  String get aCCEPTtRACK {
+    return localizedValues[locale.languageCode]['ACCEPT&tRACK'];
   }
 
   String get accptRejest {
@@ -97,12 +96,12 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['password'];
   }
 
-  String get LOGIN {
-    return localizedValues[locale.languageCode]['LOGIN'];
+  String get lOGIN {
+    return localizedValues[locale.languageCode]['lOGIN'];
   }
 
-  String get LOGOUT {
-    return localizedValues[locale.languageCode]['LOGOUT'];
+  String get lOGOUT {
+    return localizedValues[locale.languageCode]['lOGOUT'];
   }
 
   String get errorPassword {
@@ -165,6 +164,19 @@ class MyLocalizations {
     return localizedValues[locale.languageCode]['orderDelivered'];
   }
 
+  String get cashOnDelivery {
+    return localizedValues[locale.languageCode]['cashOnDelivery'];
+  }
+
+  String get tap {
+    return localizedValues[locale.languageCode]['tap'];
+  }
+
+  String get youhaveupdatedstatustoOutfordelivery {
+    return localizedValues[locale.languageCode]
+        ['youhaveupdatedstatustoOutfordelivery'];
+  }
+
   greetTo(name) {
     return localizedValues[locale.languageCode]['greetTo']
         .replaceAll('{{name}}', name);
@@ -172,12 +184,12 @@ class MyLocalizations {
 }
 
 class MyLocalizationsDelegate extends LocalizationsDelegate<MyLocalizations> {
-  Map<String, Map<String, String>> localizedValues;
-
-  MyLocalizationsDelegate(this.localizedValues);
+  Map localizedValues;
+  List languageList;
+  MyLocalizationsDelegate(this.localizedValues, this.languageList);
 
   @override
-  bool isSupported(Locale locale) => languages.contains(locale.languageCode);
+  bool isSupported(Locale locale) => languageList.contains(locale.languageCode);
 
   @override
   Future<MyLocalizations> load(Locale locale) {

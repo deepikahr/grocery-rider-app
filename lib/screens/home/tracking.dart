@@ -15,7 +15,6 @@ import '../../models/socket.dart';
 import '../../services/common.dart';
 import '../../services/socket.dart';
 import '../../styles/styles.dart';
-import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
@@ -47,6 +46,8 @@ class _TrackingState extends State<Tracking> {
   String fullName = '', deliveryAddress = '', currency;
   SocketService socket;
   String startButtonText = 'START';
+
+  SolidController _soldController = SolidController();
 
   @override
   void initState() {
@@ -233,21 +234,24 @@ class _TrackingState extends State<Tracking> {
       }),
       bottomSheet: Consumer<OrderModel>(builder: (context, data, child) {
         return SolidBottomSheet(
+          controller: _soldController,
+          draggableBody: true,
           headerBar: Container(
-              height: 299,
-              decoration: BoxDecoration(
-                borderRadius: new BorderRadius.only(
-                    topLeft: const Radius.circular(50),
-                    topRight: const Radius.circular(50)),
-                color: primary,
-              ),
-              child: Column(
-                children: <Widget>[
-                  buildTimingInfoBlock(),
-                  buildDirectionBlock(),
-                  buildUserDetailsBlock(),
-                ],
-              )),
+            height: 315,
+            decoration: BoxDecoration(
+              borderRadius: new BorderRadius.only(
+                  topLeft: const Radius.circular(50),
+                  topRight: const Radius.circular(50)),
+              color: primary,
+            ),
+            child: Column(
+              children: <Widget>[
+                buildTimingInfoBlock(),
+                buildDirectionBlock(),
+                buildUserDetailsBlock(),
+              ],
+            ),
+          ),
           body: Container(
             color: Colors.white,
             child: ListView(
@@ -261,6 +265,7 @@ class _TrackingState extends State<Tracking> {
                 buildPaymentInfoBlock(),
                 SizedBox(height: 20),
                 buildDeliveredButton(),
+                SizedBox(height: 400),
               ],
             ),
           ),
@@ -271,8 +276,9 @@ class _TrackingState extends State<Tracking> {
 
   Widget buildTimingInfoBlock() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Container(width: 8),
+        // Container(width: 8),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Column(
@@ -284,32 +290,41 @@ class _TrackingState extends State<Tracking> {
                 style: titleWPM(),
               ),
               Text(
-                '${MyLocalizations.of(context).timeSlot} ${order['deliveryTime']}',
+                '${MyLocalizations.of(context).timeSlot} ',
+                style: titleWPM(),
+              ),
+              Text(
+                '${order['deliveryTime']}',
                 style: titleWPM(),
               )
             ],
           ),
         ),
-        GFButton(
-          onPressed: () {
-            if (order['orderStatus'] == 'Confirmed') {
-              startButtonText = 'STARTED';
-              Common.showSnackbar(
-                  _scaffoldKey, 'You have updated status to: Out for delivery');
-              socket.updateOrderStatus(
-                  socket.getSocket(), 'Out for delivery', widget.orderID);
-            }
-          },
-          text: startButtonText,
-          textStyle: titleRPM(startButtonText == 'START' ? red : primary),
-          icon: Icon(
-            startButtonText == 'START' ? Icons.play_arrow : Icons.check,
-            color: startButtonText == 'START' ? red : primary,
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          child: GFButton(
+            onPressed: () {
+              if (order['orderStatus'] == 'Confirmed') {
+                startButtonText = 'STARTED';
+                Common.showSnackbar(
+                    _scaffoldKey,
+                    MyLocalizations.of(context)
+                        .youhaveupdatedstatustoOutfordelivery);
+                socket.updateOrderStatus(
+                    socket.getSocket(), 'Out for delivery', widget.orderID);
+              }
+            },
+            text: startButtonText,
+            textStyle: titleRPM(startButtonText == 'START' ? red : primary),
+            icon: Icon(
+              startButtonText == 'START' ? Icons.play_arrow : Icons.check,
+              color: startButtonText == 'START' ? red : primary,
+            ),
+            color: Colors.white,
+            size: GFSize.MEDIUM,
+            borderShape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
-          color: Colors.white,
-          size: GFSize.LARGE,
-          borderShape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       ],
     );
@@ -321,7 +336,7 @@ class _TrackingState extends State<Tracking> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.only(left: 25, top: 0),
+            padding: EdgeInsets.only(left: 25, right: 16),
             child: Text(
               MyLocalizations.of(context).directions,
               style: titleWPM(),
@@ -341,7 +356,7 @@ class _TrackingState extends State<Tracking> {
                     color: red,
                   ),
                   color: Colors.white,
-                  size: GFSize.LARGE,
+                  size: GFSize.MEDIUM,
                   borderShape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16)),
                 ),
@@ -356,7 +371,7 @@ class _TrackingState extends State<Tracking> {
                     color: Colors.red,
                   ),
                   color: Colors.white,
-                  size: GFSize.LARGE,
+                  size: GFSize.MEDIUM,
                   borderShape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16)),
                 ),
@@ -379,7 +394,7 @@ class _TrackingState extends State<Tracking> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(left: 18, bottom: 6),
+            padding: const EdgeInsets.only(left: 18, bottom: 6, right: 16),
             child: Text(
               '${MyLocalizations.of(context).orderId} ${order['orderID']}',
               style: titleXSmallBPR(),
@@ -444,7 +459,7 @@ class _TrackingState extends State<Tracking> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(left: 18, bottom: 6),
+          padding: const EdgeInsets.only(left: 18, bottom: 6, right: 16),
           child: Text(
             MyLocalizations.of(context).address,
             style: titleXSmallBPR(),
@@ -476,7 +491,7 @@ class _TrackingState extends State<Tracking> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(left: 18, bottom: 6),
+          padding: const EdgeInsets.only(left: 18, bottom: 6, right: 16),
           child: Text(
             MyLocalizations.of(context).items,
             style: titleXSmallBPR(),
@@ -491,25 +506,20 @@ class _TrackingState extends State<Tracking> {
           ),
           alignment: AlignmentDirectional.centerStart,
           child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  ListView.builder(
-                      physics: ScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: order['cart']['cart'].length,
-                      itemBuilder: (BuildContext context, int index) {
-                        List products = order['cart']['cart'];
-                        return Text(
-                          "${products[index]['productName']} (${products[index]['unit']}) X ${products[index]['quantity']}",
-                          style: titleLargeBPM(),
-                        );
-                      }),
-                ],
-              )),
-        )
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: ListView.builder(
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: order['cart']['cart'].length,
+                itemBuilder: (BuildContext context, int index) {
+                  List products = order['cart']['cart'];
+                  return Text(
+                    "${products[index]['productName']} (${products[index]['unit']}) X ${products[index]['quantity']}",
+                    style: titleLargeBPM(),
+                  );
+                }),
+          ),
+        ),
       ],
     );
   }
@@ -520,7 +530,7 @@ class _TrackingState extends State<Tracking> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(left: 18, bottom: 6),
+          padding: const EdgeInsets.only(left: 18, bottom: 6, right: 16),
           child: Text(
             MyLocalizations.of(context).payment,
             style: titleXSmallBPR(),
@@ -546,12 +556,17 @@ class _TrackingState extends State<Tracking> {
                   style: titleXLargeGPB(),
                 ),
                 Container(
-                    // height: 50,
-                    child:
-                        VerticalDivider(color: Colors.black.withOpacity(0.1))),
-                Text(
-                  order['paymentType'] == 'COD' ? 'Cash on delivery' : 'Stripe',
-                  style: titleLargeBPB(),
+                  child: VerticalDivider(
+                    color: Colors.black.withOpacity(0.1),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    order['paymentType'] == 'COD'
+                        ? MyLocalizations.of(context).cashOnDelivery
+                        : MyLocalizations.of(context).tap,
+                    style: titleLargeBPB(),
+                  ),
                 )
               ],
             ),

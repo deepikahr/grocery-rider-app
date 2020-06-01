@@ -9,15 +9,15 @@ import '../../services/auth.dart';
 import '../home/tabs.dart';
 import '../../styles/styles.dart';
 
-class Login extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+class LOGIN extends StatefulWidget {
+  final Map localizedValues;
   final String locale;
-  Login({Key key, this.localizedValues, this.locale}) : super(key: key);
+  LOGIN({Key key, this.localizedValues, this.locale}) : super(key: key);
   @override
-  _LoginState createState() => _LoginState();
+  _LOGINState createState() => _LOGINState();
 }
 
-class _LoginState extends State<Login> {
+class _LOGINState extends State<LOGIN> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -66,8 +66,9 @@ class _LoginState extends State<Login> {
   }
 
   void checkAUthentication() async {
-    await Common.getToken().then((token) {
+    await Common.getToken().then((token) async {
       if (token != null) {
+        await AuthService.setLanguageCodeToProfile();
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
@@ -84,7 +85,7 @@ class _LoginState extends State<Login> {
     });
   }
 
-  void login() async {
+  void lOGIN() async {
     if (_formKey.currentState.validate()) {
       setState(() {
         isLoading = true;
@@ -96,14 +97,16 @@ class _LoginState extends State<Login> {
           'password': password,
           "playerId": palyerId ?? 'no id found'
         };
-        AuthService.login(body).then((onValue) {
+        AuthService.lOGIN(body).then((onValue) {
           if (onValue['response_code'] == 401) {
             Common.showSnackbar(_scaffoldKey, onValue['response_data']);
           } else if (onValue['response_code'] == 200 &&
               onValue['response_data']['token'] != null) {
             if (onValue['response_data']['role'] == 'Delivery Boy') {
               Common.setToken(onValue['response_data']['token']).then((_) {
-                Common.setAccountID(onValue['response_data']['_id']).then((_) {
+                Common.setAccountID(onValue['response_data']['_id'])
+                    .then((_) async {
+                  await AuthService.setLanguageCodeToProfile();
                   if (mounted) {
                     Navigator.pushAndRemoveUntil(
                         context,
@@ -144,7 +147,7 @@ class _LoginState extends State<Login> {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          isLoggedIn == null ? '' : 'Login',
+          isLoggedIn == null ? '' : MyLocalizations.of(context).lOGIN,
           style: titleWPS(),
         ),
         centerTitle: true,
@@ -231,7 +234,7 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                       ),
-                      buildLoginButton()
+                      buildlOGINButton()
                     ],
                   ),
                 ),
@@ -305,20 +308,20 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget buildLoginButton() {
+  Widget buildlOGINButton() {
     return Positioned(
       bottom: 10.0,
       child: Container(
         height: 51,
         child: GFButton(
           onPressed: () {
-            if (!isLoading) login();
+            if (!isLoading) lOGIN();
           },
           size: GFSize.LARGE,
           child: isLoading
               ? SquareLoader()
               : Text(
-                  MyLocalizations.of(context).LOGIN,
+                  MyLocalizations.of(context).lOGIN,
                   style: titleXLargeWPB(),
                 ),
           color: secondary,

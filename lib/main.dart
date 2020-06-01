@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:grocerydelivery/screens/auth/login.dart';
+import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -8,32 +11,50 @@ import 'models/order.dart';
 import 'models/socket.dart';
 import 'package:provider/provider.dart';
 import 'styles/styles.dart';
-import 'screens/auth/login.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'services/constants.dart';
 import 'services/localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'services/initialize_i18n.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initPlatformPlayerState();
-  Map<String, Map<String, String>> localizedValues = await initializeI18n();
-  String _locale = 'en';
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => OrderModel()),
-        ChangeNotifierProvider(create: (context) => AdminModel()),
-        ChangeNotifierProvider(create: (context) => SocketModel()),
-        ChangeNotifierProvider(create: (context) => LocationModel()),
-      ],
-      child: DeliveryApp(
-        _locale,
-        localizedValues,
-      ),
-    ),
-  );
+  runApp(MaterialApp(
+    home: AnimatedScreen(),
+    debugShowCheckedModeBanner: false,
+  ));
+  Common.getSelectedLanguage().then((selectedLocale) {
+    Map localizedValues;
+    String defaultLocale = '';
+    String locale = selectedLocale ?? defaultLocale;
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.dark));
+
+    APIService.getLanguageJson(locale).then((value) async {
+      localizedValues = value['response_data']['json'];
+      if (locale == '') {
+        defaultLocale = value['response_data']['defaultCode']['languageCode'];
+        locale = defaultLocale;
+      }
+      await Common.setSelectedLanguage(locale);
+      await Common.setAllLanguageNames(value['response_data']['langName']);
+      await Common.setAllLanguageCodes(value['response_data']['langCode']);
+      runApp(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (context) => OrderModel()),
+            ChangeNotifierProvider(create: (context) => AdminModel()),
+            ChangeNotifierProvider(create: (context) => SocketModel()),
+            ChangeNotifierProvider(create: (context) => LocationModel()),
+          ],
+          child: DeliveryApp(
+            locale: locale,
+            localizedValues: localizedValues,
+          ),
+        ),
+      );
+    });
+  });
 }
 
 void initPlatformPlayerState() async {
@@ -59,52 +80,50 @@ void initPlatformPlayerState() async {
   }
 }
 
-class DeliveryApp extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+class DeliveryApp extends StatelessWidget {
   final String locale;
-  DeliveryApp(this.locale, this.localizedValues);
-  @override
-  _DeliveryAppState createState() => _DeliveryAppState();
-}
-
-class _DeliveryAppState extends State<DeliveryApp> {
-  @override
-  void initState() {
-    super.initState();
-    getData();
-  }
-
-  var selectedLanguage = "English";
-
-  getData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        selectedLanguage = prefs.getString('selectedLanguage');
-      });
-    }
-  }
-
+  final Map localizedValues;
+  DeliveryApp({
+    Key key,
+    this.locale,
+    this.localizedValues,
+  });
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      locale:
-          Locale(selectedLanguage == null ? widget.locale : selectedLanguage),
+      locale: Locale(locale),
       localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues),
+        MyLocalizationsDelegate(localizedValues, [locale]),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: languages.map((language) => Locale(language, '')),
+      supportedLocales: [Locale(locale)],
       debugShowCheckedModeBanner: false,
-      title: 'Readymade grocery delivery app',
-      theme: ThemeData(
-        primaryColor: primary,
-        accentColor: primary,
+      title: Constants.APP_NAME,
+      theme: ThemeData(primaryColor: primary, accentColor: primary),
+      home: LOGIN(
+        locale: locale,
+        localizedValues: localizedValues,
       ),
-      home: Login(
-          locale: selectedLanguage == null ? widget.locale : selectedLanguage,
-          localizedValues: widget.localizedValues),
+    );
+  }
+}
+
+class AnimatedScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        color: Colors.white,
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Image.asset(
+          'lib/assets/splash.png',
+          fit: BoxFit.cover,
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+        ),
+      ),
     );
   }
 }

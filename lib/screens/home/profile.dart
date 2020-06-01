@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grocerydelivery/main.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/order.dart';
@@ -11,10 +12,9 @@ import '../../services/socket.dart';
 import '../../styles/styles.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
-  final Map<String, Map<String, String>> localizedValues;
+  final Map localizedValues;
   final String locale;
   Profile({Key key, this.localizedValues, this.locale}) : super(key: key);
   @override
@@ -36,17 +36,7 @@ class _ProfileState extends State<Profile> {
 
   String selectedLanguages, selectedLang;
 
-  List<String> languages = [
-    'English',
-    'French',
-    'Chinese',
-    'Arbic',
-    'Japanese',
-    'Russian',
-    'Italian',
-    'Spanish',
-    'Portuguese'
-  ];
+  List languages, languagesCodes;
 
   var selectedLanguage, selectedLocale;
 
@@ -59,31 +49,12 @@ class _ProfileState extends State<Profile> {
   }
 
   getLanguages() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        selectedLanguage = prefs.getString('selectedLanguage');
-      });
-    }
-    if (selectedLanguage == 'en') {
-      selectedLocale = 'English';
-    } else if (selectedLanguage == 'fr') {
-      selectedLocale = 'French';
-    } else if (selectedLanguage == 'zh') {
-      selectedLocale = 'Chinese';
-    } else if (selectedLanguage == 'ar') {
-      selectedLocale = 'Arbic';
-    } else if (selectedLanguage == 'ja') {
-      selectedLocale = 'Japanese';
-    } else if (selectedLanguage == 'ru') {
-      selectedLocale = 'Russian';
-    } else if (selectedLanguage == 'it') {
-      selectedLocale = 'Italian';
-    } else if (selectedLanguage == 'es') {
-      selectedLocale = 'Spanish';
-    } else if (selectedLanguage == 'pt') {
-      selectedLocale = 'Portuguese';
-    }
+    await Common.getAllLanguageNames().then((value) {
+      languages = value;
+    });
+    await Common.getAllLanguageCodes().then((value) {
+      languagesCodes = value;
+    });
   }
 
   void getProfileInfo() {
@@ -112,6 +83,85 @@ class _ProfileState extends State<Profile> {
     });
   }
 
+  selectLanguagesMethod() async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Center(
+            child: Container(
+              height: 250,
+              width: MediaQuery.of(context).size.width * 0.7,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                borderRadius: new BorderRadius.all(
+                  new Radius.circular(24.0),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: ListView(
+                children: <Widget>[
+                  ListView.builder(
+                      padding: EdgeInsets.only(bottom: 25),
+                      physics: ScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount:
+                          languages.length == null ? 0 : languages.length,
+                      itemBuilder: (BuildContext context, int i) {
+                        return GFButton(
+                          onPressed: () async {
+                            await Common.setSelectedLanguage(languagesCodes[i]);
+                            Map localizedValues;
+                            String defaultLocale = '';
+                            await Common.getSelectedLanguage().then((value) {
+                              String locale = value ?? defaultLocale;
+                              APIService.getLanguageJson(locale)
+                                  .then((value) async {
+                                localizedValues =
+                                    value['response_data']['json'];
+                                if (locale == '') {
+                                  defaultLocale = value['response_data']
+                                      ['defaultCode']['languageCode'];
+                                  locale = defaultLocale;
+                                }
+                                await Common.setSelectedLanguage(locale);
+                                await Common.setAllLanguageCodes(
+                                    value['response_data']['langCode']);
+                                await Common.setAllLanguageNames(
+                                    value['response_data']['langName']);
+                                await AuthService.setLanguageCodeToProfile();
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          DeliveryApp(
+                                        locale: locale,
+                                        localizedValues: localizedValues,
+                                      ),
+                                    ),
+                                    (Route<dynamic> route) => false);
+                              });
+                            });
+                          },
+                          type: GFButtonType.transparent,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                languages[i],
+                                style: titleSmallBPR(),
+                              ),
+                              Container()
+                            ],
+                          ),
+                        );
+                      }),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,7 +183,7 @@ class _ProfileState extends State<Profile> {
                   child: SquareLoader(),
                 )
               : profileInfo == {}
-                  ? buildLogoutButton()
+                  ? buildlOGOUTButton()
                   : Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
@@ -259,205 +309,36 @@ class _ProfileState extends State<Profile> {
                           SizedBox(
                             height: 20,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                MyLocalizations.of(context).selectLanguages,
-                                style: titleSmallBPR(),
+                          InkWell(
+                            onTap: () {
+                              selectLanguagesMethod();
+                            },
+                            child: Container(
+                              height: 55,
+                              decoration: BoxDecoration(
+                                color: Color(0xFFF7F7F7),
                               ),
-                              DropdownButtonHideUnderline(
-                                child: DropdownButton(
-                                  hint: Text(selectedLocale == null
-                                      ? 'English'
-                                      : selectedLocale),
-                                  value: selectedLanguages,
-                                  onChanged: (newValue) async {
-                                    if (newValue == 'English') {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      if (mounted) {
-                                        setState(() {
-                                          prefs.setString(
-                                              'selectedLanguage', 'en');
-                                        });
-                                      }
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DeliveryApp(
-                                              "en",
-                                              widget.localizedValues,
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false);
-                                    } else if (newValue == 'Chinese') {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      if (mounted) {
-                                        setState(() {
-                                          prefs.setString(
-                                              'selectedLanguage', 'zh');
-                                        });
-                                      }
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DeliveryApp(
-                                              "zh",
-                                              widget.localizedValues,
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false);
-                                    } else if (newValue == 'Arbic') {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      if (mounted) {
-                                        setState(() {
-                                          prefs.setString(
-                                              'selectedLanguage', 'ar');
-                                        });
-                                      }
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DeliveryApp(
-                                              "ar",
-                                              widget.localizedValues,
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false);
-                                    } else if (newValue == 'Japanese') {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      if (mounted) {
-                                        setState(() {
-                                          prefs.setString(
-                                              'selectedLanguage', 'ja');
-                                        });
-                                      }
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DeliveryApp(
-                                              "ja",
-                                              widget.localizedValues,
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false);
-                                    } else if (newValue == 'Russian') {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      if (mounted) {
-                                        setState(() {
-                                          prefs.setString(
-                                              'selectedLanguage', 'ru');
-                                        });
-                                      }
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DeliveryApp(
-                                              "ru",
-                                              widget.localizedValues,
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false);
-                                    } else if (newValue == 'Italian') {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      if (mounted) {
-                                        setState(() {
-                                          prefs.setString(
-                                              'selectedLanguage', 'it');
-                                        });
-                                      }
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DeliveryApp(
-                                              "it",
-                                              widget.localizedValues,
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false);
-                                    } else if (newValue == 'Spanish') {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      if (mounted) {
-                                        setState(() {
-                                          prefs.setString(
-                                              'selectedLanguage', 'es');
-                                        });
-                                      }
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DeliveryApp(
-                                              "es",
-                                              widget.localizedValues,
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false);
-                                    } else if (newValue == 'Portuguese') {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      if (mounted) {
-                                        setState(() {
-                                          prefs.setString(
-                                              'selectedLanguage', 'pt');
-                                        });
-                                      }
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DeliveryApp(
-                                              "pt",
-                                              widget.localizedValues,
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false);
-                                    } else {
-                                      SharedPreferences prefs =
-                                          await SharedPreferences.getInstance();
-                                      if (mounted) {
-                                        setState(() {
-                                          prefs.setString(
-                                              'selectedLanguage', 'fr');
-                                        });
-                                      }
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                DeliveryApp(
-                                              "fr",
-                                              widget.localizedValues,
-                                            ),
-                                          ),
-                                          (Route<dynamic> route) => false);
-                                    }
-                                  },
-                                  items: languages.map((lang) {
-                                    return DropdownMenuItem(
-                                      child: new Text(lang),
-                                      value: lang,
-                                    );
-                                  }).toList(),
-                                ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0,
+                                        bottom: 10.0,
+                                        left: 20.0,
+                                        right: 20.0),
+                                    child: Text(
+                                      MyLocalizations.of(context)
+                                          .selectLanguages,
+                                      style: titleSmallBPR(),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                           SizedBox(height: 30),
-                          buildLogoutButton(),
+                          buildlOGOUTButton(),
                         ],
                       ),
                     ),
@@ -466,28 +347,47 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Widget buildLogoutButton() {
+  Widget buildlOGOUTButton() {
     return Container(
       height: 51,
       child: GFButton(
         onPressed: () {
-          Common.removeToken().then((value) {
-            Common.removeAccountID().then((value) {
-              socket.getSocket().destroy();
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => Login(
-                        locale: widget.locale,
-                        localizedValues: widget.localizedValues),
-                  ),
-                  (Route<dynamic> route) => false);
+          Map localizedValues;
+          String defaultLocale = '';
+
+          String locale = defaultLocale;
+          APIService.getLanguageJson(locale).then((value) async {
+            localizedValues = value['response_data']['json'];
+            if (locale == '') {
+              defaultLocale =
+                  value['response_data']['defaultCode']['languageCode'];
+              locale = defaultLocale;
+            }
+            await Common.setSelectedLanguage(locale);
+            await Common.setAllLanguageCodes(
+                value['response_data']['langCode']);
+            await Common.setAllLanguageNames(
+                value['response_data']['langName']);
+            await AuthService.setLanguageCodeToProfile();
+            Common.removeToken().then((value) {
+              Common.removeAccountID().then((value) {
+                socket.getSocket().destroy();
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => DeliveryApp(
+                        locale: locale,
+                        localizedValues: localizedValues,
+                      ),
+                    ),
+                    (Route<dynamic> route) => false);
+              });
             });
           });
         },
         size: GFSize.LARGE,
         child: Text(
-          MyLocalizations.of(context).LOGOUT,
+          MyLocalizations.of(context).lOGOUT,
           style: titleGPBSec(),
         ),
         type: GFButtonType.outline2x,
