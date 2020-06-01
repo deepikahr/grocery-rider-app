@@ -9,10 +9,9 @@ class APIService {
   static final Client client = Client();
 
   static Future<Map<String, dynamic>> getLocationformation() async {
-    String token;
-    String languageCode;
+    String token, languageCode;
     await Common.getSelectedLanguage().then((code) {
-      languageCode = code;
+      languageCode = code ?? "";
     });
     await Common.getToken().then((onValue) {
       token = onValue;
@@ -27,11 +26,11 @@ class APIService {
   }
 
   static Future<Map<String, dynamic>> getUserInfo() async {
-    String languageCode;
+    String languageCode, token;
     await Common.getSelectedLanguage().then((code) {
-      languageCode = code;
+      languageCode = code ?? "";
     });
-    String token;
+
     await Common.getToken().then((onValue) {
       token = onValue;
     });
@@ -47,8 +46,9 @@ class APIService {
   static Future<dynamic> getGlobalSettings() async {
     String languageCode;
     await Common.getSelectedLanguage().then((code) {
-      languageCode = code;
+      languageCode = code ?? "";
     });
+
     final response = await client.get(Constants.BASE_URL + 'setting/user/App',
         headers: {
           'Content-Type': 'application/json',
@@ -60,8 +60,9 @@ class APIService {
   static Future<Map<String, dynamic>> aboutUs() async {
     String languageCode;
     await Common.getSelectedLanguage().then((code) {
-      languageCode = code;
+      languageCode = code ?? "";
     });
+
     final response = await client
         .get(Constants.BASE_URL + "business/business/about/us", headers: {
       'Content-Type': 'application/json',
