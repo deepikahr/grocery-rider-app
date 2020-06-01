@@ -9,8 +9,11 @@ class APIService {
   static final Client client = Client();
 
   static Future<Map<String, dynamic>> getLocationformation() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     String token;
+    String languageCode;
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code;
+    });
     await Common.getToken().then((onValue) {
       token = onValue;
     });
@@ -18,14 +21,16 @@ class APIService {
         .get(Constants.BASE_URL + 'delivery/tax/settings/details', headers: {
       'Content-Type': 'application/json',
       'Authorization': 'bearer $token',
-      'language': prefs.getString('selectedLanguage') ?? ""
+      'language': languageCode
     });
     return json.decode(response.body);
   }
 
   static Future<Map<String, dynamic>> getUserInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    String languageCode;
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code;
+    });
     String token;
     await Common.getToken().then((onValue) {
       token = onValue;
@@ -34,29 +39,33 @@ class APIService {
         await client.get(Constants.BASE_URL + 'users/me', headers: {
       'Content-Type': 'application/json',
       'Authorization': 'bearer $token',
-      'language': prefs.getString('selectedLanguage') ?? ""
+      'language': languageCode
     });
     return json.decode(response.body);
   }
 
   static Future<dynamic> getGlobalSettings() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    final response =
-        await client.get(Constants.BASE_URL + 'setting/user/App', headers: {
-      'Content-Type': 'application/json',
-      'language': prefs.getString('selectedLanguage') ?? ""
+    String languageCode;
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code;
     });
+    final response = await client.get(Constants.BASE_URL + 'setting/user/App',
+        headers: {
+          'Content-Type': 'application/json',
+          'language': languageCode
+        });
     return json.decode(response.body);
   }
 
   static Future<Map<String, dynamic>> aboutUs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    String languageCode;
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code;
+    });
     final response = await client
         .get(Constants.BASE_URL + "business/business/about/us", headers: {
       'Content-Type': 'application/json',
-      'language': prefs.getString('selectedLanguage') ?? ""
+      'language': languageCode
     });
     return json.decode(response.body);
   }

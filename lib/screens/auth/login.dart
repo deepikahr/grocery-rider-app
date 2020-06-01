@@ -66,8 +66,9 @@ class _LOGINState extends State<LOGIN> {
   }
 
   void checkAUthentication() async {
-    await Common.getToken().then((token) {
+    await Common.getToken().then((token) async {
       if (token != null) {
+        await AuthService.setLanguageCodeToProfile();
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
@@ -103,7 +104,9 @@ class _LOGINState extends State<LOGIN> {
               onValue['response_data']['token'] != null) {
             if (onValue['response_data']['role'] == 'Delivery Boy') {
               Common.setToken(onValue['response_data']['token']).then((_) {
-                Common.setAccountID(onValue['response_data']['_id']).then((_) {
+                Common.setAccountID(onValue['response_data']['_id'])
+                    .then((_) async {
+                  await AuthService.setLanguageCodeToProfile();
                   if (mounted) {
                     Navigator.pushAndRemoveUntil(
                         context,
