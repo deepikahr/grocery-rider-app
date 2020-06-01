@@ -9,7 +9,7 @@ class AuthService {
   static Future<Map<String, dynamic>> lOGIN(body) async {
     String languageCode;
     await Common.getSelectedLanguage().then((code) {
-      languageCode = code;
+      languageCode = code ?? "";
     });
     final response = await client.post(Constants.BASE_URL + 'users/login',
         body: json.encode(body),
@@ -26,10 +26,8 @@ class AuthService {
       token = tkn;
     });
     await Common.getSelectedLanguage().then((code) {
-      languageCode = code;
+      languageCode = code ?? "";
     });
-    print(languageCode);
-    print(token);
     final response =
         await client.get(Constants.BASE_URL + 'users/language/set', headers: {
       'Content-Type': 'application/json',
