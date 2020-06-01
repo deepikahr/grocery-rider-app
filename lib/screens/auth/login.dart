@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import '../../services/common.dart';
@@ -245,7 +246,9 @@ class _LOGINState extends State<LOGIN> {
 
   Widget buildEmailTextFormField() {
     return TextFormField(
-      initialValue: "delivery1@ionicfirebaseapp.com",
+      initialValue: Constants.APP_NAME.contains('Readymade')
+          ? "delivery1@ionicfirebaseapp.com"
+          : null,
       cursorColor: primary,
       decoration: InputDecoration(
         filled: true,
@@ -277,7 +280,7 @@ class _LOGINState extends State<LOGIN> {
 
   Widget buildPasswordextFormField() {
     return TextFormField(
-      initialValue: "123456",
+      initialValue: Constants.APP_NAME.contains('Readymade') ? "123456" : null,
       cursorColor: primary,
       decoration: InputDecoration(
         filled: true,

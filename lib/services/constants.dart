@@ -2,9 +2,9 @@ class Constants {
   // app name
   static const APP_NAME = "Readymade grocery delivery app";
   // delopy url production
-  static const BASE_URL = "http://162.243.171.81:3000/";
+  // static const BASE_URL = "http://162.243.171.81:3000/";
   // delopy url testing
-  // static const BASE_URL = "http://f89653981197.ngrok.io/";
+  static const BASE_URL = "http://f89653981197.ngrok.io/";
   // ONE_SIGNAL_KEY
   static const ONE_SIGNAL_KEY = "a76b6867-bf12-440f-8bc2-30946c652af8";
   // Google API key
