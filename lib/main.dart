@@ -118,7 +118,7 @@ class AnimatedScreen extends StatelessWidget {
         color: Colors.white,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: Constants.APP_NAME.contains('سائق وهج ستور')
+        child: Constants.APP_NAME.contains('Readymade Grocery App')
             ? Image.asset(
                 'lib/assets/splash.png',
                 fit: BoxFit.cover,
