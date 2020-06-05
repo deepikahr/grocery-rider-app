@@ -47,12 +47,20 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
           .setSocketInstance(socket);
       await Common.getAccountID().then((id) {
         socket.getSocket().on('assigned-orders$id', (data) {
-          Provider.of<OrderModel>(context, listen: false)
-              .addOrders(data['assignedOrders']);
+          if (mounted) {
+            setState(() {
+              Provider.of<OrderModel>(context, listen: false)
+                  .addOrders(data['assignedOrders']);
+            });
+          }
         });
         socket.getSocket().on('delivered-orders$id', (data) {
-          Provider.of<OrderModel>(context, listen: false)
-              .addDelieveredOrders(data['orders']);
+          if (mounted) {
+            setState(() {
+              Provider.of<OrderModel>(context, listen: false)
+                  .addDelieveredOrders(data['orders']);
+            });
+          }
         });
       });
     });
