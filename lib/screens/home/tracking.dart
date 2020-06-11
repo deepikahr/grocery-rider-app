@@ -175,7 +175,8 @@ class _TrackingState extends State<Tracking> {
   }
 
   void _launchMap(LatLng location) async {
-    var mapSchema = 'geo:${location.latitude},${location.longitude}';
+    var mapSchema =
+        'google.navigation:q=${location.latitude},${location.longitude}';
     if (await canLaunch(mapSchema)) {
       await launch(mapSchema);
     } else {

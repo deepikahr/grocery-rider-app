@@ -15,7 +15,7 @@ PODS:
   - location_web (0.0.1):
     - Flutter
   - OneSignal (2.13.1)
-  - onesignal_flutter (2.4.0):
+  - onesignal_flutter (2.4.1):
     - Flutter
     - OneSignal (= 2.13.1)
   - shared_preferences (0.0.1):
@@ -84,7 +84,7 @@ SPEC CHECKSUMS:
   location: 3a2eed4dd2fab25e7b7baf2a9efefe82b512d740
   location_web: b94e7433cfe28c0f7c8923c2ee482824b32e55a7
   OneSignal: fa98eaa90372bb367b6a4a1c1622ffb9832c7600
-  onesignal_flutter: b138d71305c8edebe502b97fedb115c9e30f8e20
+  onesignal_flutter: fc5794fdcfdbd3f17426cb63c78281a3f51c85ff
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   shared_preferences_macos: f3f29b71ccbb56bf40c9dd6396c9acf15e214087
   shared_preferences_web: 141cce0c3ed1a1c5bf2a0e44f52d31eeb66e5ea9
