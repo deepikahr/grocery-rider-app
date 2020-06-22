@@ -8,7 +8,7 @@ class Constants {
   // ONE_SIGNAL_KEY
   static const ONE_SIGNAL_KEY = "a76b6867-bf12-440f-8bc2-30946c652af8";
   // Google API key
-  static const GOOGLE_API_KEY = "AIzaSyD6Q4UgAYOL203nuwNeBr4j_-yAd1U1gko";
+  static const GOOGLE_API_KEY = "AIzaSyBAwPGO0nO-z1aXVgEJg5G_XRAo6RnepSw";
   // URL for socket usage
   static final String socketUrl = BASE_URL.substring(0, BASE_URL.length - 1);
 }
