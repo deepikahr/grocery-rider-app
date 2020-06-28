@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/services.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
@@ -17,6 +18,7 @@ import 'services/constants.dart';
 import 'services/localizations.dart';
 
 void main() async {
+  await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
   initPlatformPlayerState();
   runApp(MaterialApp(
@@ -67,7 +69,7 @@ void initPlatformPlayerState() async {
       .setNotificationReceivedHandler((OSNotification notification) {});
   OneSignal.shared
       .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
-  await OneSignal.shared.init(Constants.ONE_SIGNAL_KEY, iOSSettings: settings);
+  await OneSignal.shared.init(Constants.oneSignalKey, iOSSettings: settings);
   OneSignal.shared
       .promptUserForPushNotificationPermission(fallbackToSettings: true);
   OneSignal.shared

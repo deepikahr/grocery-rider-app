@@ -1,5 +1,3 @@
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'common.dart';
 import 'package:http/http.dart' show Client;
 import 'constants.dart';
@@ -17,7 +15,7 @@ class APIService {
       token = onValue;
     });
     final response = await client
-        .get(Constants.BASE_URL + 'delivery/tax/settings/details', headers: {
+        .get(Constants.baseURL + 'delivery/tax/settings/details', headers: {
       'Content-Type': 'application/json',
       'Authorization': 'bearer $token',
       'language': languageCode
@@ -35,7 +33,7 @@ class APIService {
       token = onValue;
     });
     final response =
-        await client.get(Constants.BASE_URL + 'users/me', headers: {
+        await client.get(Constants.baseURL + 'users/me', headers: {
       'Content-Type': 'application/json',
       'Authorization': 'bearer $token',
       'language': languageCode
@@ -49,7 +47,7 @@ class APIService {
       languageCode = code ?? "";
     });
 
-    final response = await client.get(Constants.BASE_URL + 'setting/user/App',
+    final response = await client.get(Constants.baseURL + 'setting/user/App',
         headers: {
           'Content-Type': 'application/json',
           'language': languageCode
@@ -64,7 +62,7 @@ class APIService {
     });
 
     final response = await client
-        .get(Constants.BASE_URL + "business/business/about/us", headers: {
+        .get(Constants.baseURL + "business/business/about/us", headers: {
       'Content-Type': 'application/json',
       'language': languageCode
     });
@@ -73,7 +71,7 @@ class APIService {
 
   static Future<Map<String, dynamic>> getLanguageJson(languageCode) async {
     final response = await client.get(
-        Constants.BASE_URL +
+        Constants.baseURL +
             "language/user/info?req_from=deliveyAppJson&language_code=$languageCode",
         headers: {
           'Content-Type': 'application/json',

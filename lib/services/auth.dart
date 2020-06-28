@@ -11,7 +11,7 @@ class AuthService {
     await Common.getSelectedLanguage().then((code) {
       languageCode = code ?? "";
     });
-    final response = await client.post(Constants.BASE_URL + 'users/login',
+    final response = await client.post(Constants.baseURL + 'users/login',
         body: json.encode(body),
         headers: {
           'Content-Type': 'application/json',
@@ -29,7 +29,7 @@ class AuthService {
       languageCode = code ?? "";
     });
     final response =
-        await client.get(Constants.BASE_URL + 'users/language/set', headers: {
+        await client.get(Constants.baseURL + 'users/language/set', headers: {
       'Content-Type': 'application/json',
       'language': languageCode,
       'Authorization': 'bearer $token',

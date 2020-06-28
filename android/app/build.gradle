@@ -50,6 +50,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [googleMapApiKey: "$System.env.GOOGLE_MAP_API_KEY"]
     }
 
     signingConfigs {
