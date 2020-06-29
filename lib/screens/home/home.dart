@@ -44,12 +44,14 @@ class Home extends StatelessWidget {
                 return Padding(
                     padding: EdgeInsets.only(top: 50), child: SquareLoader());
               } else if (data.orders.length > 0) {
+                print(data.orders.reversed.toList());
                 return ListView.builder(
                     physics: ScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: data.orders.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return buildOrderCard(data.orders[index], index, context);
+                      List orderList = data.orders.reversed.toList();
+                      return buildOrderCard(orderList[index], index, context);
                     });
               } else {
                 return Padding(
