@@ -205,3 +205,148 @@ TextStyle subTitleLargeBPM() {
     fontFamily: 'PoppinsMedium',
   );
 }
+
+TextStyle textbarlowRegularBlack() {
+  return TextStyle(
+    fontSize: 15.0,
+    fontFamily: 'BarlowRegular',
+    color: Colors.black,
+  );
+}
+
+TextStyle textBarlowRegularBlack() {
+  return TextStyle(
+      fontSize: 16.0,
+      fontFamily: 'BarlowRegular',
+      color: Colors.black,
+      fontWeight: FontWeight.w500);
+}
+
+TextStyle textbarlowRegularaPrimary() {
+  return TextStyle(
+    fontSize: 16.0,
+    fontFamily: 'BarlowRegular',
+    fontWeight: FontWeight.w600,
+    color: primary,
+  );
+}
+
+TextStyle textbarlowSemiBoldBlack() {
+  return TextStyle(
+    fontSize: 17.0,
+    fontFamily: 'BarlowSemiBold',
+    color: Colors.black,
+    fontWeight: FontWeight.w700,
+  );
+}
+
+TextStyle textBarlowSemiBoldBlack() {
+  return TextStyle(
+//////barlowBold//////
+    fontSize: 20.0,
+    fontWeight: FontWeight.bold,
+    fontFamily: 'BarlowSemiBold',
+    color: Colors.black,
+  );
+}
+
+TextStyle textBarlowSemiBoldBlackbigg() {
+  return TextStyle(
+    fontSize: 22.0,
+    fontWeight: FontWeight.bold,
+    fontFamily: 'BarlowSemiBold',
+    color: Colors.black,
+  );
+}
+
+TextStyle textbarlowMediumBlack() {
+  return TextStyle(
+    fontSize: 20.0,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'BarlowMedium',
+    color: Colors.black,
+  );
+}
+
+TextStyle textbarlowMediumPrimary() {
+  return TextStyle(
+    fontSize: 20.0,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'BarlowMedium',
+    color: primary,
+  );
+}
+
+TextStyle textbarlowMediumBlackm() {
+  return TextStyle(
+    fontSize: 14.0,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'BarlowMedium',
+    color: Colors.black,
+  );
+}
+
+TextStyle textBarlowRegularrBlack() {
+  return TextStyle(
+    fontSize: 20.0,
+    fontFamily: 'BarlowRegular',
+    fontWeight: FontWeight.w400,
+    color: Colors.black,
+  );
+}
+
+TextStyle hintSfMediumredsmall() {
+  return TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 16.0,
+    color: red,
+    fontFamily: 'SfUiDMedium',
+  );
+}
+
+TextStyle textBarlowMediumGreen() {
+  return TextStyle(
+    fontSize: 16.0,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'BarlowMedium',
+    color: Color(0xFF20C978),
+  );
+}
+
+TextStyle textbarlowRegularBlackb() {
+  return TextStyle(
+    fontSize: 13.0,
+    fontFamily: 'BarlowRegular',
+    color: Colors.black,
+  );
+}
+
+TextStyle textbarlowRegularBlackd() {
+  return TextStyle(
+    fontSize: 12.0,
+    fontFamily: 'BarlowRegular',
+    color: Colors.black.withOpacity(0.60),
+  );
+}
+
+TextStyle textbarlowRegulardull() {
+  return TextStyle(
+      fontSize: 13.0, fontFamily: 'BarlowRegular', color: Color(0xFFBBBBBB));
+}
+
+TextStyle textbarlowRegularBlackdull() {
+  return TextStyle(
+    fontSize: 15.0,
+    fontFamily: 'BarlowRegular',
+    color: Colors.black.withOpacity(0.60),
+  );
+}
+
+TextStyle textBarlowMediumBlack() {
+  return TextStyle(
+    fontSize: 17.0,
+    fontWeight: FontWeight.w500,
+    fontFamily: 'BarlowMedium',
+    color: Colors.black,
+  );
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:getflutter/getflutter.dart';
+import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/screens/auth/forgotpassword.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
@@ -231,6 +232,8 @@ class _LOGINState extends State<LOGIN> {
                               ),
                               SizedBox(height: 10),
                               buildPasswordextFormField(),
+                              SizedBox(height: 10),
+                              buildForgotPasswordLink(),
                             ],
                           ),
                         ),
@@ -241,6 +244,38 @@ class _LOGINState extends State<LOGIN> {
                 ),
               ],
             ),
+    );
+  }
+
+  Widget buildForgotPasswordLink() {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ForgotPassword(
+              locale: widget.locale,
+              localizedValues: widget.localizedValues,
+            ),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10.0),
+        child: RichText(
+          text: TextSpan(
+            children: <TextSpan>[
+              TextSpan(
+                  text: MyLocalizations.of(context).forgotPassword + "?",
+                  style: titleSmallBPR()),
+              TextSpan(
+                text: '',
+                style: TextStyle(color: primary),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
