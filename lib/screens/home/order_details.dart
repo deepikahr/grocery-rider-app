@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import '../../models/order.dart';
 import '../../styles/styles.dart';
-import 'package:getflutter/getflutter.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 

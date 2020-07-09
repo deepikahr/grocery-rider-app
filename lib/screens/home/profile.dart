@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:grocerydelivery/main.dart';
-import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/order.dart';
@@ -9,7 +8,7 @@ import '../../services/api_service.dart';
 import '../../services/common.dart';
 import '../../services/socket.dart';
 import '../../styles/styles.dart';
-import 'package:getflutter/getflutter.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
@@ -28,16 +27,9 @@ class _ProfileState extends State<Profile> {
   TextEditingController emailController = TextEditingController();
   SocketService socket;
 
-  var dropdownValue;
-
-  String getLang;
-  Map<String, Map<String, String>> localizedValues;
-
   String selectedLanguages, selectedLang;
 
   List languages, languagesCodes;
-
-  var selectedLanguage, selectedLocale;
 
   @override
   void initState() {
@@ -109,37 +101,7 @@ class _ProfileState extends State<Profile> {
                         return GFButton(
                           onPressed: () async {
                             await Common.setSelectedLanguage(languagesCodes[i]);
-                            Map localizedValues;
-                            String defaultLocale = '';
-                            await Common.getSelectedLanguage().then((value) {
-                              String locale = value ?? defaultLocale;
-                              APIService.getLanguageJson(locale)
-                                  .then((value) async {
-                                localizedValues =
-                                    value['response_data']['json'];
-                                if (locale == '') {
-                                  defaultLocale = value['response_data']
-                                      ['defaultCode']['languageCode'];
-                                  locale = defaultLocale;
-                                }
-                                await Common.setSelectedLanguage(locale);
-                                await Common.setAllLanguageCodes(
-                                    value['response_data']['langCode']);
-                                await Common.setAllLanguageNames(
-                                    value['response_data']['langName']);
-                                await AuthService.setLanguageCodeToProfile();
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          DeliveryApp(
-                                        locale: locale,
-                                        localizedValues: localizedValues,
-                                      ),
-                                    ),
-                                    (Route<dynamic> route) => false);
-                              });
-                            });
+                            main();
                           },
                           type: GFButtonType.transparent,
                           child: Row(
@@ -351,36 +313,12 @@ class _ProfileState extends State<Profile> {
       height: 51,
       child: GFButton(
         onPressed: () {
-          Map localizedValues;
-          String defaultLocale = '';
-
-          String locale = defaultLocale;
-          APIService.getLanguageJson(locale).then((value) async {
-            localizedValues = value['response_data']['json'];
-            if (locale == '') {
-              defaultLocale =
-                  value['response_data']['defaultCode']['languageCode'];
-              locale = defaultLocale;
-            }
-            await Common.setSelectedLanguage(locale);
-            await Common.setAllLanguageCodes(
-                value['response_data']['langCode']);
-            await Common.setAllLanguageNames(
-                value['response_data']['langName']);
-            await AuthService.setLanguageCodeToProfile();
-            Common.removeToken().then((value) {
-              Common.removeAccountID().then((value) {
-                socket.getSocket().destroy();
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => DeliveryApp(
-                        locale: locale,
-                        localizedValues: localizedValues,
-                      ),
-                    ),
-                    (Route<dynamic> route) => false);
-              });
+          Common.getSelectedLanguage().then((selectedLocale) async {
+            await APIService.setLanguageCodeToProfileDefult(selectedLocale)
+                .then((value) async {
+              await Common.setToken(null);
+              await Common.setAccountID(null);
+              main();
             });
           });
         },

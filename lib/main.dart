@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/services.dart';
-import 'package:getflutter/getflutter.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/common.dart';
@@ -21,10 +22,15 @@ void main() async {
   await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
   initPlatformPlayerState();
-  runApp(MaterialApp(
-    home: AnimatedScreen(),
-    debugShowCheckedModeBanner: false,
-  ));
+  runZoned<Future<Null>>(() {
+    runApp(MaterialApp(
+      home: AnimatedScreen(),
+      debugShowCheckedModeBanner: false,
+    ));
+    return Future.value(null);
+    // ignore: deprecated_member_use
+  }, onError: (error, stackTrace) {});
+
   Common.getSelectedLanguage().then((selectedLocale) {
     Map localizedValues;
     String defaultLocale = '';
@@ -42,20 +48,24 @@ void main() async {
       await Common.setSelectedLanguage(locale);
       await Common.setAllLanguageNames(value['response_data']['langName']);
       await Common.setAllLanguageCodes(value['response_data']['langCode']);
-      runApp(
-        MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (context) => OrderModel()),
-            ChangeNotifierProvider(create: (context) => AdminModel()),
-            ChangeNotifierProvider(create: (context) => SocketModel()),
-            ChangeNotifierProvider(create: (context) => LocationModel()),
-          ],
-          child: DeliveryApp(
-            locale: locale,
-            localizedValues: localizedValues,
+      runZoned<Future<Null>>(() {
+        runApp(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => OrderModel()),
+              ChangeNotifierProvider(create: (context) => AdminModel()),
+              ChangeNotifierProvider(create: (context) => SocketModel()),
+              ChangeNotifierProvider(create: (context) => LocationModel()),
+            ],
+            child: DeliveryApp(
+              locale: locale,
+              localizedValues: localizedValues,
+            ),
           ),
-        ),
-      );
+        );
+        return Future.value(null);
+        // ignore: deprecated_member_use
+      }, onError: (error, stackTrace) {});
     });
   });
 }
@@ -120,17 +130,12 @@ class AnimatedScreen extends StatelessWidget {
         color: Colors.white,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: Constants.APP_NAME.contains('Readymade')
-            ? Image.asset(
-                'lib/assets/splash.png',
-                fit: BoxFit.cover,
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-              )
-            : GFLoader(
-                type: GFLoaderType.ios,
-                size: 40,
-              ),
+        child: Image.asset(
+          'lib/assets/splash.png',
+          fit: BoxFit.cover,
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+        ),
       ),
     );
   }

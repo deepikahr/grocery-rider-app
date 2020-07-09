@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:getflutter/getflutter.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import '../../models/admin_info.dart';
 import '../../models/order.dart';
@@ -86,7 +86,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         ],
       ),
       bottomNavigationBar: GFTabBar(
-        initialIndex: 0,
         controller: tabController,
         length: 3,
         tabBarColor: Colors.white,

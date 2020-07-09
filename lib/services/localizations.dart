@@ -195,9 +195,103 @@ class MyLocalizations {
         "You have updated status to: Out for delivery";
   }
 
-  greetTo(name) {
-    return localizedValues[locale.languageCode]['greetTo']
-        .replaceAll('{{name}}', name);
+  String get ok {
+    return localizedValues[locale.languageCode]['ok'] ?? "OK";
+  }
+
+  String get forgotPassword {
+    return localizedValues[locale.languageCode]['forgotPassword'] ??
+        "Forgot Password";
+  }
+
+  String get passwordreset {
+    return localizedValues[locale.languageCode]['passwordreset'] ??
+        "Password Reset";
+  }
+
+  String get pleaseenteryourregisteredEmailtosendtheresetcode {
+    return localizedValues[locale.languageCode]
+            ['pleaseenteryourregisteredEmailtosendtheresetcode'] ??
+        "Please enter your registered Email to send the reset code";
+  }
+
+  String get email {
+    return localizedValues[locale.languageCode]['email'] ?? "Email";
+  }
+
+  String get enterYourEmail {
+    return localizedValues[locale.languageCode]['enterYourEmail'] ??
+        "Enter Your Email";
+  }
+
+  String get pleaseEnterValidEmail {
+    return localizedValues[locale.languageCode]['pleaseEnterValidEmail'] ??
+        "Please Enter Valid Email";
+  }
+
+  String get submit {
+    return localizedValues[locale.languageCode]['submit'] ?? "Submit";
+  }
+
+  String get pleaseEnter4DigitOTP {
+    return localizedValues[locale.languageCode]['pleaseEnter4DigitOTP'] ??
+        "Please Enter 4 Digit OTP";
+  }
+
+  String get error {
+    return localizedValues[locale.languageCode]['error'] ?? "Error";
+  }
+
+  String get welcome {
+    return localizedValues[locale.languageCode]['welcome'] ?? "Welcome";
+  }
+
+  String get verifyOtp {
+    return localizedValues[locale.languageCode]['verifyOtp'] ?? "Verify Otp";
+  }
+
+  String get wehavesenta4digitcodeto {
+    return localizedValues[locale.languageCode]['wehavesenta4digitcodeto'] ??
+        "We have sent a 4 digit code to";
+  }
+
+  String get enterVerificationcode {
+    return localizedValues[locale.languageCode]['enterVerificationcode'] ??
+        "Enter Verification code";
+  }
+
+  String get submitOTP {
+    return localizedValues[locale.languageCode]['submitOTP'] ?? "Submit OTP";
+  }
+
+  String get enternewpassword {
+    return localizedValues[locale.languageCode]['enternewpassword'] ??
+        "Enter new password";
+  }
+
+  String get reenternewpassword {
+    return localizedValues[locale.languageCode]['reenternewpassword'] ??
+        "Re-enter new password";
+  }
+
+  String get passwordsdonotmatch {
+    return localizedValues[locale.languageCode]['passwordsdonotmatch'] ??
+        "Passwords do not match";
+  }
+
+  String get enterPassword {
+    return localizedValues[locale.languageCode]['enterPassword'] ??
+        "Enter Password";
+  }
+
+  String get pleaseEnterMin6DigitPassword {
+    return localizedValues[locale.languageCode]
+            ['pleaseEnterMin6DigitPassword'] ??
+        "Please Enter Min 6 Digit Password";
+  }
+
+  String get resentOTP {
+    return localizedValues[locale.languageCode]['resentOTP'] ?? "Resent OTP";
   }
 }
 
