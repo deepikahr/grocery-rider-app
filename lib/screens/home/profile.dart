@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grocerydelivery/main.dart';
+import 'package:grocerydelivery/screens/auth/changePassword.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/order.dart';
@@ -153,9 +154,10 @@ class _ProfileState extends State<Profile> {
                           SizedBox(height: 30),
                           Center(
                             child: GFAvatar(
-                              backgroundImage: NetworkImage(profileInfo[
-                                      'profilePic'] ??
-                                  'https://cdn.pixabay.com/photo/2020/03/12/19/55/northern-gannet-4926108__340.jpg'),
+                              backgroundImage: profileInfo['profilePic'] == null
+                                  ? AssetImage('lib/assets/logo/logo.png')
+                                  : NetworkImage(
+                                      'https://cdn.pixabay.com/photo/2020/03/12/19/55/northern-gannet-4926108__340.jpg'),
                               radius: 60,
                             ),
                           ),
@@ -298,6 +300,46 @@ class _ProfileState extends State<Profile> {
                               ),
                             ),
                           ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      ChangePassword(
+                                          locale: widget.locale,
+                                          localizedValues:
+                                              widget.localizedValues),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 55,
+                              decoration: BoxDecoration(
+                                color: Color(0xFFF7F7F7),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0,
+                                        bottom: 10.0,
+                                        left: 20.0,
+                                        right: 20.0),
+                                    child: Text(
+                                      MyLocalizations.of(context)
+                                          .changePassword,
+                                      style: titleSmallBPR(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                           SizedBox(height: 30),
                           buildlOGOUTButton(),
                         ],
@@ -318,6 +360,7 @@ class _ProfileState extends State<Profile> {
                 .then((value) async {
               await Common.setToken(null);
               await Common.setAccountID(null);
+              socket.getSocket().destroy();
               main();
             });
           });

@@ -140,4 +140,23 @@ class APIService {
     });
     return json.decode(response.body);
   }
+
+  static Future<Map<String, dynamic>> changePassword(body) async {
+    String token, languageCode;
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code ?? "";
+    });
+    await Common.getToken().then((onValue) {
+      token = onValue;
+    });
+    final response = await client.post(
+        Constants.baseURL + "users/change-password",
+        body: json.encode(body),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'bearer $token',
+          'language': languageCode,
+        });
+    return json.decode(response.body);
+  }
 }
