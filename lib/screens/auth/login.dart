@@ -42,11 +42,12 @@ class _LOGINState extends State<LOGIN> {
       });
     }
     APIService.aboutUs().then((value) {
+      print(value);
       try {
         if (value['response_code'] == 200) {
           if (mounted) {
             setState(() {
-              aboutUsDatails = value['response_data'][0];
+              aboutUsDatails = value['response_data'];
               isAboutUsData = false;
             });
           }
@@ -123,11 +124,11 @@ class _LOGINState extends State<LOGIN> {
               });
             } else {
               Common.showSnackbar(_scaffoldKey,
-                  '$email ${MyLocalizations.of(context).authorizationError}');
+                  '$email ${MyLocalizations.of(context).getLocalizations("AUTHORICATION_ERROR")}');
             }
           } else {
-            Common.showSnackbar(
-                _scaffoldKey, MyLocalizations.of(context).wrongFormat);
+            Common.showSnackbar(_scaffoldKey,
+                MyLocalizations.of(context).getLocalizations("WRONG_FORMAT"));
           }
           setState(() {
             isLoading = false;
@@ -149,7 +150,9 @@ class _LOGINState extends State<LOGIN> {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          isLoggedIn == null ? '' : MyLocalizations.of(context).lOGIN,
+          isLoggedIn == null
+              ? ''
+              : MyLocalizations.of(context).getLocalizations("LOGIN"),
           style: titleWPS(),
         ),
         centerTitle: true,
@@ -213,21 +216,18 @@ class _LOGINState extends State<LOGIN> {
                                             height: 60,
                                           ),
                               ),
-                              // Center(
-                              //     child: Text(
-                              //         MyLocalizations.of(context)
-                              //             .groceryDelivery,
-                              //         style: titleLargePPB())),
                               SizedBox(height: 50),
                               Text(
-                                MyLocalizations.of(context).emailId,
+                                MyLocalizations.of(context)
+                                    .getLocalizations("EMAIL_ID", true),
                                 style: titleSmallBPR(),
                               ),
                               SizedBox(height: 10),
                               buildEmailTextFormField(),
                               SizedBox(height: 25),
                               Text(
-                                MyLocalizations.of(context).password,
+                                MyLocalizations.of(context)
+                                    .getLocalizations("PASSWORD", true),
                                 style: titleSmallBPR(),
                               ),
                               SizedBox(height: 10),
@@ -266,7 +266,8 @@ class _LOGINState extends State<LOGIN> {
           text: TextSpan(
             children: <TextSpan>[
               TextSpan(
-                  text: MyLocalizations.of(context).forgotPassword + "?",
+                  text: MyLocalizations.of(context)
+                      .getLocalizations("ERROR_EMAIL"),
                   style: titleSmallBPR()),
               TextSpan(
                 text: '',
@@ -303,7 +304,7 @@ class _LOGINState extends State<LOGIN> {
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty || !RegExp(Common.emailPattern).hasMatch(value)) {
-          return MyLocalizations.of(context).errorEmail;
+          return MyLocalizations.of(context).getLocalizations("ERROR_EMAIL");
         } else
           return null;
       },
@@ -336,7 +337,7 @@ class _LOGINState extends State<LOGIN> {
       obscureText: true,
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
-          return MyLocalizations.of(context).errorPassword;
+          return MyLocalizations.of(context).getLocalizations("ERROR_PASSWORD");
         } else
           return null;
       },
@@ -359,7 +360,7 @@ class _LOGINState extends State<LOGIN> {
           child: isLoading
               ? SquareLoader()
               : Text(
-                  MyLocalizations.of(context).lOGIN,
+                  MyLocalizations.of(context).getLocalizations("LOGIN"),
                   style: titleXLargeWPB(),
                 ),
           color: secondary,

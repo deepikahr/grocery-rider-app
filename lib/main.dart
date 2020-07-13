@@ -40,14 +40,15 @@ void main() async {
         statusBarIconBrightness: Brightness.dark));
 
     APIService.getLanguageJson(locale).then((value) async {
-      localizedValues = value['response_data']['json'];
-      if (locale == '') {
-        defaultLocale = value['response_data']['defaultCode']['languageCode'];
-        locale = defaultLocale;
-      }
+      print(value);
+      localizedValues = value['response_data'];
+      // if (locale == '') {
+      //   defaultLocale = value['response_data']['defaultCode']['languageCode'];
+      //   locale = defaultLocale;
+      // }
       await Common.setSelectedLanguage(locale);
-      await Common.setAllLanguageNames(value['response_data']['langName']);
-      await Common.setAllLanguageCodes(value['response_data']['langCode']);
+      // await Common.setAllLanguageNames(value['response_data']['langName']);
+      // await Common.setAllLanguageCodes(value['response_data']['langCode']);
       runZoned<Future<Null>>(() {
         runApp(
           MultiProvider(

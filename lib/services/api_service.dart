@@ -61,7 +61,7 @@ class APIService {
     });
 
     final response = await client
-        .get(Constants.baseURL + "business/business/about/us", headers: {
+        .get(Constants.baseURL + "business/delivery/detail", headers: {
       'Content-Type': 'application/json',
       'language': languageCode
     });
@@ -70,8 +70,7 @@ class APIService {
 
   static Future<Map<String, dynamic>> getLanguageJson(languageCode) async {
     final response = await client.get(
-        Constants.baseURL +
-            "language/user/info?req_from=deliveyAppJson&language_code=$languageCode",
+        Constants.baseURL + "languages/delivery?code=$languageCode",
         headers: {
           'Content-Type': 'application/json',
         });
@@ -151,6 +150,115 @@ class APIService {
     });
     final response = await client.post(
         Constants.baseURL + "users/change-password",
+        body: json.encode(body),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'bearer $token',
+          'language': languageCode,
+        });
+    return json.decode(response.body);
+  }
+
+  //notification list
+  static Future<Map<String, dynamic>> getOrderHistory(orderId) async {
+    String token, languageCode;
+    await Common.getToken().then((tkn) {
+      token = tkn;
+    });
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code ?? "";
+    });
+    final response = await client.get(
+        Constants.baseURL + "orders/detail/delivery-boy/$orderId",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'bearer $token',
+          'language': languageCode,
+        });
+    return json.decode(response.body);
+  }
+
+  static Future<dynamic> orderStausChange(body) async {
+    String token, languageCode;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code ?? "";
+    });
+    final response = await client.put(
+        Constants.baseURL + "orders/delivery-boy/status/update",
+        body: json.encode(body),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+          'language': languageCode,
+        });
+    return json.decode(response.body);
+  }
+
+  static Future<dynamic> getLanguagesList() async {
+    String token, languageCode;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code ?? "";
+    });
+    final response =
+        await client.get(Constants.baseURL + "languages/list", headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+      'language': languageCode,
+    });
+    return json.decode(response.body);
+  }
+
+  static Future<dynamic> getDeliverdOrder() async {
+    String token, languageCode;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code ?? "";
+    });
+    final response = await client.get(
+        Constants.baseURL + "orders/delivery-boy/delivered/list",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+          'language': languageCode,
+        });
+    return json.decode(response.body);
+  }
+
+  static Future<dynamic> getAssignedOrder() async {
+    String token, languageCode;
+    await Common.getToken().then((onValue) {
+      token = 'bearer ' + onValue;
+    });
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code ?? "";
+    });
+    final response = await client
+        .get(Constants.baseURL + "orders/delivery-boy/assigned/list", headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+      'language': languageCode,
+    });
+    return json.decode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> orderAcceptOrRejectApi(body) async {
+    String token, languageCode;
+    await Common.getToken().then((tkn) {
+      token = tkn;
+    });
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code ?? "";
+    });
+    final response = await client.put(
+        Constants.baseURL + "orders/accept-or-reject/delivery-boy",
         body: json.encode(body),
         headers: {
           'Content-Type': 'application/json',

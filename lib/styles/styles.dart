@@ -350,3 +350,39 @@ TextStyle textBarlowMediumBlack() {
     color: Colors.black,
   );
 }
+
+TextStyle pageHeader() {
+  return new TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 18.0,
+    color: Colors.black,
+    fontFamily: 'PoppinsSemiBold',
+  );
+}
+
+TextStyle keyText() {
+  return new TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 14.0,
+    color: Colors.black,
+    fontFamily: 'PoppinsBold',
+  );
+}
+
+TextStyle keyTextWhite() {
+  return new TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 14.0,
+    color: Colors.white,
+    fontFamily: 'PoppinsBold',
+  );
+}
+
+TextStyle keyValue() {
+  return new TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 14.0,
+    color: Colors.black,
+    fontFamily: 'PoppinsRegular',
+  );
+}

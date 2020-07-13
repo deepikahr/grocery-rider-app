@@ -101,7 +101,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               color: primary,
               height: 20,
             ),
-            text: MyLocalizations.of(context).home,
+            text: MyLocalizations.of(context).getLocalizations("HOME"),
           ),
           Tab(
             icon: SvgPicture.asset(
@@ -109,7 +109,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               color: primary,
               height: 20,
             ),
-            text: MyLocalizations.of(context).profile,
+            text: MyLocalizations.of(context).getLocalizations("PROFILE"),
           ),
           Tab(
             icon: SvgPicture.asset(
@@ -117,7 +117,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               color: primary,
               height: 20,
             ),
-            text: MyLocalizations.of(context).history,
+            text: MyLocalizations.of(context).getLocalizations("HISTORY"),
           ),
         ],
       ),

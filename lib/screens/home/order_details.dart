@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/order.dart';
 import '../../styles/styles.dart';
 import 'package:getwidget/getwidget.dart';
@@ -9,20 +11,56 @@ import 'package:intl/intl.dart';
 
 class OrderDetails extends StatefulWidget {
   final String orderID;
-  OrderDetails({Key key, this.orderID}) : super(key: key);
+  final Map localizedValues;
+  final String locale;
+  OrderDetails({Key key, this.localizedValues, this.locale, this.orderID})
+      : super(key: key);
   @override
   _OrderDetailsState createState() => _OrderDetailsState();
 }
 
 class _OrderDetailsState extends State<OrderDetails> {
-  Map<String, dynamic> order;
+  Map order;
   String currency;
+  bool orderDataLoading = false;
 
-  Map<String, dynamic> findOrderByID(List orders, String orderID) =>
-      orders.firstWhere((element) => element['_id'] == orderID);
   @override
   void initState() {
+    getOrderDetails();
     super.initState();
+  }
+
+  Future<void> getOrderDetails() async {
+    if (mounted) {
+      setState(() {
+        orderDataLoading = true;
+      });
+    }
+    await APIService.getOrderHistory(widget.orderID).then((value) {
+      if (value['response_code'] == 200 && mounted) {
+        setState(() {
+          if (mounted) {
+            setState(() {
+              order = value['response_data'];
+
+              orderDataLoading = false;
+            });
+          }
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            orderDataLoading = false;
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          orderDataLoading = false;
+        });
+      }
+    });
   }
 
   @override
@@ -31,75 +69,38 @@ class _OrderDetailsState extends State<OrderDetails> {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          MyLocalizations.of(context).orderDetails,
+          MyLocalizations.of(context).getLocalizations("ORDER_DETAILS"),
           style: titleWPS(),
         ),
         centerTitle: true,
       ),
       backgroundColor: greyA,
-      body: Consumer<OrderModel>(builder: (context, data, child) {
-        order = findOrderByID(data.deliveredOrders, widget.orderID);
-        currency = data.currency;
-        String firstName = '',
-            lastName = '',
-            fullName = '',
-            deliveryAddress = '';
-        if (order['user'] != null && order['user']['firstName'] != null) {
-          firstName = order['user']['firstName'];
-        }
-        if (order['user'] != null && order['user']['lastName'] != null) {
-          lastName = order['user']['lastName'];
-        }
-        fullName = '$firstName $lastName';
-        if (order['deliveryAddress'] != null) {
-          deliveryAddress =
-              '${order['deliveryAddress']['flatNo']}, ${order['deliveryAddress']['apartmentName']}, ${order['deliveryAddress']['address']}';
-        }
-        return ListView(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: orderDataLoading
+          ? SquareLoader()
+          : Consumer<OrderModel>(builder: (context, data, child) {
+              // order = findOrderByID(data.deliveredOrders, widget.orderID);
+              currency = data.currency;
+              String firstName = '',
+                  lastName = '',
+                  fullName = '',
+                  deliveryAddress = '';
+              if (order['user'] != null && order['user']['firstName'] != null) {
+                firstName = order['user']['firstName'];
+              }
+              if (order['user'] != null && order['user']['lastName'] != null) {
+                lastName = order['user']['lastName'];
+              }
+              fullName = '$firstName $lastName';
+              if (order['deliveryAddress'] != null) {
+                deliveryAddress =
+                    '${order['deliveryAddress']['flatNo'] == null || order['deliveryAddress']['flatNo'] == "" ? "" : order['deliveryAddress']['flatNo'] + ", "} ${order['deliveryAddress']['apartmentName'] == null || order['deliveryAddress']['apartmentName'] == "" ? "" : order['deliveryAddress']['apartmentName'] + ", "} ${order['deliveryAddress']['address']}';
+              }
+              return ListView(
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        '# ${MyLocalizations.of(context).orderId}',
-                        style: subTitleLargeBPM(),
-                      ),
-                      Text(
-                        order['orderID'].toString(),
-                        style: subTitleSmallBPM(),
-                      )
-                    ],
-                  ),
+                  buildDescriptionCard(fullName, deliveryAddress),
                 ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        DateFormat('hh:mm a, dd/MM/yyyy')
-                            .format(DateTime.fromMillisecondsSinceEpoch(
-                                order['appTimestamp']))
-                            .toString(),
-                        style: subTitleSmallBPM(),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            buildDescriptionCard(fullName, deliveryAddress),
-          ],
-        );
-      }),
+              );
+            }),
     );
   }
 
@@ -114,23 +115,19 @@ class _OrderDetailsState extends State<OrderDetails> {
             fullName,
             style: titleXLargeBPSB(),
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           Text(
-            MyLocalizations.of(context).address,
-            style: titleXSmallBPR(),
+            MyLocalizations.of(context).getLocalizations("ADDRESS", true),
+            style: keyText(),
           ),
           Text(
             deliveryAddress,
             style: titleLargeBPM(),
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           Text(
-            MyLocalizations.of(context).items,
-            style: titleXSmallBPR(),
+            MyLocalizations.of(context).getLocalizations("ITEMS", true),
+            style: keyText(),
           ),
           ListView.builder(
               physics: ScrollPhysics(),
@@ -143,9 +140,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   style: titleLargeBPM(),
                 );
               }),
-          SizedBox(
-            height: 40,
-          ),
+          SizedBox(height: 20),
           buildFinalTotalBlock(context),
         ],
       ),
@@ -153,35 +148,201 @@ class _OrderDetailsState extends State<OrderDetails> {
   }
 
   Widget buildFinalTotalBlock(context) {
-    return Row(
+    return Column(
       children: <Widget>[
-        Expanded(
-          child: Container(
-            alignment: AlignmentDirectional.center,
-            height: 64,
-            decoration: BoxDecoration(
-                border: Border.all(color: greyB),
-                borderRadius: BorderRadius.circular(10),
-                color: greyA),
-            child: Text(DateFormat("HH:MM a, dd/MM/yyyy")
-                .format(DateTime.parse(order['updatedAt']))
-                .toString()),
+        Container(
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("ORDER_ID", true),
+                      style: keyText()),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "#${order['orderID'].toString()}",
+                          style: titleLargeBPM(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("DELIVERD", true),
+                      style: keyText()),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          DateFormat("HH:MM a, dd/MM/yyyy")
+                              .format(DateTime.parse(order['updatedAt']))
+                              .toString(),
+                          style: titleLargeBPM(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("DATE", true),
+                      style: keyText()),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          order['deliveryDate'],
+                          style: titleLargeBPM(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("TIME", true),
+                      style: keyText()),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          order['deliveryTime'],
+                          style: titleLargeBPM(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("DELIVERY_TYPE", true),
+                      style: keyText()),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          order['deliveryType'],
+                          style: titleLargeBPM(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("PAYMENT", true),
+                      style: keyText()),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          order['paymentType'] == 'COD'
+                              ? MyLocalizations.of(context)
+                                  .getLocalizations("CASH_ON_DELIVERY")
+                              : order['paymentType'] == 'CARD'
+                                  ? MyLocalizations.of(context)
+                                      .getLocalizations("PAYBYCARD")
+                                  : order['paymentType'],
+                          style: titleLargeBPM(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("SUB_TOTAL", true),
+                      style: keyText()),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "$currency${order['subTotal'].toDouble().toStringAsFixed(2)}",
+                          style: titleLargeBPM(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("DELIVERY_CHARGES", true),
+                      style: keyText()),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "$currency${order['deliveryCharges'].toDouble().toStringAsFixed(2)}",
+                          style: titleLargeBPM(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("TOTAL", true),
+                      style: keyText()),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "$currency${order['grandTotal'].toDouble().toStringAsFixed(2)}",
+                          style: titleLargeBPM(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ],
           ),
-        ),
-        SizedBox(
-          width: 20,
-        ),
-        Column(
-          children: <Widget>[
-            Text(
-              MyLocalizations.of(context).total,
-              style: titleXSmallBPR(),
-            ),
-            Text(
-              '$currency${order['grandTotal']}',
-              style: titleXLargeGPB(),
-            )
-          ],
         )
       ],
     );
