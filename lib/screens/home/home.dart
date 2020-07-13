@@ -1,20 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../models/location.dart';
-import '../../models/order.dart';
 import '../../models/socket.dart';
 import '../../styles/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'tracking.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   final Map localizedValues;
   final String locale;
   Home({Key key, this.localizedValues, this.locale}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  bool assignedOrderLoading = false;
+  List assignedOrdersList;
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+  @override
+  void initState() {
+    getAssignedOrders();
+    super.initState();
+  }
+
+  Future<void> getAssignedOrders() async {
+    if (mounted) {
+      setState(() {
+        assignedOrderLoading = true;
+      });
+    }
+    await APIService.getAssignedOrder().then((value) {
+      _refreshController.refreshCompleted();
+      if (mounted) {
+        setState(() {
+          assignedOrderLoading = false;
+        });
+      }
+      if (value['response_code'] == 200 && mounted) {
+        setState(() {
+          assignedOrdersList = value['response_data'];
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            assignedOrdersList = [];
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          assignedOrdersList = [];
+          assignedOrderLoading = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,58 +71,58 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primary,
-        title: Text(
-          MyLocalizations.of(context).home,
-          style: titleWPS(),
-        ),
+        title: Text(MyLocalizations.of(context).getLocalizations("HOME"),
+            style: titleWPS()),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: ListView(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
-            child: Text(
-              MyLocalizations.of(context).activeRequests,
-              style: titleBPS(),
-            ),
-          ),
-          Consumer<OrderModel>(
-            builder: (context, data, child) {
-              if (data == null || data.orders == null) {
-                return Padding(
-                    padding: EdgeInsets.only(top: 50), child: SquareLoader());
-              } else if (data.orders.length > 0) {
-                print(data.orders.reversed.toList());
-                return ListView.builder(
-                    physics: ScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: data.orders.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      List orderList = data.orders.reversed.toList();
-                      return buildOrderCard(orderList[index], index, context);
-                    });
-              } else {
-                return Padding(
-                  padding: EdgeInsets.only(top: 100),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.hourglass_empty,
-                        size: 100,
-                        color: greyB,
-                      ),
-                      Text(
-                        MyLocalizations.of(context).noActiveRequests,
-                        style: titleBPS(),
-                      ),
-                    ],
+      body: SmartRefresher(
+        enablePullDown: true,
+        enablePullUp: false,
+        controller: _refreshController,
+        onRefresh: () {
+          getAssignedOrders();
+        },
+        child: assignedOrderLoading == true
+            ? SquareLoader()
+            : ListView(
+                children: <Widget>[
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 20, left: 16, right: 16),
+                    child: Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("ACTIVE_REQUESTS"),
+                      style: titleBPS(),
+                    ),
                   ),
-                );
-              }
-            },
-          ),
-        ],
+                  assignedOrdersList.length > 0
+                      ? ListView.builder(
+                          physics: ScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: assignedOrdersList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return buildOrderCard(
+                                assignedOrdersList[index], index, context);
+                          })
+                      : Padding(
+                          padding: EdgeInsets.only(top: 100),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.hourglass_empty,
+                                size: 100,
+                                color: greyB,
+                              ),
+                              Text(
+                                  MyLocalizations.of(context)
+                                      .getLocalizations("NO_ACTIVE_REQUESTS"),
+                                  style: pageHeader()),
+                            ],
+                          ),
+                        )
+                ],
+              ),
       ),
     );
   }
@@ -92,8 +141,8 @@ class Home extends StatelessWidget {
           '${order['deliveryAddress']['flatNo']}, ${order['deliveryAddress']['apartmentName']}, ${order['deliveryAddress']['address']}';
     }
     return GFCard(
-      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       content: Column(
         children: <Widget>[
           Row(
@@ -102,96 +151,70 @@ class Home extends StatelessWidget {
               Row(
                 children: <Widget>[
                   Container(
-                    height: 15,
-                    child: SvgPicture.asset(
-                      'lib/assets/icons/customer.svg',
-                    ),
-                  ),
+                      height: 15,
+                      child: SvgPicture.asset('lib/assets/icons/customer.svg')),
                   Text(
-                    MyLocalizations.of(context).customer,
-                    style: titleXSmallBPR(),
-                  ),
-                  Text(
-                    fullName,
-                    style: titleXSmallBBPR(),
-                  )
+                      MyLocalizations.of(context)
+                          .getLocalizations("CUSTOMER", true),
+                      style: keyText()),
+                  Text(fullName, style: keyValue())
                 ],
               ),
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
           Row(
             children: <Widget>[
               Container(
                   height: 15,
-                  child: Icon(
-                    Icons.timer,
-                    color: greyB,
-                    size: 15,
-                  )),
-              Text(
-                MyLocalizations.of(context).timeDate,
-                style: titleXSmallBPR(),
-              ),
-              Text(
-                DateFormat('hh:mm a, dd/MM/yyyy')
-                    .format(DateTime.fromMillisecondsSinceEpoch(
-                        order['appTimestamp']))
-                    .toString(),
-                style: titleXSmallBBPR(),
-              )
+                  width: 20,
+                  child: Icon(Icons.timer, color: greyB, size: 15)),
+              Text(MyLocalizations.of(context).getLocalizations("DATE", true),
+                  style: keyText()),
+              Text(order['deliveryDate'] + ' ' + order['deliveryTime'],
+                  style: keyValue())
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
           Row(
             children: <Widget>[
               Container(
                 height: 15,
-                child: SvgPicture.asset(
-                  'lib/assets/icons/hash.svg',
-                ),
+                child: SvgPicture.asset('lib/assets/icons/hash.svg'),
               ),
               Text(
-                MyLocalizations.of(context).orderId,
-                style: titleXSmallBPR(),
-              ),
-              Text(
-                order['orderID'].toString(),
-                style: titleXSmallBBPR(),
-              )
+                  MyLocalizations.of(context)
+                      .getLocalizations("ORDER_ID", true),
+                  style: keyText()),
+              Text("#${order['orderID'].toString()}", style: keyValue())
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
           Row(
             children: <Widget>[
               Container(
                 height: 15,
-                child: SvgPicture.asset(
-                  'lib/assets/icons/location.svg',
-                ),
+                child: SvgPicture.asset('lib/assets/icons/location.svg'),
               ),
               Row(children: [
                 Text(
-                  MyLocalizations.of(context).address,
-                  style: titleXSmallBPR(),
-                ),
+                    MyLocalizations.of(context)
+                        .getLocalizations("ADDRESS", true),
+                    style: keyText()),
                 SizedBox(width: 20),
                 order['deliveryAddress'] != null
                     ? Container(
                         decoration: BoxDecoration(
-                          color: primary,
+                          color: secondary,
                           borderRadius: BorderRadius.circular(5),
                         ),
-                        padding: EdgeInsets.all(2),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 2, horizontal: 5),
                         child: Text(order['deliveryAddress']['addressType'],
-                            style: TextStyle(color: greyA, fontSize: 10)),
-                      )
+                            style: TextStyle(
+                                color: greyA,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500)))
                     : Container(),
               ])
             ],
@@ -203,17 +226,12 @@ class Home extends StatelessWidget {
               borderRadius: BorderRadius.circular(5),
               color: greyA,
             ),
-            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 2),
-            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 30),
-            child: Text(
-              deliveryAddress,
-              textAlign: TextAlign.center,
-              style: titleBPM(),
-            ),
+            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            child: Text(deliveryAddress,
+                textAlign: TextAlign.center, style: titleBPM()),
           ),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 10),
           Consumer<SocketModel>(builder: (context, service, child) {
             return order['isAcceptedByDeliveryBoy']
                 ? buildViewDetailsButton(context, order, index)
@@ -241,10 +259,26 @@ class Home extends StatelessWidget {
             if (order['isLoading'] == null) {
               order['isLoading'] = true;
               order['isAcceptedByDeliveryBoy'] = false;
-              Provider.of<OrderModel>(context, listen: false)
-                  .updateOrder(order, index);
-              service.getSocketInstance.orderEmitForAcceptReject(
-                  service.getSocketInstance.getSocket(), order);
+              // Provider.of<OrderModel>(context, listen: false)
+              //     .updateOrder(order, index);
+              // service.getSocketInstance.orderEmitForAcceptReject(
+              //     service.getSocketInstance.getSocket(), order);
+              Map body = {"order": order};
+              APIService.orderAcceptOrRejectApi(body).then((value) {
+                if (value['response_code'] == 200 && mounted) {
+                  setState(() {
+                    assignedOrdersList.removeAt(index);
+                  });
+                } else {
+                  if (mounted) {
+                    setState(() {});
+                  }
+                }
+              }).catchError((e) {
+                if (mounted) {
+                  setState(() {});
+                }
+              });
             }
           },
           size: GFSize.LARGE,
@@ -253,7 +287,7 @@ class Home extends StatelessWidget {
                   !order['isAcceptedByDeliveryBoy']
               ? SquareLoader()
               : Text(
-                  MyLocalizations.of(context).rEJECT,
+                  MyLocalizations.of(context).getLocalizations("REJECT"),
                   style: titleGPB(),
                 ),
           color: greyB,
@@ -282,7 +316,7 @@ class Home extends StatelessWidget {
                 !order['isAcceptedByDeliveryBoy']
             ? SquareLoader()
             : Text(
-                MyLocalizations.of(context).tRACK,
+                MyLocalizations.of(context).getLocalizations("TRACK"),
                 style: titleGPB(),
               ),
         textStyle: titleSPB(),
@@ -302,18 +336,45 @@ class Home extends StatelessWidget {
             if (order['isLoading'] == null) {
               order['isLoading'] = true;
               order['isAcceptedByDeliveryBoy'] = true;
-              Provider.of<OrderModel>(context, listen: false)
-                  .updateOrder(order, index);
-              service.getSocketInstance.orderEmitForAcceptReject(
-                  service.getSocketInstance.getSocket(), order);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Tracking(
-                          orderID: order['_id'].toString(),
-                        )),
-              );
+              Map body = {"order": order};
+              APIService.orderAcceptOrRejectApi(body).then((value) {
+                if (value['response_code'] == 200 && mounted) {
+                  setState(() {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Tracking(
+                                orderID: order['_id'].toString(),
+                              )),
+                    );
+                  });
+                } else {
+                  if (mounted) {
+                    setState(() {
+                      order['isAcceptedByDeliveryBoy'] = false;
+                    });
+                  }
+                }
+              }).catchError((e) {
+                if (mounted) {
+                  setState(() {
+                    order['isAcceptedByDeliveryBoy'] = false;
+                  });
+                }
+              });
             }
+            // Provider.of<OrderModel>(context, listen: false)
+            //     .updateOrder(order, index);
+            // service.getSocketInstance.orderEmitForAcceptReject(
+            //     service.getSocketInstance.getSocket(), order);
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //       builder: (context) => Tracking(
+            //             orderID: order['orderID'].toString(),
+            //           )),
+            // );
+            // }
           },
           size: GFSize.LARGE,
           child: order['isLoading'] != null &&
@@ -321,7 +382,7 @@ class Home extends StatelessWidget {
                   order['isAcceptedByDeliveryBoy']
               ? SquareLoader()
               : Text(
-                  MyLocalizations.of(context).accptRejest,
+                  MyLocalizations.of(context).getLocalizations("ACCEPT_TRACK"),
                   style: titleGPB(),
                 ),
           textStyle: titleSPB(),

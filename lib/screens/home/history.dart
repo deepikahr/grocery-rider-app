@@ -1,18 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
-import '../../models/order.dart';
 import '../../styles/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'order_details.dart';
 
-class History extends StatelessWidget {
+class History extends StatefulWidget {
   final Map localizedValues;
   final String locale;
   History({Key key, this.localizedValues, this.locale}) : super(key: key);
+
+  @override
+  _HistoryState createState() => _HistoryState();
+}
+
+class _HistoryState extends State<History> {
+  bool deliverdOrderLoading = false;
+  List deliverdOrdersList;
+  @override
+  void initState() {
+    getDeliverdInfo();
+    super.initState();
+  }
+
+  Future<void> getDeliverdInfo() async {
+    if (mounted) {
+      setState(() {
+        deliverdOrderLoading = true;
+      });
+    }
+    await APIService.getDeliverdOrder().then((value) {
+      if (mounted) {
+        setState(() {
+          deliverdOrderLoading = false;
+        });
+      }
+      if (value['response_code'] == 200 && mounted) {
+        setState(() {
+          deliverdOrdersList = value['response_data'];
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            deliverdOrdersList = [];
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          deliverdOrdersList = [];
+          deliverdOrderLoading = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,57 +65,52 @@ class History extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          MyLocalizations.of(context).history,
+          MyLocalizations.of(context).getLocalizations("HISTORY"),
           style: titleWPS(),
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: ListView(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
-            child: Text(
-              MyLocalizations.of(context).completedRequests,
-              style: titleBPS(),
+      body: deliverdOrderLoading == true
+          ? SquareLoader()
+          : ListView(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+                  child: Text(
+                    MyLocalizations.of(context)
+                        .getLocalizations("COMPLETED_REQUESTS"),
+                    style: titleBPS(),
+                  ),
+                ),
+                deliverdOrdersList.length > 0
+                    ? ListView.builder(
+                        physics: ScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: deliverdOrdersList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return buildOrderCard(
+                              context, deliverdOrdersList[index], index);
+                        })
+                    : Padding(
+                        padding: EdgeInsets.only(top: 100),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.hourglass_empty,
+                              size: 100,
+                              color: greyB,
+                            ),
+                            Text(
+                              MyLocalizations.of(context)
+                                  .getLocalizations("NO_DELIVERED_ORDERS"),
+                              style: titleBPS(),
+                            ),
+                          ],
+                        ),
+                      )
+              ],
             ),
-          ),
-          Consumer<OrderModel>(
-            builder: (context, data, child) {
-              if (data.deliveredOrders == null) {
-                return Padding(
-                  padding: EdgeInsets.only(top: 50),
-                  child: SquareLoader(),
-                );
-              }
-              if (data.deliveredOrders.length > 0) {
-                return ListView.builder(
-                    physics: ScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: data.deliveredOrders.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return buildOrderCard(
-                          context, data.deliveredOrders[index], index);
-                    });
-              } else {
-                return Padding(
-                    padding: EdgeInsets.only(top: 100),
-                    child: Column(children: [
-                      Icon(
-                        Icons.hourglass_empty,
-                        size: 100,
-                        color: greyB,
-                      ),
-                      Text(
-                        MyLocalizations.of(context).noDeliveredOrders,
-                        style: titleBPS(),
-                      ),
-                    ]));
-              }
-            },
-          ),
-        ],
-      ),
     );
   }
 
@@ -88,9 +128,10 @@ class History extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => OrderDetails(
-                    orderID: order['_id'].toString(),
-                  )),
+            builder: (context) => OrderDetails(
+              orderID: order['_id'].toString(),
+            ),
+          ),
         );
       },
       child: GFCard(
@@ -110,8 +151,9 @@ class History extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      MyLocalizations.of(context).customer,
-                      style: titleXSmallBPR(),
+                      MyLocalizations.of(context)
+                          .getLocalizations("CUSTOMER", true),
+                      style: keyText(),
                     ),
                     Text(
                       fullName,
@@ -133,8 +175,9 @@ class History extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  MyLocalizations.of(context).orderId,
-                  style: titleXSmallBPR(),
+                  MyLocalizations.of(context)
+                      .getLocalizations("ORDER_ID", true),
+                  style: keyText(),
                 ),
                 Text(
                   order['orderID'].toString(),
@@ -155,15 +198,20 @@ class History extends StatelessWidget {
                       size: 15,
                     )),
                 Text(
-                  MyLocalizations.of(context).timeDate,
-                  style: titleXSmallBPR(),
+                  MyLocalizations.of(context)
+                      .getLocalizations("DATE_TIME", true),
+                  style: keyText(),
                 ),
-                Text(
-                  DateFormat('hh:mm a, dd/MM/yyyy')
-                      .format(DateTime.fromMillisecondsSinceEpoch(
-                          order['appTimestamp']))
-                      .toString(),
-                  style: titleXSmallBBPR(),
+                Expanded(
+                  child: Text(
+                    DateFormat('hh:mm a, dd/MM/yyyy, EEEE')
+                        .format(DateTime.fromMillisecondsSinceEpoch(
+                            order['appTimestamp']))
+                        .toString(),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: titleXSmallBBPR(),
+                  ),
                 )
               ],
             ),

@@ -28,10 +28,8 @@ class _ProfileState extends State<Profile> {
   TextEditingController emailController = TextEditingController();
   SocketService socket;
 
-  String selectedLanguages, selectedLang;
-
-  List languages, languagesCodes;
-
+  List languagesList;
+  bool languagesListLoading = false;
   @override
   void initState() {
     socket = Provider.of<SocketModel>(context, listen: false).getSocketInstance;
@@ -41,11 +39,38 @@ class _ProfileState extends State<Profile> {
   }
 
   getLanguages() async {
-    await Common.getAllLanguageNames().then((value) {
-      languages = value;
-    });
-    await Common.getAllLanguageCodes().then((value) {
-      languagesCodes = value;
+    if (mounted) {
+      setState(() {
+        languagesListLoading = true;
+      });
+    }
+    APIService.getLanguagesList().then((value) {
+      print(value);
+      if (value['response_code'] == 200 && mounted) {
+        setState(() {
+          if (mounted) {
+            setState(() {
+              languagesList = value['response_data'];
+
+              languagesListLoading = false;
+            });
+          }
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            languagesList = [];
+            languagesListLoading = false;
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          languagesList = [];
+          languagesListLoading = false;
+        });
+      }
     });
   }
 
@@ -96,12 +121,14 @@ class _ProfileState extends State<Profile> {
                       padding: EdgeInsets.only(bottom: 25),
                       physics: ScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount:
-                          languages.length == null ? 0 : languages.length,
+                      itemCount: languagesList.length == null
+                          ? 0
+                          : languagesList.length,
                       itemBuilder: (BuildContext context, int i) {
                         return GFButton(
                           onPressed: () async {
-                            await Common.setSelectedLanguage(languagesCodes[i]);
+                            await Common.setSelectedLanguage(
+                                languagesList[i]['languageCode']);
                             main();
                           },
                           type: GFButtonType.transparent,
@@ -109,7 +136,7 @@ class _ProfileState extends State<Profile> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               Text(
-                                languages[i],
+                                languagesList[i]['languageName'],
                                 style: titleSmallBPR(),
                               ),
                               Container()
@@ -130,7 +157,7 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          MyLocalizations.of(context).profile,
+          MyLocalizations.of(context).getLocalizations("PROFILE"),
           style: titleWPS(),
         ),
         centerTitle: true,
@@ -139,7 +166,7 @@ class _ProfileState extends State<Profile> {
       backgroundColor: Colors.white,
       body: ListView(
         children: <Widget>[
-          profileInfo == null
+          profileInfo == null || languagesListLoading
               ? Padding(
                   padding: EdgeInsets.only(top: 50),
                   child: SquareLoader(),
@@ -163,7 +190,8 @@ class _ProfileState extends State<Profile> {
                           ),
                           SizedBox(height: 30),
                           Text(
-                            MyLocalizations.of(context).userName,
+                            MyLocalizations.of(context)
+                                .getLocalizations("USER_NAME", true),
                             style: titleSmallBPR(),
                           ),
                           SizedBox(
@@ -191,7 +219,8 @@ class _ProfileState extends State<Profile> {
                             height: 25,
                           ),
                           Text(
-                            MyLocalizations.of(context).emailId,
+                            MyLocalizations.of(context)
+                                .getLocalizations("EMAIL_ID", true),
                             style: titleSmallBPR(),
                           ),
                           SizedBox(
@@ -219,7 +248,8 @@ class _ProfileState extends State<Profile> {
                             height: 25,
                           ),
                           Text(
-                            MyLocalizations.of(context).mobileNumber,
+                            MyLocalizations.of(context)
+                                .getLocalizations("MOBILE_NUMBER", true),
                             style: titleSmallBPR(),
                           ),
                           SizedBox(
@@ -245,7 +275,8 @@ class _ProfileState extends State<Profile> {
                           ),
                           SizedBox(height: 25),
                           Text(
-                            MyLocalizations.of(context).ordersCompleted,
+                            MyLocalizations.of(context)
+                                .getLocalizations("ORDER_COMPLETED", true),
                             style: titleSmallBPR(),
                           ),
                           SizedBox(
@@ -272,34 +303,38 @@ class _ProfileState extends State<Profile> {
                           SizedBox(
                             height: 20,
                           ),
-                          InkWell(
-                            onTap: () {
-                              selectLanguagesMethod();
-                            },
-                            child: Container(
-                              height: 55,
-                              decoration: BoxDecoration(
-                                color: Color(0xFFF7F7F7),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 10.0,
-                                        bottom: 10.0,
-                                        left: 20.0,
-                                        right: 20.0),
-                                    child: Text(
-                                      MyLocalizations.of(context)
-                                          .selectLanguages,
-                                      style: titleSmallBPR(),
+                          languagesList.length > 0
+                              ? InkWell(
+                                  onTap: () {
+                                    selectLanguagesMethod();
+                                  },
+                                  child: Container(
+                                    height: 55,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFF7F7F7),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 10.0,
+                                              bottom: 10.0,
+                                              left: 20.0,
+                                              right: 20.0),
+                                          child: Text(
+                                            MyLocalizations.of(context)
+                                                .getLocalizations(
+                                                    "SELECT_LANGUAGE"),
+                                            style: titleSmallBPR(),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                )
+                              : Container(),
                           SizedBox(
                             height: 20,
                           ),
@@ -332,7 +367,7 @@ class _ProfileState extends State<Profile> {
                                         right: 20.0),
                                     child: Text(
                                       MyLocalizations.of(context)
-                                          .changePassword,
+                                          .getLocalizations("CHANGE_PASSWORD"),
                                       style: titleSmallBPR(),
                                     ),
                                   ),
@@ -367,7 +402,7 @@ class _ProfileState extends State<Profile> {
         },
         size: GFSize.LARGE,
         child: Text(
-          MyLocalizations.of(context).lOGOUT,
+          MyLocalizations.of(context).getLocalizations("LOGOUT"),
           style: titleGPBSec(),
         ),
         type: GFButtonType.outline2x,

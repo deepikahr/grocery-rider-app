@@ -55,7 +55,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   actions: <Widget>[
                     new FlatButton(
                       child: new Text(
-                        MyLocalizations.of(context).ok,
+                        MyLocalizations.of(context).getLocalizations("OK"),
                         style: textbarlowRegularaPrimary(),
                       ),
                       onPressed: () {
@@ -118,7 +118,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           ),
         ),
         title: Text(
-          MyLocalizations.of(context).forgotPassword,
+          MyLocalizations.of(context).getLocalizations("FORGET_PASSWORD"),
           style: titleWPS(),
         ),
         centerTitle: true,
@@ -134,7 +134,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 padding: const EdgeInsets.only(
                     top: 40.0, left: 18.0, bottom: 8.0, right: 20.0),
                 child: Text(
-                  MyLocalizations.of(context).passwordreset,
+                  MyLocalizations.of(context)
+                      .getLocalizations("PASSWORD_RESET"),
                   style: textbarlowMediumBlack(),
                 ),
               ),
@@ -143,7 +144,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     left: 18.0, bottom: 25.0, right: 20.0),
                 child: Text(
                   MyLocalizations.of(context)
-                      .pleaseenteryourregisteredEmailtosendtheresetcode,
+                      .getLocalizations("FORET_PASS_MESSAGE"),
                   style: textbarlowRegularBlack(),
                 ),
               ),
@@ -156,7 +157,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     text: TextSpan(
                       children: <TextSpan>[
                         TextSpan(
-                            text: MyLocalizations.of(context).email,
+                            text: MyLocalizations.of(context)
+                                .getLocalizations("EMAIL"),
                             style: textbarlowRegularBlack()),
                         TextSpan(
                           text: ' *',
@@ -177,12 +179,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     },
                     validator: (String value) {
                       if (value.isEmpty) {
-                        return MyLocalizations.of(context).enterYourEmail;
+                        return MyLocalizations.of(context)
+                            .getLocalizations("ENTER_YOUR_EMAIL");
                       } else if (!RegExp(
                               r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
                           .hasMatch(value)) {
                         return MyLocalizations.of(context)
-                            .pleaseEnterValidEmail;
+                            .getLocalizations("ERROR_MAIL");
                       } else
                         return null;
                     },
@@ -221,7 +224,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        MyLocalizations.of(context).submit,
+                        MyLocalizations.of(context).getLocalizations("SUBMIT"),
                         style: titleXLargeWPB(),
                       ),
                       SizedBox(
