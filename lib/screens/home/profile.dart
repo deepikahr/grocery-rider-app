@@ -81,7 +81,7 @@ class _ProfileState extends State<Profile> {
     APIService.getUserInfo().then((value) {
       if (value['response_code'] == 200 && mounted) {
         setState(() {
-          profileInfo = value['response_data']['userInfo'];
+          profileInfo = value['response_data'];
           nameController.text =
               '${profileInfo['firstName']} ${profileInfo['lastName']}';
           numberController.text = profileInfo['mobileNumber'] ?? '';
@@ -127,9 +127,16 @@ class _ProfileState extends State<Profile> {
                       itemBuilder: (BuildContext context, int i) {
                         return GFButton(
                           onPressed: () async {
-                            await Common.setSelectedLanguage(
+                            Common.setSelectedLanguage(
                                 languagesList[i]['languageCode']);
-                            main();
+                            Common.getSelectedLanguage()
+                                .then((selectedLocale) async {
+                              Map body = {"language": selectedLocale};
+                              await APIService.updateUserInfo(body)
+                                  .then((onValue) {
+                                main();
+                              });
+                            });
                           },
                           type: GFButtonType.transparent,
                           child: Row(
@@ -391,12 +398,14 @@ class _ProfileState extends State<Profile> {
       child: GFButton(
         onPressed: () {
           Common.getSelectedLanguage().then((selectedLocale) async {
-            await APIService.setLanguageCodeToProfileDefult(selectedLocale)
-                .then((value) async {
-              await Common.setToken(null);
-              await Common.setAccountID(null);
-              socket.getSocket().destroy();
-              main();
+            Map body = {"language": selectedLocale};
+            await APIService.updateUserInfo(body).then((onValue) {
+              Map body = {"playerId": null};
+              APIService.updateUserInfo(body).then((value) async {
+                await Common.setToken(null);
+                await Common.setAccountID(null);
+                main();
+              });
             });
           });
         },

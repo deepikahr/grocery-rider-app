@@ -20,6 +20,7 @@ class APIService {
       'Authorization': 'bearer $token',
       'language': languageCode
     });
+    print(json.decode(response.body));
     return json.decode(response.body);
   }
 
@@ -51,20 +52,6 @@ class APIService {
           'Content-Type': 'application/json',
           'language': languageCode
         });
-    return json.decode(response.body);
-  }
-
-  static Future<Map<String, dynamic>> aboutUs() async {
-    String languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-
-    final response = await client
-        .get(Constants.baseURL + "business/delivery/detail", headers: {
-      'Content-Type': 'application/json',
-      'language': languageCode
-    });
     return json.decode(response.body);
   }
 
@@ -122,21 +109,6 @@ class APIService {
           'Authorization': 'bearer $token',
           'language': languageCode,
         });
-    return json.decode(response.body);
-  }
-
-  static Future<dynamic> setLanguageCodeToProfileDefult(languageCode) async {
-    String token;
-    await Common.getToken().then((tkn) {
-      token = tkn;
-    });
-
-    final response =
-        await client.get(Constants.baseURL + 'users/language/set', headers: {
-      'Content-Type': 'application/json',
-      'language': languageCode,
-      'Authorization': 'bearer $token',
-    });
     return json.decode(response.body);
   }
 
@@ -229,6 +201,8 @@ class APIService {
           'Authorization': token,
           'language': languageCode,
         });
+    print(json.decode(response.body));
+
     return json.decode(response.body);
   }
 
@@ -246,6 +220,8 @@ class APIService {
       'Authorization': token,
       'language': languageCode,
     });
+    print(json.decode(response.body));
+
     return json.decode(response.body);
   }
 
@@ -265,6 +241,27 @@ class APIService {
           'Authorization': 'bearer $token',
           'language': languageCode,
         });
+    return json.decode(response.body);
+  }
+
+  // user data update
+  static Future<Map<String, dynamic>> updateUserInfo(body) async {
+    String token, languageCode;
+    await Common.getToken().then((tkn) {
+      token = tkn;
+    });
+    await Common.getSelectedLanguage().then((code) {
+      languageCode = code ?? "";
+    });
+    final response = await client.put(
+        Constants.baseURL + "users/update/profile",
+        body: json.encode(body),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'bearer $token',
+          'language': languageCode,
+        });
+
     return json.decode(response.body);
   }
 }

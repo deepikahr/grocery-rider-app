@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:grocerydelivery/models/admin_info.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
@@ -35,7 +36,7 @@ class _TrackingState extends State<Tracking> {
   static const double CAMERA_TILT = 0;
   static const double CAMERA_BEARING = 30;
   static LatLng agentLocation, customerLocation, storeLocation;
-  static Map<String, dynamic> order;
+  static Map<String, dynamic> order, adminLocation;
   final PolylinePoints polylinePoints = PolylinePoints();
   final Completer<GoogleMapController> _controller = Completer();
   final Set<Marker> _markers = {};
@@ -115,10 +116,12 @@ class _TrackingState extends State<Tracking> {
   }
 
   void setLatLng() {
-    storeLocation = LatLng(order['location']['location']['coordinates'][1],
-        order['location']['location']['coordinates'][0]);
-    customerLocation = LatLng(order['deliveryAddress']['location']['lat'],
-        order['deliveryAddress']['location']['long']);
+    // storeLocation = LatLng(order['location']['location']['coordinates'][1],
+    //     order['location']['location']['coordinates'][0]);
+    storeLocation =
+        LatLng(adminLocation['latitude'], adminLocation['longitude']);
+    customerLocation = LatLng(order['deliveryAddress']['location']['latitude'],
+        order['deliveryAddress']['location']['longitude']);
     setMapPins();
   }
 
@@ -226,45 +229,48 @@ class _TrackingState extends State<Tracking> {
       key: _scaffoldKey,
       body: orderDataLoading
           ? SquareLoader()
-          : Consumer<OrderModel>(builder: (context, data, child) {
-              //   order = findOrderByID(data.orders, widget.orderID);
-              currency = data.currency;
-              if (order['orderStatus'] == 'Out for delivery')
-                startButtonText = 'STARTED';
+          : Consumer<AdminModel>(builder: (context, admin, child) {
+              adminLocation = admin.storeLocation;
+              return Consumer<OrderModel>(builder: (context, data, child) {
+                //   order = findOrderByID(data.orders, widget.orderID);
+                currency = data.currency;
+                if (order['orderStatus'] == 'Out for delivery')
+                  startButtonText = 'STARTED';
 
-              String firstName = '', lastName = '';
-              if (order['user'] != null && order['user']['firstName'] != null)
-                firstName = order['user']['firstName'];
-              if (order['user'] != null && order['user']['lastName'] != null)
-                lastName = order['user']['lastName'];
+                String firstName = '', lastName = '';
+                if (order['user'] != null && order['user']['firstName'] != null)
+                  firstName = order['user']['firstName'];
+                if (order['user'] != null && order['user']['lastName'] != null)
+                  lastName = order['user']['lastName'];
 
-              fullName = '$firstName $lastName';
+                fullName = '$firstName $lastName';
 
-              if (order['deliveryAddress'] != null) {
-                deliveryAddress =
-                    '${order['deliveryAddress']['flatNo'] == null || order['deliveryAddress']['flatNo'] == "" ? "" : order['deliveryAddress']['flatNo'] + ", "} ${order['deliveryAddress']['apartmentName'] == null || order['deliveryAddress']['apartmentName'] == "" ? "" : order['deliveryAddress']['apartmentName'] + ", "} ${order['deliveryAddress']['address']}';
-              }
-              return Container(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                child: data == null
-                    ? SquareLoader()
-                    : GoogleMap(
-                        onMapCreated: _onMapCreated,
-                        myLocationEnabled: true,
-                        myLocationButtonEnabled: true,
-                        padding: EdgeInsets.all(0),
-                        markers: _markers,
-                        polylines: _polylines,
-                        mapType: MapType.normal,
-                        initialCameraPosition: CameraPosition(
-                          zoom: CAMERA_ZOOM,
-                          bearing: CAMERA_BEARING,
-                          tilt: CAMERA_TILT,
-                          target: agentLocation ?? LatLng(12.8718, 77.6022),
+                if (order['deliveryAddress'] != null) {
+                  deliveryAddress =
+                      '${order['deliveryAddress']['flatNo'] == null || order['deliveryAddress']['flatNo'] == "" ? "" : order['deliveryAddress']['flatNo'] + ", "} ${order['deliveryAddress']['apartmentName'] == null || order['deliveryAddress']['apartmentName'] == "" ? "" : order['deliveryAddress']['apartmentName'] + ", "} ${order['deliveryAddress']['address']}';
+                }
+                return Container(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: data == null
+                      ? SquareLoader()
+                      : GoogleMap(
+                          onMapCreated: _onMapCreated,
+                          myLocationEnabled: true,
+                          myLocationButtonEnabled: true,
+                          padding: EdgeInsets.all(0),
+                          markers: _markers,
+                          polylines: _polylines,
+                          mapType: MapType.normal,
+                          initialCameraPosition: CameraPosition(
+                            zoom: CAMERA_ZOOM,
+                            bearing: CAMERA_BEARING,
+                            tilt: CAMERA_TILT,
+                            target: agentLocation ?? LatLng(12.8718, 77.6022),
+                          ),
                         ),
-                      ),
-              );
+                );
+              });
             }),
       bottomSheet: orderDataLoading
           ? SquareLoader()

@@ -317,7 +317,7 @@ class _OtpState extends State<Otp> {
                         : Text("")
                   ],
                 ),
-                textStyle: textBarlowRegularrBlack(),
+                textStyle: titleXLargeWPB(),
               ),
             ),
           ),

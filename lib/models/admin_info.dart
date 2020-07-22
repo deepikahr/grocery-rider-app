@@ -7,12 +7,12 @@ class AdminModel extends ChangeNotifier {
     if (_info != null && _info['response_code'] == 200) {
       if (_info['response_data']['location'] != null) {
         return {
-          'lat': _info['response_data']['location']['lat'],
-          'long': _info['response_data']['location']['lng']
+          'latitude': _info['response_data']['location']['latitude'],
+          'longitude': _info['response_data']['location']['longitude']
         };
       }
     }
-    return {'lat': 12.8718, 'long': 77.6022};
+    return {'latitude': 12.8718, 'longitude': 77.6022};
   }
 
   void updateInfo(Map locationInfo) {

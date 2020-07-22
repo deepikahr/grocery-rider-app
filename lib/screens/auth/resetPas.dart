@@ -322,7 +322,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                             : Text("")
                       ],
                     ),
-                    textStyle: textBarlowRegularrBlack(),
+                    textStyle: titleXLargeWPB(),
                   ),
                 ),
               ),

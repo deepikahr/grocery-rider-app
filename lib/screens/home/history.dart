@@ -204,7 +204,7 @@ class _HistoryState extends State<History> {
                 ),
                 Expanded(
                   child: Text(
-                    DateFormat('hh:mm a, dd/MM/yyyy, EEEE')
+                    DateFormat('hh:mm a, dd/MM/yyyy')
                         .format(DateTime.fromMillisecondsSinceEpoch(
                             order['appTimestamp']))
                         .toString(),

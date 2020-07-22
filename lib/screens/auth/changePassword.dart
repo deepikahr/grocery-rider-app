@@ -129,7 +129,7 @@ class _ChangePasswordState extends State<ChangePassword> {
         ),
         title: Text(
           MyLocalizations.of(context).getLocalizations("CHANGE_PASSWORD"),
-          style: textbarlowSemiBoldBlack(),
+          style: titleWPS(),
         ),
         centerTitle: true,
         backgroundColor: primary,
@@ -376,7 +376,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                     right: 0.0,
                   ),
                   child: GFButton(
-                    color: primary,
+                    color: secondary,
                     blockButton: true,
                     onPressed: changePassword,
                     child: Row(
@@ -385,7 +385,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                         Text(
                           MyLocalizations.of(context)
                               .getLocalizations("SUBMIT"),
-                          style: textbarlowMediumBlack(),
+                          style: titleXLargeWPB(),
                         ),
                         SizedBox(
                           height: 10,
