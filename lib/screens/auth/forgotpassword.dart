@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/otp.dart';
-import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 
@@ -30,8 +30,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           isVerfyEmailLoading = true;
         });
       }
-      Map<String, dynamic> body = {"email": email.toLowerCase()};
-      await APIService.verifyEmail(body).then((onValue) {
+      await AuthService.forgetPassword(email.toLowerCase()).then((onValue) {
+        print(onValue);
         try {
           if (mounted) {
             setState(() {
@@ -47,7 +47,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   content: new SingleChildScrollView(
                     child: new ListBody(
                       children: <Widget>[
-                        new Text('${onValue['response_data']['message']}',
+                        new Text('${onValue['response_data']}',
                             style: textBarlowRegularBlack()),
                       ],
                     ),
@@ -65,7 +65,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           MaterialPageRoute(
                             builder: (context) => Otp(
                               email: email.toLowerCase(),
-                              token: onValue['response_data']['token'],
                               locale: widget.locale,
                               localizedValues: widget.localizedValues,
                             ),

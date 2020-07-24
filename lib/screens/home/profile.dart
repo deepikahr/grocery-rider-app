@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grocerydelivery/main.dart';
 import 'package:grocerydelivery/screens/auth/changePassword.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/order.dart';
@@ -78,7 +79,7 @@ class _ProfileState extends State<Profile> {
     countController.text = Provider.of<OrderModel>(context, listen: false)
         .lengthOfDeliveredOrders
         .toString();
-    APIService.getUserInfo().then((value) {
+    AuthService.getUserInfo().then((value) {
       if (value['response_code'] == 200 && mounted) {
         setState(() {
           profileInfo = value['response_data'];
@@ -129,14 +130,7 @@ class _ProfileState extends State<Profile> {
                           onPressed: () async {
                             Common.setSelectedLanguage(
                                 languagesList[i]['languageCode']);
-                            Common.getSelectedLanguage()
-                                .then((selectedLocale) async {
-                              Map body = {"language": selectedLocale};
-                              await APIService.updateUserInfo(body)
-                                  .then((onValue) {
-                                main();
-                              });
-                            });
+                            main();
                           },
                           type: GFButtonType.transparent,
                           child: Row(
@@ -399,9 +393,9 @@ class _ProfileState extends State<Profile> {
         onPressed: () {
           Common.getSelectedLanguage().then((selectedLocale) async {
             Map body = {"language": selectedLocale};
-            await APIService.updateUserInfo(body).then((onValue) {
+            await AuthService.updateUserInfo(body).then((onValue) {
               Map body = {"playerId": null};
-              APIService.updateUserInfo(body).then((value) async {
+              AuthService.updateUserInfo(body).then((value) async {
                 await Common.setToken(null);
                 await Common.setAccountID(null);
                 main();

@@ -24,7 +24,7 @@ class _LOGINState extends State<LOGIN> {
   String email, password;
   bool isLoading = false;
 
-  void lOGIN() async {
+  void loginMethod() async {
     if (_formKey.currentState.validate()) {
       setState(() {
         isLoading = true;
@@ -36,15 +36,16 @@ class _LOGINState extends State<LOGIN> {
           'password': password,
           "playerId": palyerId ?? 'no id found'
         };
-        AuthService.lOGIN(body).then((onValue) {
+        AuthService.login(body).then((onValue) {
+          print(onValue);
           if (onValue['response_code'] == 401) {
             Common.showSnackbar(_scaffoldKey, onValue['response_data']);
           } else if (onValue['response_code'] == 200 &&
               onValue['response_data']['token'] != null) {
-            if (onValue['response_data']['role'] == 'Delivery Boy') {
+            if (onValue['response_data']['role'] == 'DELIVERY_BOY') {
               Common.setToken(onValue['response_data']['token'])
                   .then((_) async {
-                await AuthService.setLanguageCodeToProfile();
+                Common.setAccountID(onValue['response_data']['id']);
                 if (mounted) {
                   Navigator.pushAndRemoveUntil(
                       context,
@@ -252,7 +253,7 @@ class _LOGINState extends State<LOGIN> {
         height: 51,
         child: GFButton(
           onPressed: () {
-            if (!isLoading) lOGIN();
+            if (!isLoading) loginMethod();
           },
           size: GFSize.LARGE,
           child: isLoading

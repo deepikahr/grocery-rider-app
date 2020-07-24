@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/screens/home/tabs.dart';
 import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -126,6 +127,10 @@ class _DeliveryAppState extends State<DeliveryApp> {
           setState(() {
             checkDeliveyDisOrNot = false;
             isLoggedIn = true;
+            Common.getSelectedLanguage().then((selectedLocale) async {
+              Map body = {"language": selectedLocale};
+              await AuthService.updateUserInfo(body);
+            });
           });
         }
       } else {

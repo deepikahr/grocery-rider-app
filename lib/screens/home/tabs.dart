@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import '../../models/admin_info.dart';
 import '../../models/order.dart';
@@ -34,14 +35,14 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   void initSocket() async {
-    APIService.getGlobalSettings().then((onValue) async {
+    APIService.getLocationformation().then((onValue) async {
       if (onValue['response_data'] != null &&
           onValue['response_data']['currencyCode'] != null) {
         Provider.of<OrderModel>(context, listen: false)
             .updateCurrency(onValue['response_data']['currencyCode']);
       }
     });
-    APIService.getUserInfo().then((value) {
+    AuthService.getUserInfo().then((value) {
       print(value);
       if (value['response_code'] == 200 && mounted) {
         setState(() {

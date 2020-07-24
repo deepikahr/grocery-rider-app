@@ -234,7 +234,7 @@ class _TrackingState extends State<Tracking> {
               return Consumer<OrderModel>(builder: (context, data, child) {
                 //   order = findOrderByID(data.orders, widget.orderID);
                 currency = data.currency;
-                if (order['orderStatus'] == 'Out for delivery')
+                if (order['orderStatus'] == 'OUT_FOR_DELIVERY')
                   startButtonText = 'STARTED';
 
                 String firstName = '', lastName = '';
@@ -348,7 +348,7 @@ class _TrackingState extends State<Tracking> {
               if (order['orderStatus'] == "Confirmed") {
                 Map body = {
                   "orderId": order['_id'].toString(),
-                  "status": "Out for delivery"
+                  "status": "OUT_FOR_DELIVERY"
                 };
                 await APIService.orderStausChange(body).then((value) {
                   if (value['response_code'] == 200 && mounted) {
@@ -356,7 +356,7 @@ class _TrackingState extends State<Tracking> {
                       if (mounted) {
                         setState(() {
                           startButtonText = 'STARTED';
-                          order['orderStatus'] = 'Out for delivery';
+                          order['orderStatus'] = 'OUT_FOR_DELIVERY';
                           Common.showSnackbar(
                               _scaffoldKey,
                               MyLocalizations.of(context).getLocalizations(
@@ -682,7 +682,7 @@ class _TrackingState extends State<Tracking> {
   }
 
   Widget buildDeliveredButton() {
-    return order['orderStatus'] == 'Out for delivery'
+    return order['orderStatus'] == 'OUT_FOR_DELIVERY'
         ? Container(
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: GFButton(
@@ -704,14 +704,14 @@ class _TrackingState extends State<Tracking> {
                   } else {
                     if (mounted) {
                       setState(() {
-                        order['orderStatus'] = 'Out for delivery';
+                        order['orderStatus'] = 'OUT_FOR_DELIVERY';
                       });
                     }
                   }
                 }).catchError((e) {
                   if (mounted) {
                     setState(() {
-                      order['orderStatus'] = 'Out for delivery';
+                      order['orderStatus'] = 'OUT_FOR_DELIVERY';
                     });
                   }
                 });
