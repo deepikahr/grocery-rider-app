@@ -1,270 +1,79 @@
-import 'common.dart';
+import 'package:grocerydelivery/services/interCepter.dart';
+import 'package:http_interceptor/http_interceptor.dart';
 import 'package:http/http.dart' show Client;
 import 'constants.dart';
 import 'dart:convert';
 
+Client client =
+    HttpClientWithInterceptor.build(interceptors: [ApiInterceptor()]);
+
 class APIService {
-  static final Client client = Client();
-
+  // get location info
   static Future<Map<String, dynamic>> getLocationformation() async {
-    String token, languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    await Common.getToken().then((onValue) {
-      token = onValue;
-    });
-    final response = await client
-        .get(Constants.baseURL + 'delivery/tax/settings/details', headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'bearer $token',
-      'language': languageCode
-    });
+    final response = await client.get(Constants.baseURL + 'settings/details');
     return json.decode(response.body);
   }
 
-  static Future<Map<String, dynamic>> getUserInfo() async {
-    String languageCode, token;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-
-    await Common.getToken().then((onValue) {
-      token = onValue;
-    });
-    final response = await client.get(Constants.baseURL + 'users/me', headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'bearer $token',
-      'language': languageCode
-    });
-    return json.decode(response.body);
-  }
-
-  static Future<dynamic> getGlobalSettings() async {
-    String languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-
-    final response = await client.get(Constants.baseURL + 'setting/user/App',
-        headers: {
-          'Content-Type': 'application/json',
-          'language': languageCode
-        });
-    return json.decode(response.body);
-  }
-
-  static Future<Map<String, dynamic>> aboutUs() async {
-    String languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-
-    final response = await client
-        .get(Constants.baseURL + "business/delivery/detail", headers: {
-      'Content-Type': 'application/json',
-      'language': languageCode
-    });
-    return json.decode(response.body);
-  }
-
+  // get json data
   static Future<Map<String, dynamic>> getLanguageJson(languageCode) async {
-    final response = await client.get(
-        Constants.baseURL + "languages/delivery?code=$languageCode",
-        headers: {
-          'Content-Type': 'application/json',
-        });
+    final response = await client
+        .get(Constants.baseURL + "languages/delivery?code=$languageCode");
     return json.decode(response.body);
   }
 
-  // verify email
-  static Future<Map<String, dynamic>> verifyEmail(body) async {
-    String languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    final response = await client.post(Constants.baseURL + "users/verify/email",
-        body: json.encode(body),
-        headers: {
-          'Content-Type': 'application/json',
-          'language': languageCode,
-        });
-    return json.decode(response.body);
-  }
-
-  // reset password
-  static Future<Map<String, dynamic>> resetPassword(body, token) async {
-    String languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    final response = await client.post(
-        Constants.baseURL + "users/reset-password",
-        body: json.encode(body),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'bearer $token',
-          'language': languageCode,
-        });
-    return json.decode(response.body);
-  }
-
-  // verify otp
-  static Future<Map<String, dynamic>> verifyOtp(body, token) async {
-    String languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    final response = await client.post(Constants.baseURL + "users/verify/OTP",
-        body: json.encode(body),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'bearer $token',
-          'language': languageCode,
-        });
-    return json.decode(response.body);
-  }
-
-  static Future<dynamic> setLanguageCodeToProfileDefult(languageCode) async {
-    String token;
-    await Common.getToken().then((tkn) {
-      token = tkn;
-    });
-
-    final response =
-        await client.get(Constants.baseURL + 'users/language/set', headers: {
-      'Content-Type': 'application/json',
-      'language': languageCode,
-      'Authorization': 'bearer $token',
-    });
-    return json.decode(response.body);
-  }
-
-  static Future<Map<String, dynamic>> changePassword(body) async {
-    String token, languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    await Common.getToken().then((onValue) {
-      token = onValue;
-    });
-    final response = await client.post(
-        Constants.baseURL + "users/change-password",
-        body: json.encode(body),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'bearer $token',
-          'language': languageCode,
-        });
+  // get languages list
+  static Future<dynamic> getLanguagesList() async {
+    final response = await client.get(Constants.baseURL + "languages/list");
     return json.decode(response.body);
   }
 
   //notification list
   static Future<Map<String, dynamic>> getOrderHistory(orderId) async {
-    String token, languageCode;
-    await Common.getToken().then((tkn) {
-      token = tkn;
-    });
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    final response = await client.get(
-        Constants.baseURL + "orders/detail/delivery-boy/$orderId",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'bearer $token',
-          'language': languageCode,
-        });
+    final response = await client.put(
+      Constants.baseURL + "orders/delivery-boy/accept/$orderId",
+    );
+    print("/orders/delivery-boy/accept/$orderId");
     return json.decode(response.body);
   }
 
   static Future<dynamic> orderStausChange(body) async {
-    String token, languageCode;
-    await Common.getToken().then((onValue) {
-      token = 'bearer ' + onValue;
-    });
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
     final response = await client.put(
-        Constants.baseURL + "orders/delivery-boy/status/update",
-        body: json.encode(body),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token,
-          'language': languageCode,
-        });
+      Constants.baseURL + "orders/delivery-boy/status/update",
+      body: json.encode(body),
+    );
     return json.decode(response.body);
   }
 
-  static Future<dynamic> getLanguagesList() async {
-    String token, languageCode;
-    await Common.getToken().then((onValue) {
-      token = 'bearer ' + onValue;
-    });
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    final response =
-        await client.get(Constants.baseURL + "languages/list", headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token,
-      'language': languageCode,
-    });
+  // get delivered order list
+  static Future<dynamic> getDeliverdOrder(limit, index) async {
+    final response = await client.put(
+      Constants.baseURL +
+          "orders/delivery-boy/delivered/list?limit=$limit&page=$index",
+    );
+    print("/orders/delivery-boy/delivered/list?limit=$limit&page=$index");
+    print(json.decode(response.body));
+
     return json.decode(response.body);
   }
 
-  static Future<dynamic> getDeliverdOrder() async {
-    String token, languageCode;
-    await Common.getToken().then((onValue) {
-      token = 'bearer ' + onValue;
-    });
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    final response = await client.get(
-        Constants.baseURL + "orders/delivery-boy/delivered/list",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token,
-          'language': languageCode,
-        });
+  // get assigned order list
+  static Future<dynamic> getAssignedOrder(limit, index) async {
+    final response = await client.put(
+      Constants.baseURL +
+          "orders/delivery-boy/assigned/list?limit=$limit&page=$index",
+    );
+    print("orders/delivery-boy/assigned/list?limit=$limit&page=$index");
+    print(json.decode(response.body));
+
     return json.decode(response.body);
   }
 
-  static Future<dynamic> getAssignedOrder() async {
-    String token, languageCode;
-    await Common.getToken().then((onValue) {
-      token = 'bearer ' + onValue;
-    });
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    final response = await client
-        .get(Constants.baseURL + "orders/delivery-boy/assigned/list", headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token,
-      'language': languageCode,
-    });
-    return json.decode(response.body);
-  }
-
+  // get orderAcceptOrRejectApi order
   static Future<Map<String, dynamic>> orderAcceptOrRejectApi(body) async {
-    String token, languageCode;
-    await Common.getToken().then((tkn) {
-      token = tkn;
-    });
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
     final response = await client.put(
-        Constants.baseURL + "orders/accept-or-reject/delivery-boy",
-        body: json.encode(body),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'bearer $token',
-          'language': languageCode,
-        });
+      Constants.baseURL + "orders/accept-or-reject/delivery-boy",
+      body: json.encode(body),
+    );
     return json.decode(response.body);
   }
 }

@@ -18,21 +18,23 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
-  bool deliverdOrderLoading = false;
-  List deliverdOrdersList;
+  bool deliverdOrderLoading = false, lastApiCall = false;
+  List deliverdOrdersList = [];
+  int productLimt = 10, productIndex = 0, totalProduct = 1;
+
   @override
   void initState() {
-    getDeliverdInfo();
-    super.initState();
-  }
-
-  Future<void> getDeliverdInfo() async {
     if (mounted) {
       setState(() {
         deliverdOrderLoading = true;
       });
     }
-    await APIService.getDeliverdOrder().then((value) {
+    getDeliverdInfo(productIndex);
+    super.initState();
+  }
+
+  Future<void> getDeliverdInfo(productIndex) async {
+    await APIService.getDeliverdOrder(productIndex, productLimt).then((value) {
       if (mounted) {
         setState(() {
           deliverdOrderLoading = false;
@@ -40,7 +42,22 @@ class _HistoryState extends State<History> {
       }
       if (value['response_code'] == 200 && mounted) {
         setState(() {
-          deliverdOrdersList = value['response_data'];
+          deliverdOrdersList.addAll(value['response_data']);
+          totalProduct = value["total"];
+          int index = deliverdOrdersList.length;
+          if (lastApiCall == true) {
+            productIndex++;
+            if (index < totalProduct) {
+              getDeliverdInfo(productIndex);
+            } else {
+              if (index == totalProduct) {
+                if (mounted) {
+                  lastApiCall = false;
+                  getDeliverdInfo(productIndex);
+                }
+              }
+            }
+          }
         });
       } else {
         if (mounted) {
@@ -204,7 +221,7 @@ class _HistoryState extends State<History> {
                 ),
                 Expanded(
                   child: Text(
-                    DateFormat('hh:mm a, dd/MM/yyyy, EEEE')
+                    DateFormat('hh:mm a, dd/MM/yyyy')
                         .format(DateTime.fromMillisecondsSinceEpoch(
                             order['appTimestamp']))
                         .toString(),

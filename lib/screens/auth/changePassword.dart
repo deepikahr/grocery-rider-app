@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
-import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 
@@ -48,7 +48,7 @@ class _ChangePasswordState extends State<ChangePassword> {
           "newPassword": newPassword,
           "confirmPassword": confirmPassword
         };
-        await APIService.changePassword(body).then((onValue) {
+        await AuthService.changePassword(body).then((onValue) {
           try {
             if (mounted) {
               setState(() {
@@ -129,7 +129,7 @@ class _ChangePasswordState extends State<ChangePassword> {
         ),
         title: Text(
           MyLocalizations.of(context).getLocalizations("CHANGE_PASSWORD"),
-          style: textbarlowSemiBoldBlack(),
+          style: titleWPS(),
         ),
         centerTitle: true,
         backgroundColor: primary,
@@ -376,7 +376,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                     right: 0.0,
                   ),
                   child: GFButton(
-                    color: primary,
+                    color: secondary,
                     blockButton: true,
                     onPressed: changePassword,
                     child: Row(
@@ -385,7 +385,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                         Text(
                           MyLocalizations.of(context)
                               .getLocalizations("SUBMIT"),
-                          style: textbarlowMediumBlack(),
+                          style: titleXLargeWPB(),
                         ),
                         SizedBox(
                           height: 10,

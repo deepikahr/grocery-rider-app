@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/services.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
+import 'package:grocerydelivery/screens/home/tabs.dart';
 import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -32,6 +34,7 @@ void main() async {
   }, onError: (error, stackTrace) {});
 
   Common.getSelectedLanguage().then((selectedLocale) {
+    print(selectedLocale);
     Map localizedValues;
     String defaultLocale = '';
     String locale = selectedLocale ?? defaultLocale;
@@ -41,14 +44,11 @@ void main() async {
 
     APIService.getLanguageJson(locale).then((value) async {
       print(value);
-      localizedValues = value['response_data'];
-      // if (locale == '') {
-      //   defaultLocale = value['response_data']['defaultCode']['languageCode'];
-      //   locale = defaultLocale;
-      // }
+      localizedValues = value['response_data']['json'];
+      defaultLocale = value['response_data']['languageCode'];
+      locale = defaultLocale;
+
       await Common.setSelectedLanguage(locale);
-      // await Common.setAllLanguageNames(value['response_data']['langName']);
-      // await Common.setAllLanguageCodes(value['response_data']['langCode']);
       runZoned<Future<Null>>(() {
         runApp(
           MultiProvider(
@@ -94,7 +94,7 @@ void initPlatformPlayerState() async {
   }
 }
 
-class DeliveryApp extends StatelessWidget {
+class DeliveryApp extends StatefulWidget {
   final String locale;
   final Map localizedValues;
   DeliveryApp({
@@ -102,23 +102,72 @@ class DeliveryApp extends StatelessWidget {
     this.locale,
     this.localizedValues,
   });
+
+  @override
+  _DeliveryAppState createState() => _DeliveryAppState();
+}
+
+class _DeliveryAppState extends State<DeliveryApp> {
+  bool isLoggedIn = false, checkDeliveyDisOrNot = false;
+  @override
+  void initState() {
+    checkAUthentication();
+    super.initState();
+  }
+
+  void checkAUthentication() async {
+    if (mounted) {
+      setState(() {
+        checkDeliveyDisOrNot = true;
+      });
+    }
+    await Common.getToken().then((token) async {
+      if (token != null) {
+        if (mounted) {
+          setState(() {
+            checkDeliveyDisOrNot = false;
+            isLoggedIn = true;
+            Common.getSelectedLanguage().then((selectedLocale) async {
+              Map body = {"language": selectedLocale};
+              await AuthService.updateUserInfo(body);
+            });
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            checkDeliveyDisOrNot = false;
+            isLoggedIn = false;
+          });
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      locale: Locale(locale),
+      locale: Locale(widget.locale),
       localizationsDelegates: [
-        MyLocalizationsDelegate(localizedValues, [locale]),
+        MyLocalizationsDelegate(widget.localizedValues, [widget.locale]),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: [Locale(locale)],
+      supportedLocales: [Locale(widget.locale)],
       debugShowCheckedModeBanner: false,
       title: Constants.APP_NAME,
       theme: ThemeData(primaryColor: primary, accentColor: primary),
-      home: LOGIN(
-        locale: locale,
-        localizedValues: localizedValues,
-      ),
+      home: checkDeliveyDisOrNot
+          ? AnimatedScreen()
+          : isLoggedIn == false
+              ? LOGIN(
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                )
+              : Tabs(
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                ),
     );
   }
 }

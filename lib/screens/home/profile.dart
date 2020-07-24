@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grocerydelivery/main.dart';
 import 'package:grocerydelivery/screens/auth/changePassword.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import '../../models/order.dart';
@@ -78,10 +79,10 @@ class _ProfileState extends State<Profile> {
     countController.text = Provider.of<OrderModel>(context, listen: false)
         .lengthOfDeliveredOrders
         .toString();
-    APIService.getUserInfo().then((value) {
+    AuthService.getUserInfo().then((value) {
       if (value['response_code'] == 200 && mounted) {
         setState(() {
-          profileInfo = value['response_data']['userInfo'];
+          profileInfo = value['response_data'];
           nameController.text =
               '${profileInfo['firstName']} ${profileInfo['lastName']}';
           numberController.text = profileInfo['mobileNumber'] ?? '';
@@ -127,7 +128,7 @@ class _ProfileState extends State<Profile> {
                       itemBuilder: (BuildContext context, int i) {
                         return GFButton(
                           onPressed: () async {
-                            await Common.setSelectedLanguage(
+                            Common.setSelectedLanguage(
                                 languagesList[i]['languageCode']);
                             main();
                           },
@@ -391,12 +392,14 @@ class _ProfileState extends State<Profile> {
       child: GFButton(
         onPressed: () {
           Common.getSelectedLanguage().then((selectedLocale) async {
-            await APIService.setLanguageCodeToProfileDefult(selectedLocale)
-                .then((value) async {
-              await Common.setToken(null);
-              await Common.setAccountID(null);
-              socket.getSocket().destroy();
-              main();
+            Map body = {"language": selectedLocale};
+            await AuthService.updateUserInfo(body).then((onValue) {
+              Map body = {"playerId": null};
+              AuthService.updateUserInfo(body).then((value) async {
+                await Common.setToken(null);
+                await Common.setAccountID(null);
+                main();
+              });
             });
           });
         },

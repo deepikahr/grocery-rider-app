@@ -16,7 +16,7 @@ class MyLocalizations {
     String keyValue = localizedValues[locale.languageCode][keyName];
     keyValue ??= keyName;
 
-    if (isKeyValue) keyValue = keyValue + ": ";
+    if (isKeyValue) keyValue = keyValue + " : ";
     return keyValue;
   }
 }

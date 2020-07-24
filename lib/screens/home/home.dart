@@ -21,23 +21,24 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  bool assignedOrderLoading = false;
-  List assignedOrdersList;
+  bool assignedOrderLoading = false, lastApiCall = false;
+  List assignedOrdersList = [];
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+  int productLimt = 10, productIndex = 0, totalProduct = 1;
   @override
   void initState() {
-    getAssignedOrders();
-    super.initState();
-  }
-
-  Future<void> getAssignedOrders() async {
     if (mounted) {
       setState(() {
         assignedOrderLoading = true;
       });
     }
-    await APIService.getAssignedOrder().then((value) {
+    getAssignedOrders(productIndex);
+    super.initState();
+  }
+
+  Future<void> getAssignedOrders(productIndex) async {
+    await APIService.getAssignedOrder(productIndex, productLimt).then((value) {
       _refreshController.refreshCompleted();
       if (mounted) {
         setState(() {
@@ -46,7 +47,22 @@ class _HomeState extends State<Home> {
       }
       if (value['response_code'] == 200 && mounted) {
         setState(() {
-          assignedOrdersList = value['response_data'];
+          assignedOrdersList.addAll(value['response_data']);
+          totalProduct = value["total"];
+          int index = assignedOrdersList.length;
+          if (lastApiCall == true) {
+            productIndex++;
+            if (index < totalProduct) {
+              getAssignedOrders(productIndex);
+            } else {
+              if (index == totalProduct) {
+                if (mounted) {
+                  lastApiCall = false;
+                  getAssignedOrders(productIndex);
+                }
+              }
+            }
+          }
         });
       } else {
         if (mounted) {
@@ -81,7 +97,12 @@ class _HomeState extends State<Home> {
         enablePullUp: false,
         controller: _refreshController,
         onRefresh: () {
-          getAssignedOrders();
+          setState(() {
+            productLimt = 10;
+            productIndex = 0;
+            totalProduct = 1;
+            getAssignedOrders(productIndex);
+          });
         },
         child: assignedOrderLoading == true
             ? SquareLoader()

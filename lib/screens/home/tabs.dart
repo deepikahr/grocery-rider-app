@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import '../../models/admin_info.dart';
 import '../../models/order.dart';
-import '../../models/socket.dart';
 import '../../services/api_service.dart';
 import '../../services/common.dart';
-import '../../services/socket.dart';
 import 'package:provider/provider.dart';
 import 'profile.dart';
 import '../../styles/styles.dart';
@@ -36,33 +35,20 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   void initSocket() async {
-    SocketService socket = SocketService();
-    APIService.getGlobalSettings().then((onValue) async {
+    APIService.getLocationformation().then((onValue) async {
       if (onValue['response_data'] != null &&
           onValue['response_data']['currencyCode'] != null) {
         Provider.of<OrderModel>(context, listen: false)
             .updateCurrency(onValue['response_data']['currencyCode']);
       }
-      Provider.of<SocketModel>(context, listen: false)
-          .setSocketInstance(socket);
-      await Common.getAccountID().then((id) {
-        socket.getSocket().on('assigned-orders$id', (data) {
-          if (mounted) {
-            setState(() {
-              Provider.of<OrderModel>(context, listen: false)
-                  .addOrders(data['assignedOrders']);
-            });
-          }
+    });
+    AuthService.getUserInfo().then((value) {
+      print(value);
+      if (value['response_code'] == 200 && mounted) {
+        setState(() {
+          Common.setAccountID(value['response_data']['_id']);
         });
-        socket.getSocket().on('delivered-orders$id', (data) {
-          if (mounted) {
-            setState(() {
-              Provider.of<OrderModel>(context, listen: false)
-                  .addDelieveredOrders(data['orders']);
-            });
-          }
-        });
-      });
+      }
     });
   }
 

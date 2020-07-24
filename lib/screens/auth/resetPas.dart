@@ -3,14 +3,19 @@ import 'package:flutter/material.dart';
 
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
-import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 
 class ResetPassword extends StatefulWidget {
-  final String token, locale;
+  final String verificationToken, locale, email;
   final Map localizedValues;
-  ResetPassword({Key key, this.token, this.localizedValues, this.locale})
+  ResetPassword(
+      {Key key,
+      this.verificationToken,
+      this.localizedValues,
+      this.locale,
+      this.email})
       : super(key: key);
 
   @override
@@ -37,8 +42,12 @@ class _ResetPasswordState extends State<ResetPassword> {
           isResetPasswordLoading = true;
         });
       }
-      Map<String, dynamic> body = {"password": password1};
-      await APIService.resetPassword(body, widget.token).then((onValue) {
+      Map<String, dynamic> body = {
+        "newPassword": password1,
+        "email": widget.email,
+        "verificationToken": widget.verificationToken
+      };
+      await AuthService.resetPassword(body).then((onValue) {
         try {
           if (mounted) {
             setState(() {
@@ -322,7 +331,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                             : Text("")
                       ],
                     ),
-                    textStyle: textBarlowRegularrBlack(),
+                    textStyle: titleXLargeWPB(),
                   ),
                 ),
               ),

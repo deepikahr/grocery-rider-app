@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/resetPas.dart';
-import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:pin_entry_text_field/pin_entry_text_field.dart';
 
 class Otp extends StatefulWidget {
-  Otp({Key key, this.email, this.token, this.locale, this.localizedValues})
+  Otp({Key key, this.email, this.locale, this.localizedValues})
       : super(key: key);
-  final String email, token, locale;
+  final String email, locale;
   final Map localizedValues;
 
   @override
@@ -39,8 +39,7 @@ class _OtpState extends State<Otp> {
             isOtpVerifyLoading = true;
           });
         }
-        Map<String, dynamic> body = {"otp": enteredOtp};
-        await APIService.verifyOtp(body, widget.token).then((onValue) {
+        await AuthService.verifyOtp(enteredOtp, widget.email).then((onValue) {
           try {
             if (mounted) {
               setState(() {
@@ -57,7 +56,7 @@ class _OtpState extends State<Otp> {
                       child: new ListBody(
                         children: <Widget>[
                           new Text(
-                            '${onValue['response_data']['message']}',
+                            '${onValue['response_data']['message'] ?? ""}',
                             style: textBarlowMediumBlack(),
                           ),
                         ],
@@ -70,11 +69,14 @@ class _OtpState extends State<Otp> {
                           style: TextStyle(color: green),
                         ),
                         onPressed: () {
+                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ResetPassword(
-                                token: onValue['response_data']['token'],
+                                verificationToken: onValue['response_data']
+                                    ['verificationToken'],
+                                email: widget.email,
                                 locale: widget.locale,
                                 localizedValues: widget.localizedValues,
                               ),
@@ -160,10 +162,9 @@ class _OtpState extends State<Otp> {
         isResentOtpLoading = true;
       });
     }
-    Map body = {
-      "email": widget.email,
-    };
-    await APIService.verifyEmail(body).then((response) {
+
+    await AuthService.forgetPassword(widget.email.toLowerCase())
+        .then((response) {
       try {
         if (mounted) {
           setState(() {
@@ -171,7 +172,7 @@ class _OtpState extends State<Otp> {
           });
         }
         if (response['response_code'] == 200) {
-          showSnackbar(response['response_data']['message']);
+          showSnackbar(response['response_data']);
         } else {
           showSnackbar(response['response_data']);
         }
@@ -317,7 +318,7 @@ class _OtpState extends State<Otp> {
                         : Text("")
                   ],
                 ),
-                textStyle: textBarlowRegularrBlack(),
+                textStyle: titleXLargeWPB(),
               ),
             ),
           ),
