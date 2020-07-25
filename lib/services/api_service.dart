@@ -29,51 +29,46 @@ class APIService {
 
   //notification list
   static Future<Map<String, dynamic>> getOrderHistory(orderId) async {
-    final response = await client.put(
-      Constants.baseURL + "orders/delivery-boy/accept/$orderId",
-    );
-    print("/orders/delivery-boy/accept/$orderId");
+    final response = await client
+        .get(Constants.baseURL + "orders/delivery-boy/detail/$orderId");
     return json.decode(response.body);
   }
 
-  static Future<dynamic> orderStausChange(body) async {
+  static Future<dynamic> orderStausChange(body, orderId) async {
     final response = await client.put(
-      Constants.baseURL + "orders/delivery-boy/status/update",
+      Constants.baseURL + "orders/delivery-boy/status-update/$orderId",
       body: json.encode(body),
     );
+    print("orders/delivery-boy/status-update/$orderId");
+    print(json.decode(response.body));
     return json.decode(response.body);
   }
 
   // get delivered order list
   static Future<dynamic> getDeliverdOrder(limit, index) async {
-    final response = await client.put(
-      Constants.baseURL +
-          "orders/delivery-boy/delivered/list?limit=$limit&page=$index",
-    );
-    print("/orders/delivery-boy/delivered/list?limit=$limit&page=$index");
-    print(json.decode(response.body));
-
+    final response = await client.put(Constants.baseURL +
+        "orders/delivery-boy/delivered/list?limit=$limit&page=$index");
     return json.decode(response.body);
   }
 
   // get assigned order list
   static Future<dynamic> getAssignedOrder(limit, index) async {
-    final response = await client.put(
-      Constants.baseURL +
-          "orders/delivery-boy/assigned/list?limit=$limit&page=$index",
-    );
-    print("orders/delivery-boy/assigned/list?limit=$limit&page=$index");
-    print(json.decode(response.body));
-
+    final response = await client.put(Constants.baseURL +
+        "orders/delivery-boy/assigned/list?limit=$limit&page=$index");
     return json.decode(response.body);
   }
 
-  // get orderAcceptOrRejectApi order
-  static Future<Map<String, dynamic>> orderAcceptOrRejectApi(body) async {
-    final response = await client.put(
-      Constants.baseURL + "orders/accept-or-reject/delivery-boy",
-      body: json.encode(body),
-    );
+  // get order Accept api order
+  static Future<Map<String, dynamic>> orderAcceptApi(orderId) async {
+    final response = await client
+        .put(Constants.baseURL + "orders/delivery-boy/accept/$orderId");
+    return json.decode(response.body);
+  }
+
+  // get RejectApi order
+  static Future<Map<String, dynamic>> orderRejectApi(orderId) async {
+    final response = await client
+        .put(Constants.baseURL + "orders/delivery-boy/reject/$orderId");
     return json.decode(response.body);
   }
 }

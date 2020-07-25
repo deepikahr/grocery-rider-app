@@ -5,7 +5,6 @@ import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import '../../styles/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'order_details.dart';
 
 class History extends StatefulWidget {
@@ -34,7 +33,7 @@ class _HistoryState extends State<History> {
   }
 
   Future<void> getDeliverdInfo(productIndex) async {
-    await APIService.getDeliverdOrder(productIndex, productLimt).then((value) {
+    await APIService.getDeliverdOrder(productLimt, productIndex).then((value) {
       if (mounted) {
         setState(() {
           deliverdOrderLoading = false;
@@ -132,14 +131,6 @@ class _HistoryState extends State<History> {
   }
 
   Widget buildOrderCard(context, order, index) {
-    String fullName = '', firstName = '', lastName = '';
-    if (order['user'] != null && order['user']['firstName'] != null) {
-      firstName = order['user']['firstName'];
-    }
-    if (order['user'] != null && order['user']['lastName'] != null) {
-      lastName = order['user']['lastName'];
-    }
-    fullName = '$firstName $lastName';
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -156,33 +147,24 @@ class _HistoryState extends State<History> {
         margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         content: Column(
           children: <Widget>[
+            SizedBox(height: 5),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(
-                      height: 15,
-                      child: SvgPicture.asset(
-                        'lib/assets/icons/customer.svg',
-                      ),
-                    ),
-                    Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("CUSTOMER", true),
-                      style: keyText(),
-                    ),
-                    Text(
-                      fullName,
-                      style: titleXSmallBBPR(),
-                    )
-                  ],
-                ),
+                Container(
+                    height: 15,
+                    width: 20,
+                    child: Icon(Icons.timer, color: greyB, size: 15)),
+                Text(MyLocalizations.of(context).getLocalizations("DATE", true),
+                    style: keyText()),
+                Expanded(
+                  child: Text(
+                    order['deliveryDate'] + ', ' + order['deliveryTime'],
+                    style: keyValue(),
+                  ),
+                )
               ],
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Row(
               children: <Widget>[
                 Container(
@@ -197,43 +179,10 @@ class _HistoryState extends State<History> {
                   style: keyText(),
                 ),
                 Text(
-                  order['orderID'].toString(),
+                  "#" + order['orderID'].toString(),
                   style: titleXSmallBBPR(),
                 )
               ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: <Widget>[
-                Container(
-                    height: 15,
-                    child: Icon(
-                      Icons.timer,
-                      color: greyB,
-                      size: 15,
-                    )),
-                Text(
-                  MyLocalizations.of(context)
-                      .getLocalizations("DATE_TIME", true),
-                  style: keyText(),
-                ),
-                Expanded(
-                  child: Text(
-                    DateFormat('hh:mm a, dd/MM/yyyy')
-                        .format(DateTime.fromMillisecondsSinceEpoch(
-                            order['appTimestamp']))
-                        .toString(),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: titleXSmallBBPR(),
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 5,
             ),
           ],
         ),

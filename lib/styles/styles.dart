@@ -103,6 +103,15 @@ TextStyle titleGPB() {
   );
 }
 
+TextStyle titleGPBB() {
+  return new TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 15.0,
+    color: Colors.black,
+    fontFamily: 'PoppinsBold',
+  );
+}
+
 TextStyle titleGPBSec() {
   return new TextStyle(
     fontWeight: FontWeight.w500,

@@ -1,13 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
-import '../../models/order.dart';
 import '../../styles/styles.dart';
 import 'package:getwidget/getwidget.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class OrderDetails extends StatefulWidget {
   final String orderID;
@@ -23,10 +21,13 @@ class _OrderDetailsState extends State<OrderDetails> {
   Map order;
   String currency;
   bool orderDataLoading = false;
-
+  var mobileNumber, fullName, deliveryAddress;
   @override
   void initState() {
     getOrderDetails();
+    Common.getCurrency().then((value) {
+      currency = value;
+    });
     super.initState();
   }
 
@@ -43,6 +44,20 @@ class _OrderDetailsState extends State<OrderDetails> {
             setState(() {
               order = value['response_data'];
 
+              String firstName = '', lastName = '';
+              if (order['order']['user'] != null &&
+                  order['order']['user']['firstName'] != null)
+                firstName = order['order']['user']['firstName'];
+              if (order['order']['user'] != null &&
+                  order['order']['user']['lastName'] != null)
+                lastName = order['order']['user']['lastName'];
+              mobileNumber =
+                  order['order']['user']['mobileNumber'].toString() ?? "";
+              fullName = '$firstName $lastName';
+              if (order['order']['address'] != null) {
+                deliveryAddress =
+                    '${order['order']['address']['flatNo']}, ${order['order']['address']['apartmentName']}, ${order['order']['address']['address']}';
+              }
               orderDataLoading = false;
             });
           }
@@ -77,30 +92,11 @@ class _OrderDetailsState extends State<OrderDetails> {
       backgroundColor: greyA,
       body: orderDataLoading
           ? SquareLoader()
-          : Consumer<OrderModel>(builder: (context, data, child) {
-              // order = findOrderByID(data.deliveredOrders, widget.orderID);
-              currency = data.currency;
-              String firstName = '',
-                  lastName = '',
-                  fullName = '',
-                  deliveryAddress = '';
-              if (order['user'] != null && order['user']['firstName'] != null) {
-                firstName = order['user']['firstName'];
-              }
-              if (order['user'] != null && order['user']['lastName'] != null) {
-                lastName = order['user']['lastName'];
-              }
-              fullName = '$firstName $lastName';
-              if (order['deliveryAddress'] != null) {
-                deliveryAddress =
-                    '${order['deliveryAddress']['flatNo'] == null || order['deliveryAddress']['flatNo'] == "" ? "" : order['deliveryAddress']['flatNo'] + ", "} ${order['deliveryAddress']['apartmentName'] == null || order['deliveryAddress']['apartmentName'] == "" ? "" : order['deliveryAddress']['apartmentName'] + ", "} ${order['deliveryAddress']['address']}';
-              }
-              return ListView(
-                children: <Widget>[
-                  buildDescriptionCard(fullName, deliveryAddress),
-                ],
-              );
-            }),
+          : ListView(
+              children: <Widget>[
+                buildDescriptionCard(fullName, deliveryAddress),
+              ],
+            ),
     );
   }
 
@@ -132,9 +128,9 @@ class _OrderDetailsState extends State<OrderDetails> {
           ListView.builder(
               physics: ScrollPhysics(),
               shrinkWrap: true,
-              itemCount: order['cart']['cart'].length,
+              itemCount: order['cart']['products'].length,
               itemBuilder: (BuildContext context, int index) {
-                List products = order['cart']['cart'];
+                List products = order['cart']['products'];
                 return Text(
                   "${products[index]['productName']} (${products[index]['unit']}) X ${products[index]['quantity']}",
                   style: titleLargeBPM(),
@@ -165,29 +161,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          "#${order['orderID'].toString()}",
-                          style: titleLargeBPM(),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("DELIVERD", true),
-                      style: keyText()),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          DateFormat("HH:MM a, dd/MM/yyyy")
-                              .format(DateTime.parse(order['updatedAt']))
-                              .toString(),
+                          "#${order['order']['orderID'].toString()}",
                           style: titleLargeBPM(),
                         ),
                       ],
@@ -207,7 +181,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          order['deliveryDate'],
+                          order['order']['deliveryDate'],
                           style: titleLargeBPM(),
                         ),
                       ],
@@ -227,27 +201,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          order['deliveryTime'],
-                          style: titleLargeBPM(),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("DELIVERY_TYPE", true),
-                      style: keyText()),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          order['deliveryType'],
+                          order['order']['deliveryTime'],
                           style: titleLargeBPM(),
                         ),
                       ],
@@ -267,13 +221,13 @@ class _OrderDetailsState extends State<OrderDetails> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          order['paymentType'] == 'COD'
+                          order['order']['paymentType'] == 'COD'
                               ? MyLocalizations.of(context)
                                   .getLocalizations("CASH_ON_DELIVERY")
-                              : order['paymentType'] == 'CARD'
+                              : order['order']['paymentType'] == 'CARD'
                                   ? MyLocalizations.of(context)
                                       .getLocalizations("PAYBYCARD")
-                                  : order['paymentType'],
+                                  : order['order']['paymentType'],
                           style: titleLargeBPM(),
                         ),
                       ],
@@ -293,7 +247,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          "$currency${order['subTotal'].toDouble().toStringAsFixed(2)}",
+                          "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}",
                           style: titleLargeBPM(),
                         ),
                       ],
@@ -301,26 +255,50 @@ class _OrderDetailsState extends State<OrderDetails> {
                   )
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("DELIVERY_CHARGES", true),
-                      style: keyText()),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
+              order['cart']['tax'] == 0
+                  ? Container()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
                         Text(
-                          "$currency${order['deliveryCharges'].toDouble().toStringAsFixed(2)}",
-                          style: titleLargeBPM(),
-                        ),
+                            MyLocalizations.of(context)
+                                .getLocalizations("TAX", true),
+                            style: keyText()),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                "$currency${order['cart']['tax'].toDouble().toStringAsFixed(2)}",
+                                style: titleLargeBPM(),
+                              ),
+                            ],
+                          ),
+                        )
                       ],
                     ),
-                  )
-                ],
-              ),
+              order['cart']['deliveryCharges'] == 0
+                  ? Container()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                            MyLocalizations.of(context)
+                                .getLocalizations("DELIVERY_CHARGES", true),
+                            style: keyText()),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                "$currency${order['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}",
+                                style: titleLargeBPM(),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -333,7 +311,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          "$currency${order['grandTotal'].toDouble().toStringAsFixed(2)}",
+                          "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}",
                           style: titleLargeBPM(),
                         ),
                       ],

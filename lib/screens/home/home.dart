@@ -21,11 +21,17 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  bool assignedOrderLoading = false, lastApiCall = false;
+  bool assignedOrderLoading = false,
+      lastApiCall = false,
+      isOrderAccept = false,
+      isOrderReject = false,
+      locationLoading = false;
   List assignedOrdersList = [];
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
-  int productLimt = 10, productIndex = 0, totalProduct = 1;
+  int productLimt = 10, productIndex = 0, totalProduct = 1, orderIndex;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  var adminData;
   @override
   void initState() {
     if (mounted) {
@@ -34,11 +40,51 @@ class _HomeState extends State<Home> {
       });
     }
     getAssignedOrders(productIndex);
+    getAdminInfo();
+
     super.initState();
   }
 
+  void getAdminInfo() async {
+    if (mounted) {
+      setState(() {
+        locationLoading = true;
+      });
+    }
+    await APIService.getLocationformation().then((info) {
+      print(info);
+
+      if (info != null && info['response_code'] == 200) {
+        setState(() {
+          if (info['response_data']['location'] != null) {
+            adminData = info['response_data'];
+            locationLoading = false;
+          } else {
+            if (mounted) {
+              setState(() {
+                adminData = info['response_data'];
+                adminData['location'] = {
+                  "latitude": 12.8718,
+                  "longitude": 77.6022
+                };
+                locationLoading = false;
+              });
+            }
+          }
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            adminData['location'] = {"latitude": 12.8718, "longitude": 77.6022};
+            locationLoading = false;
+          });
+        }
+      }
+    });
+  }
+
   Future<void> getAssignedOrders(productIndex) async {
-    await APIService.getAssignedOrder(productIndex, productLimt).then((value) {
+    await APIService.getAssignedOrder(productLimt, productIndex).then((value) {
       _refreshController.refreshCompleted();
       if (mounted) {
         setState(() {
@@ -81,10 +127,100 @@ class _HomeState extends State<Home> {
     });
   }
 
+  orderAccept(order) {
+    if (mounted) {
+      setState(() {
+        isOrderAccept = true;
+      });
+    }
+
+    APIService.orderAcceptApi(order['_id'].toString()).then((value) {
+      showSnackbar(value['response_data']);
+      if (value['response_code'] == 200 && mounted) {
+        setState(() {
+          isOrderAccept = false;
+          order['isAcceptedByDeliveryBoy'] = true;
+          var result = Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Tracking(
+                  orderID: order['_id'].toString(),
+                  adminData: adminData,
+                  customerInfo: order['address']),
+            ),
+          );
+          result.then((value) {
+            if (value != null) {
+              productLimt = 10;
+              productIndex = 0;
+              totalProduct = 1;
+              assignedOrdersList = [];
+
+              getAssignedOrders(productIndex);
+              getAdminInfo();
+            }
+          });
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            isOrderAccept = false;
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          isOrderAccept = false;
+        });
+      }
+    });
+  }
+
+  orderReject(order, index) {
+    if (mounted) {
+      setState(() {
+        isOrderReject = true;
+      });
+    }
+
+    APIService.orderRejectApi(order['_id'].toString()).then((value) {
+      showSnackbar(value['response_data']);
+      if (value['response_code'] == 200 && mounted) {
+        setState(() {
+          isOrderReject = false;
+          assignedOrdersList.removeAt(index);
+          order['isAcceptedByDeliveryBoy'] = false;
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            isOrderReject = false;
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          isOrderAccept = false;
+        });
+      }
+    });
+  }
+
+  void showSnackbar(message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(milliseconds: 3000),
+    );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     Provider.of<LocationModel>(context, listen: false).requestLocation();
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(MyLocalizations.of(context).getLocalizations("HOME"),
@@ -101,10 +237,11 @@ class _HomeState extends State<Home> {
             productLimt = 10;
             productIndex = 0;
             totalProduct = 1;
+            assignedOrdersList = [];
             getAssignedOrders(productIndex);
           });
         },
-        child: assignedOrderLoading == true
+        child: assignedOrderLoading == true || locationLoading == true
             ? SquareLoader()
             : ListView(
                 children: <Widget>[
@@ -157,9 +294,9 @@ class _HomeState extends State<Home> {
       lastName = order['user']['lastName'];
     }
     fullName = '$firstName $lastName';
-    if (order['deliveryAddress'] != null) {
+    if (order['address'] != null) {
       deliveryAddress =
-          '${order['deliveryAddress']['flatNo']}, ${order['deliveryAddress']['apartmentName']}, ${order['deliveryAddress']['address']}';
+          '${order['address']['flatNo']}, ${order['address']['apartmentName']}, ${order['address']['address']}';
     }
     return GFCard(
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -192,8 +329,12 @@ class _HomeState extends State<Home> {
                   child: Icon(Icons.timer, color: greyB, size: 15)),
               Text(MyLocalizations.of(context).getLocalizations("DATE", true),
                   style: keyText()),
-              Text(order['deliveryDate'] + ' ' + order['deliveryTime'],
-                  style: keyValue())
+              Expanded(
+                child: Text(
+                  order['deliveryDate'] + ', ' + order['deliveryTime'],
+                  style: keyValue(),
+                ),
+              )
             ],
           ),
           SizedBox(height: 5),
@@ -223,7 +364,7 @@ class _HomeState extends State<Home> {
                         .getLocalizations("ADDRESS", true),
                     style: keyText()),
                 SizedBox(width: 20),
-                order['deliveryAddress'] != null
+                order['address'] != null
                     ? Container(
                         decoration: BoxDecoration(
                           color: secondary,
@@ -231,7 +372,7 @@ class _HomeState extends State<Home> {
                         ),
                         padding:
                             EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-                        child: Text(order['deliveryAddress']['addressType'],
+                        child: Text(order['address']['addressType'],
                             style: TextStyle(
                                 color: greyA,
                                 fontSize: 12,
@@ -277,39 +418,17 @@ class _HomeState extends State<Home> {
         height: 51,
         child: GFButton(
           onPressed: () {
-            if (order['isLoading'] == null) {
-              order['isLoading'] = true;
-              order['isAcceptedByDeliveryBoy'] = false;
-              // Provider.of<OrderModel>(context, listen: false)
-              //     .updateOrder(order, index);
-              // service.getSocketInstance.orderEmitForAcceptReject(
-              //     service.getSocketInstance.getSocket(), order);
-              Map body = {"order": order};
-              APIService.orderAcceptOrRejectApi(body).then((value) {
-                if (value['response_code'] == 200 && mounted) {
-                  setState(() {
-                    assignedOrdersList.removeAt(index);
-                  });
-                } else {
-                  if (mounted) {
-                    setState(() {});
-                  }
-                }
-              }).catchError((e) {
-                if (mounted) {
-                  setState(() {});
-                }
-              });
-            }
+            setState(() {
+              orderIndex = index;
+            });
+            orderReject(order, index);
           },
           size: GFSize.LARGE,
-          child: order['isLoading'] != null &&
-                  order['isLoading'] &&
-                  !order['isAcceptedByDeliveryBoy']
+          child: isOrderReject && orderIndex == index
               ? SquareLoader()
               : Text(
                   MyLocalizations.of(context).getLocalizations("REJECT"),
-                  style: titleGPB(),
+                  style: titleGPBB(),
                 ),
           color: greyB,
           type: GFButtonType.outline2x,
@@ -323,24 +442,32 @@ class _HomeState extends State<Home> {
       height: 51,
       child: GFButton(
         onPressed: () {
-          Navigator.push(
+          var result = Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => Tracking(
-                      orderID: order['_id'].toString(),
-                    )),
+              builder: (context) => Tracking(
+                  orderID: order['_id'].toString(),
+                  adminData: adminData,
+                  customerInfo: order['address']),
+            ),
           );
+          result.then((value) {
+            if (value != null) {
+              productLimt = 10;
+              productIndex = 0;
+              totalProduct = 1;
+              assignedOrdersList = [];
+              getAssignedOrders(productIndex);
+              getAdminInfo();
+            }
+          });
         },
         size: GFSize.LARGE,
-        child: order['isLoading'] != null &&
-                order['isLoading'] &&
-                !order['isAcceptedByDeliveryBoy']
-            ? SquareLoader()
-            : Text(
-                MyLocalizations.of(context).getLocalizations("TRACK"),
-                style: titleGPB(),
-              ),
-        textStyle: titleSPB(),
+        child: Text(
+          MyLocalizations.of(context).getLocalizations("TRACK"),
+          style: titleGPBB(),
+        ),
+        textStyle: titleGPBB(),
         type: GFButtonType.outline2x,
         color: primary,
         blockButton: true,
@@ -354,59 +481,19 @@ class _HomeState extends State<Home> {
         height: 51,
         child: GFButton(
           onPressed: () {
-            if (order['isLoading'] == null) {
-              order['isLoading'] = true;
-              order['isAcceptedByDeliveryBoy'] = true;
-              Map body = {"order": order};
-              APIService.orderAcceptOrRejectApi(body).then((value) {
-                if (value['response_code'] == 200 && mounted) {
-                  setState(() {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Tracking(
-                                orderID: order['_id'].toString(),
-                              )),
-                    );
-                  });
-                } else {
-                  if (mounted) {
-                    setState(() {
-                      order['isAcceptedByDeliveryBoy'] = false;
-                    });
-                  }
-                }
-              }).catchError((e) {
-                if (mounted) {
-                  setState(() {
-                    order['isAcceptedByDeliveryBoy'] = false;
-                  });
-                }
-              });
-            }
-            // Provider.of<OrderModel>(context, listen: false)
-            //     .updateOrder(order, index);
-            // service.getSocketInstance.orderEmitForAcceptReject(
-            //     service.getSocketInstance.getSocket(), order);
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //       builder: (context) => Tracking(
-            //             orderID: order['orderID'].toString(),
-            //           )),
-            // );
-            // }
+            setState(() {
+              orderIndex = index;
+            });
+            orderAccept(order);
           },
           size: GFSize.LARGE,
-          child: order['isLoading'] != null &&
-                  order['isLoading'] &&
-                  order['isAcceptedByDeliveryBoy']
+          child: isOrderAccept && orderIndex == index
               ? SquareLoader()
               : Text(
                   MyLocalizations.of(context).getLocalizations("ACCEPT_TRACK"),
-                  style: titleGPB(),
+                  style: titleGPBB(),
                 ),
-          textStyle: titleSPB(),
+          textStyle: titleGPBB(),
           type: GFButtonType.outline2x,
           color: secondary,
         ),
