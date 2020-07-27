@@ -20,6 +20,18 @@ class Common {
     return Future(() => prefs.getString('token'));
   }
 
+  /// save currency on storage
+  static Future<bool> setCurrency(String token) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString('currency', token);
+  }
+
+  /// retrive currency from storage
+  static Future<String> getCurrency() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return Future(() => prefs.getString('currency'));
+  }
+
   /// remove token from storage
   static Future<bool> removeToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

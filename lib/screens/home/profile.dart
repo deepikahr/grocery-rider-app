@@ -46,7 +46,6 @@ class _ProfileState extends State<Profile> {
       });
     }
     APIService.getLanguagesList().then((value) {
-      print(value);
       if (value['response_code'] == 200 && mounted) {
         setState(() {
           if (mounted) {

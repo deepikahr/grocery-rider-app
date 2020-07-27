@@ -3,7 +3,6 @@ import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import '../../models/admin_info.dart';
-import '../../models/order.dart';
 import '../../services/api_service.dart';
 import '../../services/common.dart';
 import 'package:provider/provider.dart';
@@ -38,8 +37,9 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     APIService.getLocationformation().then((onValue) async {
       if (onValue['response_data'] != null &&
           onValue['response_data']['currencyCode'] != null) {
-        Provider.of<OrderModel>(context, listen: false)
-            .updateCurrency(onValue['response_data']['currencyCode']);
+        Common.setCurrency(onValue['response_data']['currencyCode']);
+      } else {
+        Common.setCurrency("\$");
       }
     });
     AuthService.getUserInfo().then((value) {
