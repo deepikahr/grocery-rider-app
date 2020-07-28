@@ -5,7 +5,7 @@ class Constants {
   static const APP_NAME = "Readymade Grocery Delivery App";
   
   // Base url
-  static String baseURL = DotEnv().env['BASE_URL'];
+  static String apiURL = DotEnv().env['API_URL'];
   
   // One signal key
   static String oneSignalKey = DotEnv().env['ONE_SIGNAL_KEY'];
@@ -14,5 +14,5 @@ class Constants {
   static String googleMapApiKey = DotEnv().env['GOOGLE_MAP_API_KEY'];
 
   // URL for socket usage
-  static final String socketUrl = baseURL.substring(0, baseURL.length - 1);
+  static final String socketUrl = apiURL.substring(0, apiURL.length - 1);
 }

@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
 import '../../models/location.dart';
 import '../../models/socket.dart';
 import '../../styles/styles.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 import 'tracking.dart';
 
 class Home extends StatefulWidget {
   final Map localizedValues;
   final String locale;
+
   Home({Key key, this.localizedValues, this.locale}) : super(key: key);
 
   @override
@@ -32,6 +34,7 @@ class _HomeState extends State<Home> {
   int productLimt = 10, productIndex = 0, totalProduct = 1, orderIndex;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var adminData;
+
   @override
   void initState() {
     if (mounted) {
@@ -54,7 +57,7 @@ class _HomeState extends State<Home> {
     await APIService.getLocationformation().then((info) {
       print(info);
 
-      if (info != null && info['response_code'] == 200) {
+      if (info != null && info['response_data'] != null) {
         setState(() {
           if (info['response_data']['location'] != null) {
             adminData = info['response_data'];
@@ -91,7 +94,7 @@ class _HomeState extends State<Home> {
           assignedOrderLoading = false;
         });
       }
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           assignedOrdersList.addAll(value['response_data']);
           totalProduct = value["total"];
@@ -136,7 +139,7 @@ class _HomeState extends State<Home> {
 
     APIService.orderAcceptApi(order['_id'].toString()).then((value) {
       showSnackbar(value['response_data']);
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           isOrderAccept = false;
           order['isAcceptedByDeliveryBoy'] = true;
@@ -186,7 +189,7 @@ class _HomeState extends State<Home> {
 
     APIService.orderRejectApi(order['_id'].toString()).then((value) {
       showSnackbar(value['response_data']);
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           isOrderReject = false;
           assignedOrdersList.removeAt(index);

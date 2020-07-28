@@ -21,6 +21,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool isVerfyEmailLoading = false;
+
   verifyEmail() async {
     final form = _formKey.currentState;
     if (form.validate()) {
@@ -38,7 +39,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               isVerfyEmailLoading = false;
             });
           }
-          if (onValue['response_code'] == 200) {
+          if (onValue['response_data'] != null) {
             showDialog<Null>(
               context: context,
               barrierDismissible: false, // user must tap button!
@@ -76,10 +77,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 );
               },
             );
-          } else if (onValue['response_code'] == 401) {
-            showSnackbar('${onValue['response_data']}');
-          } else {
-            showSnackbar('${onValue['response_data']}');
           }
         } catch (error) {
           if (mounted) {

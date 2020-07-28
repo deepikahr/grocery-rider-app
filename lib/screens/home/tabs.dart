@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:provider/provider.dart';
+
 import '../../models/admin_info.dart';
 import '../../services/api_service.dart';
 import '../../services/common.dart';
-import 'package:provider/provider.dart';
-import 'profile.dart';
 import '../../styles/styles.dart';
-import 'home.dart';
 import 'history.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'home.dart';
+import 'profile.dart';
 
 class Tabs extends StatefulWidget {
   final Map localizedValues;
   final String locale;
+
   Tabs({Key key, this.localizedValues, this.locale}) : super(key: key);
+
   @override
   _TabsState createState() => _TabsState();
 }
@@ -44,7 +47,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     });
     AuthService.getUserInfo().then((value) {
       print(value);
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           Common.setAccountID(value['response_data']['_id']);
         });

@@ -1,18 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+
 import '../../styles/styles.dart';
-import 'package:getwidget/getwidget.dart';
 
 class OrderDetails extends StatefulWidget {
   final String orderID;
   final Map localizedValues;
   final String locale;
+
   OrderDetails({Key key, this.localizedValues, this.locale, this.orderID})
       : super(key: key);
+
   @override
   _OrderDetailsState createState() => _OrderDetailsState();
 }
@@ -22,6 +25,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   String currency;
   bool orderDataLoading = false;
   var mobileNumber, fullName, deliveryAddress;
+
   @override
   void initState() {
     getOrderDetails();
@@ -38,7 +42,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       });
     }
     await APIService.getOrderHistory(widget.orderID).then((value) {
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           if (mounted) {
             setState(() {

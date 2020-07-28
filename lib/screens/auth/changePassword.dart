@@ -8,6 +8,7 @@ import 'package:grocerydelivery/styles/styles.dart';
 class ChangePassword extends StatefulWidget {
   final String token, locale;
   final Map localizedValues;
+
   ChangePassword({Key key, this.token, this.localizedValues, this.locale})
       : super(key: key);
 
@@ -55,7 +56,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                 isChangePasswordLoading = false;
               });
             }
-            if (onValue['response_code'] == 200) {
+            if (onValue['response_data'] != null) {
               showDialog<Null>(
                 context: context,
                 barrierDismissible: false, // user must tap button!
@@ -86,10 +87,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                   );
                 },
               );
-            } else if (onValue['response_code'] == 401) {
-              showSnackbar('${onValue['response_data']}');
-            } else {
-              showSnackbar('${onValue['response_data']}');
             }
           } catch (error) {
             if (mounted) {

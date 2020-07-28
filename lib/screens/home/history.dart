@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+
 import '../../styles/styles.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'order_details.dart';
 
 class History extends StatefulWidget {
   final Map localizedValues;
   final String locale;
+
   History({Key key, this.localizedValues, this.locale}) : super(key: key);
 
   @override
@@ -39,7 +41,7 @@ class _HistoryState extends State<History> {
           deliverdOrderLoading = false;
         });
       }
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           deliverdOrdersList.addAll(value['response_data']);
           totalProduct = value["total"];

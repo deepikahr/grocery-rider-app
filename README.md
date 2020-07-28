@@ -8,7 +8,7 @@ Grocery Delivery App
 
 Add these following in env variable 
 ```
-BASE_URL=
+API_URL=
 ONE_SIGNAL_KEY=
 GOOGLE_MAP_API_KEY=
 ```
