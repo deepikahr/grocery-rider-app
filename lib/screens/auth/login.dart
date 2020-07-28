@@ -73,7 +73,6 @@ class _LOGINState extends State<LOGIN> {
           setState(() {
             isLoading = false;
           });
-          Common.showSnackbar(_scaffoldKey, onError);
         });
       });
     }
