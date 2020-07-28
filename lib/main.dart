@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/screens/home/tabs.dart';
 import 'package:grocerydelivery/services/api_service.dart';
@@ -10,15 +11,15 @@ import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:provider/provider.dart';
+
 import 'models/admin_info.dart';
 import 'models/location.dart';
 import 'models/order.dart';
 import 'models/socket.dart';
-import 'package:provider/provider.dart';
-import 'styles/styles.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'services/constants.dart';
 import 'services/localizations.dart';
+import 'styles/styles.dart';
 
 void main() async {
   await DotEnv().load('.env');
@@ -36,14 +37,12 @@ void main() async {
   Common.getSelectedLanguage().then((selectedLocale) {
     print(selectedLocale);
     Map localizedValues;
-    String defaultLocale = '';
+    String defaultLocale = 'en';
     String locale = selectedLocale ?? defaultLocale;
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.dark));
-
     APIService.getLanguageJson(locale).then((value) async {
-      print(value);
       localizedValues = value['response_data']['json'];
       defaultLocale = value['response_data']['languageCode'];
       locale = defaultLocale;
@@ -97,6 +96,7 @@ void initPlatformPlayerState() async {
 class DeliveryApp extends StatefulWidget {
   final String locale;
   final Map localizedValues;
+
   DeliveryApp({
     Key key,
     this.locale,
@@ -109,6 +109,7 @@ class DeliveryApp extends StatefulWidget {
 
 class _DeliveryAppState extends State<DeliveryApp> {
   bool isLoggedIn = false, checkDeliveyDisOrNot = false;
+
   @override
   void initState() {
     checkAUthentication();

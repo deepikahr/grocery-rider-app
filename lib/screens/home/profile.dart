@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/main.dart';
 import 'package:grocerydelivery/screens/auth/changePassword.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:provider/provider.dart';
+
 import '../../models/order.dart';
 import '../../models/socket.dart';
 import '../../services/api_service.dart';
 import '../../services/common.dart';
 import '../../services/socket.dart';
 import '../../styles/styles.dart';
-import 'package:getwidget/getwidget.dart';
-import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
   final Map localizedValues;
   final String locale;
+
   Profile({Key key, this.localizedValues, this.locale}) : super(key: key);
+
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -31,6 +34,7 @@ class _ProfileState extends State<Profile> {
 
   List languagesList;
   bool languagesListLoading = false;
+
   @override
   void initState() {
     socket = Provider.of<SocketModel>(context, listen: false).getSocketInstance;
@@ -46,7 +50,7 @@ class _ProfileState extends State<Profile> {
       });
     }
     APIService.getLanguagesList().then((value) {
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           if (mounted) {
             setState(() {
@@ -79,18 +83,13 @@ class _ProfileState extends State<Profile> {
         .lengthOfDeliveredOrders
         .toString();
     AuthService.getUserInfo().then((value) {
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           profileInfo = value['response_data'];
           nameController.text =
               '${profileInfo['firstName']} ${profileInfo['lastName']}';
           numberController.text = profileInfo['mobileNumber'] ?? '';
           emailController.text = profileInfo['email'] ?? '';
-        });
-      }
-      if (value['statusCode'] == 401) {
-        setState(() {
-          profileInfo = {};
         });
       }
     }).catchError((e) {

@@ -4,15 +4,18 @@ import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/forgotpassword.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
-import '../../services/common.dart';
+
 import '../../services/auth.dart';
-import '../home/tabs.dart';
+import '../../services/common.dart';
 import '../../styles/styles.dart';
+import '../home/tabs.dart';
 
 class LOGIN extends StatefulWidget {
   final Map localizedValues;
   final String locale;
+
   LOGIN({Key key, this.localizedValues, this.locale}) : super(key: key);
+
   @override
   _LOGINState createState() => _LOGINState();
 }
@@ -38,9 +41,7 @@ class _LOGINState extends State<LOGIN> {
         };
         AuthService.login(body).then((onValue) {
           print(onValue);
-          if (onValue['response_code'] == 401) {
-            Common.showSnackbar(_scaffoldKey, onValue['response_data']);
-          } else if (onValue['response_code'] == 200 &&
+          if (onValue['response_data'] != null &&
               onValue['response_data']['token'] != null) {
             if (onValue['response_data']['role'] == 'DELIVERY_BOY') {
               Common.setToken(onValue['response_data']['token'])
@@ -72,7 +73,6 @@ class _LOGINState extends State<LOGIN> {
           setState(() {
             isLoading = false;
           });
-          Common.showSnackbar(_scaffoldKey, onError);
         });
       });
     }

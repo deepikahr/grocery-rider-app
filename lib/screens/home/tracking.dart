@@ -9,22 +9,25 @@ import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:location/location.dart';
+import 'package:provider/provider.dart';
+import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../models/location.dart';
 import '../../models/order.dart';
 import '../../models/socket.dart';
 import '../../services/common.dart';
 import '../../services/socket.dart';
 import '../../styles/styles.dart';
-import 'package:location/location.dart';
-import 'package:provider/provider.dart';
-import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Tracking extends StatefulWidget {
   final String orderID;
   final adminData, customerInfo;
+
   Tracking({Key key, this.orderID, this.adminData, this.customerInfo})
       : super(key: key);
+
   @override
   _TrackingState createState() => _TrackingState();
 }
@@ -53,6 +56,7 @@ class _TrackingState extends State<Tracking> {
   bool orderDataLoading = false,
       isOrderStatusOutForDeliveryLoading = false,
       isOrderStatusDeliveredLoading = false;
+
   @override
   void initState() {
     getOrderDetails();
@@ -77,7 +81,7 @@ class _TrackingState extends State<Tracking> {
     }
     setSourceAndDestinationIcons();
     await APIService.getOrderHistory(widget.orderID).then((value) {
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           if (mounted) {
             setState(() {
@@ -257,7 +261,7 @@ class _TrackingState extends State<Tracking> {
     APIService.orderStausChange(body, order['order']['_id'].toString())
         .then((value) {
       showSnackbar(value['response_data']);
-      if (value['response_code'] == 200 && mounted) {
+      if (value['response_data'] != null && mounted) {
         setState(() {
           if (status == "DELIVERED") {
             Navigator.of(context).pop(true);

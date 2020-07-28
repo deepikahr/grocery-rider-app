@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/resetPas.dart';
 import 'package:grocerydelivery/services/auth.dart';
@@ -46,7 +45,7 @@ class _OtpState extends State<Otp> {
                 isOtpVerifyLoading = false;
               });
             }
-            if (onValue['response_code'] == 200) {
+            if (onValue['response_data'] != null) {
               showDialog<Null>(
                 context: context,
                 barrierDismissible: false, // user must tap button!
@@ -88,10 +87,6 @@ class _OtpState extends State<Otp> {
                   );
                 },
               );
-            } else if (onValue['response_code'] == 401) {
-              showSnackbar('${onValue['response_data']}');
-            } else {
-              showSnackbar('${onValue['response_data']}');
             }
           } catch (error) {
             if (mounted) {
@@ -171,9 +166,7 @@ class _OtpState extends State<Otp> {
             isResentOtpLoading = false;
           });
         }
-        if (response['response_code'] == 200) {
-          showSnackbar(response['response_data']);
-        } else {
+        if (response['response_data'] != null) {
           showSnackbar(response['response_data']);
         }
       } catch (error) {

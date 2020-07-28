@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/services/auth.dart';
@@ -10,6 +9,7 @@ import 'package:grocerydelivery/styles/styles.dart';
 class ResetPassword extends StatefulWidget {
   final String verificationToken, locale, email;
   final Map localizedValues;
+
   ResetPassword(
       {Key key,
       this.verificationToken,
@@ -54,7 +54,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               isResetPasswordLoading = false;
             });
           }
-          if (onValue['response_code'] == 200) {
+          if (onValue['response_data'] != null) {
             showDialog<Null>(
               context: context,
               barrierDismissible: false, // user must tap button!
@@ -92,10 +92,6 @@ class _ResetPasswordState extends State<ResetPassword> {
                 );
               },
             );
-          } else if (onValue['response_code'] == 401) {
-            showSnackbar('${onValue['response_data']}');
-          } else {
-            showSnackbar('${onValue['response_data']}');
           }
         } catch (error) {
           if (mounted) {
