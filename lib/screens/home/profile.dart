@@ -7,7 +7,6 @@ import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/order.dart';
 import '../../models/socket.dart';
 import '../../services/api_service.dart';
 import '../../services/common.dart';
@@ -79,15 +78,14 @@ class _ProfileState extends State<Profile> {
   }
 
   void getProfileInfo() {
-    countController.text = Provider.of<OrderModel>(context, listen: false)
-        .lengthOfDeliveredOrders
-        .toString();
     AuthService.getUserInfo().then((value) {
       if (value['response_data'] != null && mounted) {
         setState(() {
           profileInfo = value['response_data'];
           nameController.text =
               '${profileInfo['firstName']} ${profileInfo['lastName']}';
+          countController.text =
+              profileInfo['noOfOrderDelivered'].toString() ?? '';
           numberController.text = profileInfo['mobileNumber'] ?? '';
           emailController.text = profileInfo['email'] ?? '';
         });

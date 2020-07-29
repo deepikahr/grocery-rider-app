@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/services/socket.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -27,14 +29,17 @@ class _HomeState extends State<Home> {
       lastApiCall = false,
       isOrderAccept = false,
       isOrderReject = false,
-      locationLoading = false;
+      locationLoading = false,
+      isNewOrderAccept = false,
+      isNewOrderReject = false;
   List assignedOrdersList = [];
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   int productLimt = 10, productIndex = 0, totalProduct = 1, orderIndex;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var adminData;
-
+  SocketService socket = SocketService();
+  Map newOrder;
   @override
   void initState() {
     if (mounted) {
@@ -44,8 +49,22 @@ class _HomeState extends State<Home> {
     }
     getAssignedOrders(productIndex);
     getAdminInfo();
-
+    intSocket();
     super.initState();
+  }
+
+  intSocket() {
+    Common.getAccountID().then((id) {
+      if (id != null) {
+        socket.getSocket().on('new-order-delivery-boy-$id', (data) {
+          if (data != null && mounted) {
+            setState(() {
+              newOrder = data;
+            });
+          }
+        });
+      }
+    });
   }
 
   void getAdminInfo() async {
@@ -55,8 +74,6 @@ class _HomeState extends State<Home> {
       });
     }
     await APIService.getLocationformation().then((info) {
-      print(info);
-
       if (info != null && info['response_data'] != null) {
         setState(() {
           if (info['response_data']['location'] != null) {
@@ -211,6 +228,73 @@ class _HomeState extends State<Home> {
     });
   }
 
+  newOrderAccept(order) {
+    if (mounted) {
+      setState(() {
+        isNewOrderAccept = true;
+      });
+    }
+
+    APIService.orderAcceptApi(order['orderId'].toString()).then((value) {
+      showSnackbar(value['response_data']);
+      if (value['response_data'] != null && mounted) {
+        setState(() {
+          isNewOrderAccept = false;
+          setState(() {
+            productLimt = 10;
+            productIndex = 0;
+            totalProduct = 1;
+            assignedOrdersList = [];
+            getAssignedOrders(productIndex);
+            newOrder = null;
+          });
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            isNewOrderAccept = false;
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          isNewOrderAccept = false;
+        });
+      }
+    });
+  }
+
+  newOrderReject(order) {
+    if (mounted) {
+      setState(() {
+        isNewOrderReject = true;
+      });
+    }
+
+    APIService.orderRejectApi(order['orderId'].toString()).then((value) {
+      showSnackbar(value['response_data']);
+      if (value['response_data'] != null && mounted) {
+        setState(() {
+          isNewOrderReject = false;
+          newOrder = null;
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            isNewOrderReject = false;
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          isNewOrderReject = false;
+        });
+      }
+    });
+  }
+
   void showSnackbar(message) {
     final snackBar = SnackBar(
       content: Text(message),
@@ -231,59 +315,223 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: SmartRefresher(
-        enablePullDown: true,
-        enablePullUp: false,
-        controller: _refreshController,
-        onRefresh: () {
-          setState(() {
-            productLimt = 10;
-            productIndex = 0;
-            totalProduct = 1;
-            assignedOrdersList = [];
-            getAssignedOrders(productIndex);
-          });
-        },
-        child: assignedOrderLoading == true || locationLoading == true
-            ? SquareLoader()
-            : ListView(
-                children: <Widget>[
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(top: 20, left: 16, right: 16),
-                    child: Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("ACTIVE_REQUESTS"),
-                      style: titleBPS(),
+      body: GFFloatingWidget(
+        showblurness: newOrder == null ? false : true,
+        verticalPosition: 50,
+        child: newOrder == null
+            ? Container()
+            : GFAlert(
+                title: MyLocalizations.of(context)
+                        .getLocalizations("ORDER_ID", true) +
+                    ' #${newOrder['orderID']}',
+                contentChild: buildNewOrderCard(newOrder),
+                bottombar: Row(
+                  children: <Widget>[
+                    buildNeworderRejectButton(newOrder),
+                    SizedBox(
+                      width: 12,
                     ),
-                  ),
-                  assignedOrdersList.length > 0
-                      ? ListView.builder(
-                          physics: ScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: assignedOrdersList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return buildOrderCard(
-                                assignedOrdersList[index], index, context);
-                          })
-                      : Padding(
-                          padding: EdgeInsets.only(top: 100),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.hourglass_empty,
-                                size: 100,
-                                color: greyB,
-                              ),
-                              Text(
-                                  MyLocalizations.of(context)
-                                      .getLocalizations("NO_ACTIVE_REQUESTS"),
-                                  style: pageHeader()),
-                            ],
-                          ),
-                        )
+                    buildNeworderAcceptButton(newOrder),
+                  ],
+                )),
+        body: SmartRefresher(
+          enablePullDown: true,
+          enablePullUp: false,
+          controller: _refreshController,
+          onRefresh: () {
+            setState(() {
+              productLimt = 10;
+              productIndex = 0;
+              totalProduct = 1;
+              assignedOrdersList = [];
+              getAssignedOrders(productIndex);
+            });
+          },
+          child: assignedOrderLoading == true || locationLoading == true
+              ? SquareLoader()
+              : ListView(
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 20, left: 16, right: 16),
+                      child: Text(
+                        MyLocalizations.of(context)
+                            .getLocalizations("ACTIVE_REQUESTS"),
+                        style: titleBPS(),
+                      ),
+                    ),
+                    assignedOrdersList.length > 0
+                        ? ListView.builder(
+                            physics: ScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: assignedOrdersList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return buildOrderCard(
+                                  assignedOrdersList[index], index, context);
+                            })
+                        : Padding(
+                            padding: EdgeInsets.only(top: 100),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.hourglass_empty,
+                                  size: 100,
+                                  color: greyB,
+                                ),
+                                Text(
+                                    MyLocalizations.of(context)
+                                        .getLocalizations("NO_ACTIVE_REQUESTS"),
+                                    style: pageHeader()),
+                              ],
+                            ),
+                          )
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildNewOrderCard(order) {
+    String fullName = '', firstName = '', lastName = '', deliveryAddress = '';
+    if (order['user'] != null && order['user']['firstName'] != null) {
+      firstName = order['user']['firstName'];
+    }
+    if (order['user'] != null && order['user']['lastName'] != null) {
+      lastName = order['user']['lastName'];
+    }
+    fullName = '$firstName $lastName';
+    if (order['address'] != null) {
+      deliveryAddress =
+          '${order['address']['flatNo']}, ${order['address']['apartmentName']}, ${order['address']['address']}';
+    }
+    return GFCard(
+      padding: EdgeInsets.symmetric(vertical: 1, horizontal: 1),
+      margin: EdgeInsets.symmetric(vertical: 1, horizontal: 1),
+      content: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Container(
+                      height: 15,
+                      child: SvgPicture.asset('lib/assets/icons/customer.svg')),
+                  Text(
+                      MyLocalizations.of(context)
+                          .getLocalizations("CUSTOMER", true),
+                      style: keyText()),
+                  Text(fullName, style: keyValue())
                 ],
               ),
+            ],
+          ),
+          SizedBox(height: 5),
+          Row(
+            children: <Widget>[
+              Container(
+                  height: 15,
+                  width: 20,
+                  child: Icon(Icons.timer, color: greyB, size: 15)),
+              Text(MyLocalizations.of(context).getLocalizations("DATE", true),
+                  style: keyText()),
+              Expanded(
+                child: Text(
+                  order['deliveryDate'] + ', ' + order['deliveryTime'],
+                  style: keyValue(),
+                ),
+              )
+            ],
+          ),
+          SizedBox(height: 5),
+          Row(
+            children: <Widget>[
+              Container(
+                height: 15,
+                child: SvgPicture.asset('lib/assets/icons/location.svg'),
+              ),
+              Row(children: [
+                Text(
+                    MyLocalizations.of(context)
+                        .getLocalizations("ADDRESS", true),
+                    style: keyText()),
+                SizedBox(width: 20),
+                order['address'] != null
+                    ? Container(
+                        decoration: BoxDecoration(
+                          color: secondary,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                        child: Text(order['address']['addressType'],
+                            style: TextStyle(
+                                color: greyA,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500)))
+                    : Container(),
+              ])
+            ],
+          ),
+          Container(
+            alignment: AlignmentDirectional.center,
+            decoration: BoxDecoration(
+              border: Border.all(color: greyB, width: 1),
+              borderRadius: BorderRadius.circular(5),
+              color: greyA,
+            ),
+            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            child: Text(deliveryAddress,
+                textAlign: TextAlign.center, style: titleBPM()),
+          ),
+          SizedBox(height: 10),
+        ],
+      ),
+    );
+  }
+
+  Widget buildNeworderRejectButton(order) {
+    return Expanded(
+      child: Container(
+        height: 51,
+        child: GFButton(
+          onPressed: () {
+            newOrderReject(order);
+          },
+          size: GFSize.LARGE,
+          child: isNewOrderReject
+              ? SquareLoader()
+              : Text(
+                  MyLocalizations.of(context).getLocalizations("REJECT"),
+                  style: titleGPBB(),
+                ),
+          color: greyB,
+          type: GFButtonType.outline2x,
+        ),
+      ),
+    );
+  }
+
+  Widget buildNeworderAcceptButton(order) {
+    return Expanded(
+      child: Container(
+        height: 51,
+        child: GFButton(
+          onPressed: () {
+            newOrderAccept(order);
+          },
+          size: GFSize.LARGE,
+          child: isNewOrderAccept
+              ? SquareLoader()
+              : Text(
+                  MyLocalizations.of(context).getLocalizations("ACCEPT"),
+                  style: titleGPBB(),
+                ),
+          textStyle: titleGPBB(),
+          type: GFButtonType.outline2x,
+          color: secondary,
+        ),
       ),
     );
   }

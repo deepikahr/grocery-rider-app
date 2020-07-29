@@ -15,7 +15,6 @@ import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/location.dart';
-import '../../models/order.dart';
 import '../../models/socket.dart';
 import '../../services/common.dart';
 import '../../services/socket.dart';
@@ -144,16 +143,11 @@ class _TrackingState extends State<Tracking> {
   }
 
   void setLatLng() {
-    print("mmkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
-    print(widget.adminData);
     setState(() {
       storeLocation = LatLng(widget.adminData['location']['latitude'],
           widget.adminData['location']['longitude']);
-      print(storeLocation);
-
       customerLocation = LatLng(widget.customerInfo['location']['latitude'],
           widget.customerInfo['location']['longitude']);
-      print(customerLocation);
       setMapPins();
     });
   }
@@ -257,7 +251,6 @@ class _TrackingState extends State<Tracking> {
 
   orderStatusChange(status) {
     Map body = {"status": status};
-    print(body);
     APIService.orderStausChange(body, order['order']['_id'].toString())
         .then((value) {
       showSnackbar(value['response_data']);
@@ -326,45 +319,43 @@ class _TrackingState extends State<Tracking> {
             ),
       bottomSheet: orderDataLoading
           ? SquareLoader()
-          : Consumer<OrderModel>(builder: (context, data, child) {
-              return SolidBottomSheet(
-                controller: _soldController,
-                draggableBody: true,
-                headerBar: Container(
-                  height: 275,
-                  decoration: BoxDecoration(
-                    borderRadius: new BorderRadius.only(
-                        topLeft: const Radius.circular(20),
-                        topRight: const Radius.circular(20)),
-                    color: primary,
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      buildTimingInfoBlock(),
-                      buildDirectionBlock(),
-                      buildUserDetailsBlock(),
-                    ],
-                  ),
+          : SolidBottomSheet(
+              controller: _soldController,
+              draggableBody: true,
+              headerBar: Container(
+                height: 275,
+                decoration: BoxDecoration(
+                  borderRadius: new BorderRadius.only(
+                      topLeft: const Radius.circular(20),
+                      topRight: const Radius.circular(20)),
+                  color: primary,
                 ),
-                body: Container(
-                  color: Colors.white,
-                  child: ListView(
-                    shrinkWrap: true,
-                    //         physics: ScrollPhysics(),
-                    children: <Widget>[
-                      buildAddressBox(),
-                      SizedBox(height: 20),
-                      buildItemsBlock(),
-                      SizedBox(height: 20),
-                      buildPaymentInfoBlock(),
-                      SizedBox(height: 20),
-                      buildDeliveredButton(),
-                      //   SizedBox(height: 20),
-                    ],
-                  ),
+                child: Column(
+                  children: <Widget>[
+                    buildTimingInfoBlock(),
+                    buildDirectionBlock(),
+                    buildUserDetailsBlock(),
+                  ],
                 ),
-              );
-            }),
+              ),
+              body: Container(
+                color: Colors.white,
+                child: ListView(
+                  shrinkWrap: true,
+                  //         physics: ScrollPhysics(),
+                  children: <Widget>[
+                    buildAddressBox(),
+                    SizedBox(height: 20),
+                    buildItemsBlock(),
+                    SizedBox(height: 20),
+                    buildPaymentInfoBlock(),
+                    SizedBox(height: 20),
+                    buildDeliveredButton(),
+                    //   SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
