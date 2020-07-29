@@ -32,9 +32,6 @@ class _ChangePasswordState extends State<ChangePassword> {
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
-      print(newPassword);
-      print(oldPassword);
-      print(confirmPassword);
       if (newPassword == oldPassword) {
         showSnackbar(MyLocalizations.of(context)
             .getLocalizations("DO_NOT_ENTER_SAME_PASS"));

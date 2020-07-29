@@ -10,21 +10,22 @@ import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
+import 'package:grocerydelivery/services/socket.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
-
-import 'models/admin_info.dart';
 import 'models/location.dart';
-import 'models/order.dart';
 import 'models/socket.dart';
 import 'services/constants.dart';
 import 'services/localizations.dart';
 import 'styles/styles.dart';
 
+Timer onesignlTimer;
 void main() async {
   await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
-  initPlatformPlayerState();
+  onesignlTimer = Timer.periodic(Duration(seconds: 4), (timer) {
+    initPlatformPlayerState();
+  });
   runZoned<Future<Null>>(() {
     runApp(MaterialApp(
       home: AnimatedScreen(),
@@ -35,9 +36,8 @@ void main() async {
   }, onError: (error, stackTrace) {});
 
   Common.getSelectedLanguage().then((selectedLocale) {
-    print(selectedLocale);
     Map localizedValues;
-    String defaultLocale = 'en';
+    String defaultLocale = '';
     String locale = selectedLocale ?? defaultLocale;
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
@@ -52,8 +52,6 @@ void main() async {
         runApp(
           MultiProvider(
             providers: [
-              ChangeNotifierProvider(create: (context) => OrderModel()),
-              ChangeNotifierProvider(create: (context) => AdminModel()),
               ChangeNotifierProvider(create: (context) => SocketModel()),
               ChangeNotifierProvider(create: (context) => LocationModel()),
             ],
@@ -86,11 +84,24 @@ void initPlatformPlayerState() async {
       .setInFocusDisplayType(OSNotificationDisplayType.notification);
   var status = await OneSignal.shared.getPermissionSubscriptionState();
   String playerId = status.subscriptionStatus.userId;
-  if (playerId == null) {
-    initPlatformPlayerState();
-  } else {
-    await Common.setPlayerID(playerId).then((onValue) {});
+  if (playerId != null) {
+    await Common.setPlayerID(playerId);
+    setPlayerId();
+    if (onesignlTimer != null && onesignlTimer.isActive) onesignlTimer.cancel();
   }
+}
+
+void setPlayerId() async {
+  await Common.getToken().then((token) async {
+    if (token != null) {
+      Common.getPlayerId().then((palyerId) {
+        Common.getSelectedLanguage().then((selectedLocale) async {
+          Map body = {"language": selectedLocale, "playerId": palyerId};
+          await AuthService.updateUserInfo(body);
+        });
+      });
+    }
+  });
 }
 
 class DeliveryApp extends StatefulWidget {
@@ -109,6 +120,7 @@ class DeliveryApp extends StatefulWidget {
 
 class _DeliveryAppState extends State<DeliveryApp> {
   bool isLoggedIn = false, checkDeliveyDisOrNot = false;
+  SocketService socket = SocketService();
 
   @override
   void initState() {
@@ -128,9 +140,11 @@ class _DeliveryAppState extends State<DeliveryApp> {
           setState(() {
             checkDeliveyDisOrNot = false;
             isLoggedIn = true;
-            Common.getSelectedLanguage().then((selectedLocale) async {
-              Map body = {"language": selectedLocale};
-              await AuthService.updateUserInfo(body);
+            Common.getPlayerId().then((palyerId) {
+              Common.getSelectedLanguage().then((selectedLocale) async {
+                Map body = {"language": selectedLocale, "playerId": palyerId};
+                await AuthService.updateUserInfo(body);
+              });
             });
           });
         }

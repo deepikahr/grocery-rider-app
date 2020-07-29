@@ -32,7 +32,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         });
       }
       await AuthService.forgetPassword(email.toLowerCase()).then((onValue) {
-        print(onValue);
         try {
           if (mounted) {
             setState(() {
