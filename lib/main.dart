@@ -23,6 +23,7 @@ Timer onesignlTimer;
 void main() async {
   await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
+  initPlatformPlayerState();
   onesignlTimer = Timer.periodic(Duration(seconds: 4), (timer) {
     initPlatformPlayerState();
   });
