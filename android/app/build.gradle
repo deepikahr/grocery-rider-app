@@ -30,7 +30,7 @@ def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
-
+def googleMapApiKey = System.getenv("GOOGLE_MAP_API_KEY")
 android {
     compileSdkVersion 29
     ndkVersion "21.3.6528147"
@@ -50,7 +50,8 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        manifestPlaceholders = [googleMapApiKey: "$System.env.GOOGLE_MAP_API_KEY"]
+        manifestPlaceholders = [googleMapApiKey: googleMapApiKey]
+
     }
 
     signingConfigs {
