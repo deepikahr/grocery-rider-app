@@ -1,18 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:getflutter/getflutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
-import '../../models/order.dart';
+
 import '../../styles/styles.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'order_details.dart';
 
-class History extends StatelessWidget {
+class History extends StatefulWidget {
   final Map localizedValues;
   final String locale;
+
   History({Key key, this.localizedValues, this.locale}) : super(key: key);
+
+  @override
+  _HistoryState createState() => _HistoryState();
+}
+
+class _HistoryState extends State<History> {
+  bool deliverdOrderLoading = false, lastApiCall = false;
+  List deliverdOrdersList = [];
+  int productLimt = 10, productIndex = 0, totalProduct = 1;
+
+  @override
+  void initState() {
+    if (mounted) {
+      setState(() {
+        deliverdOrderLoading = true;
+      });
+    }
+    getDeliverdInfo(productIndex);
+    super.initState();
+  }
+
+  Future<void> getDeliverdInfo(productIndex) async {
+    await APIService.getDeliverdOrder(productLimt, productIndex).then((value) {
+      if (mounted) {
+        setState(() {
+          deliverdOrderLoading = false;
+        });
+      }
+      if (value['response_data'] != null && mounted) {
+        setState(() {
+          deliverdOrdersList.addAll(value['response_data']);
+          totalProduct = value["total"];
+          int index = deliverdOrdersList.length;
+          if (lastApiCall == true) {
+            productIndex++;
+            if (index < totalProduct) {
+              getDeliverdInfo(productIndex);
+            } else {
+              if (index == totalProduct) {
+                if (mounted) {
+                  lastApiCall = false;
+                  getDeliverdInfo(productIndex);
+                }
+              }
+            }
+          }
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            deliverdOrdersList = [];
+          });
+        }
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          deliverdOrdersList = [];
+          deliverdOrderLoading = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,77 +83,65 @@ class History extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          MyLocalizations.of(context).history,
+          MyLocalizations.of(context).getLocalizations("HISTORY"),
           style: titleWPS(),
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: ListView(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
-            child: Text(
-              MyLocalizations.of(context).completedRequests,
-              style: titleBPS(),
+      body: deliverdOrderLoading == true
+          ? SquareLoader()
+          : ListView(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+                  child: Text(
+                    MyLocalizations.of(context)
+                        .getLocalizations("COMPLETED_REQUESTS"),
+                    style: titleBPS(),
+                  ),
+                ),
+                deliverdOrdersList.length > 0
+                    ? ListView.builder(
+                        physics: ScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: deliverdOrdersList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return buildOrderCard(
+                              context, deliverdOrdersList[index], index);
+                        })
+                    : Padding(
+                        padding: EdgeInsets.only(top: 100),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.hourglass_empty,
+                              size: 100,
+                              color: greyB,
+                            ),
+                            Text(
+                              MyLocalizations.of(context)
+                                  .getLocalizations("NO_DELIVERED_ORDERS"),
+                              style: titleBPS(),
+                            ),
+                          ],
+                        ),
+                      )
+              ],
             ),
-          ),
-          Consumer<OrderModel>(
-            builder: (context, data, child) {
-              if (data.deliveredOrders == null) {
-                return Padding(
-                  padding: EdgeInsets.only(top: 50),
-                  child: SquareLoader(),
-                );
-              }
-              if (data.deliveredOrders.length > 0) {
-                return ListView.builder(
-                    physics: ScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: data.deliveredOrders.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return buildOrderCard(
-                          context, data.deliveredOrders[index], index);
-                    });
-              } else {
-                return Padding(
-                    padding: EdgeInsets.only(top: 100),
-                    child: Column(children: [
-                      Icon(
-                        Icons.hourglass_empty,
-                        size: 100,
-                        color: greyB,
-                      ),
-                      Text(
-                        MyLocalizations.of(context).noDeliveredOrders,
-                        style: titleBPS(),
-                      ),
-                    ]));
-              }
-            },
-          ),
-        ],
-      ),
     );
   }
 
   Widget buildOrderCard(context, order, index) {
-    String fullName = '', firstName = '', lastName = '';
-    if (order['user'] != null && order['user']['firstName'] != null) {
-      firstName = order['user']['firstName'];
-    }
-    if (order['user'] != null && order['user']['lastName'] != null) {
-      lastName = order['user']['lastName'];
-    }
-    fullName = '$firstName $lastName';
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => OrderDetails(
-                    orderID: order['_id'].toString(),
-                  )),
+            builder: (context) => OrderDetails(
+              orderID: order['_id'].toString(),
+            ),
+          ),
         );
       },
       child: GFCard(
@@ -98,32 +149,24 @@ class History extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         content: Column(
           children: <Widget>[
+            SizedBox(height: 5),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(
-                      height: 15,
-                      child: SvgPicture.asset(
-                        'lib/assets/icons/customer.svg',
-                      ),
-                    ),
-                    Text(
-                      MyLocalizations.of(context).customer,
-                      style: titleXSmallBPR(),
-                    ),
-                    Text(
-                      fullName,
-                      style: titleXSmallBBPR(),
-                    )
-                  ],
-                ),
+                Container(
+                    height: 15,
+                    width: 20,
+                    child: Icon(Icons.timer, color: greyB, size: 15)),
+                Text(MyLocalizations.of(context).getLocalizations("DATE", true),
+                    style: keyText()),
+                Expanded(
+                  child: Text(
+                    order['deliveryDate'] + ', ' + order['deliveryTime'],
+                    style: keyValue(),
+                  ),
+                )
               ],
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Row(
               children: <Widget>[
                 Container(
@@ -133,42 +176,15 @@ class History extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  MyLocalizations.of(context).orderId,
-                  style: titleXSmallBPR(),
+                  MyLocalizations.of(context)
+                      .getLocalizations("ORDER_ID", true),
+                  style: keyText(),
                 ),
                 Text(
-                  order['orderID'].toString(),
+                  "#" + order['orderID'].toString(),
                   style: titleXSmallBBPR(),
                 )
               ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: <Widget>[
-                Container(
-                    height: 15,
-                    child: Icon(
-                      Icons.timer,
-                      color: greyB,
-                      size: 15,
-                    )),
-                Text(
-                  MyLocalizations.of(context).timeDate,
-                  style: titleXSmallBPR(),
-                ),
-                Text(
-                  DateFormat('hh:mm a, dd/MM/yyyy')
-                      .format(DateTime.fromMillisecondsSinceEpoch(
-                          order['appTimestamp']))
-                      .toString(),
-                  style: titleXSmallBBPR(),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 5,
             ),
           ],
         ),

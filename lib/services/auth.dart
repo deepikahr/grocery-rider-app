@@ -1,39 +1,78 @@
-import 'package:grocerydelivery/services/common.dart';
-import 'package:http/http.dart' show Client;
-import 'constants.dart';
 import 'dart:convert';
 
-class AuthService {
-  static final Client client = Client();
+import 'package:grocerydelivery/services/interCepter.dart';
+import 'package:http/http.dart' show Client;
+import 'package:http_interceptor/http_interceptor.dart';
 
-  static Future<Map<String, dynamic>> lOGIN(body) async {
-    String languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
+import 'constants.dart';
+
+Client client =
+    HttpClientWithInterceptor.build(interceptors: [ApiInterceptor()]);
+
+class AuthService {
+  //login
+  static Future<Map<String, dynamic>> login(body) async {
+    return client
+        .post(Constants.apiURL + '/users/login', body: json.encode(body))
+        .then((response) {
+      return json.decode(response.body);
     });
-    final response = await client.post(Constants.BASE_URL + 'users/login',
-        body: json.encode(body),
-        headers: {
-          'Content-Type': 'application/json',
-          'language': languageCode
-        });
-    return json.decode(response.body);
   }
 
-  static Future<dynamic> setLanguageCodeToProfile() async {
-    String languageCode, token;
-    await Common.getToken().then((tkn) {
-      token = tkn;
+  // forgetPassword
+  static Future<Map<String, dynamic>> forgetPassword(email) async {
+    Map body = {"email": email};
+    return client
+        .post(Constants.apiURL + "/users/forgot-password",
+            body: json.encode(body))
+        .then((response) {
+      return json.decode(response.body);
     });
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
+  }
+
+  // verify otp
+  static Future<Map<String, dynamic>> verifyOtp(otp, email) async {
+    return client
+        .get(Constants.apiURL + "/users/verify-otp?email=$email&otp=$otp")
+        .then((response) {
+      return json.decode(response.body);
     });
-    final response =
-        await client.get(Constants.BASE_URL + 'users/language/set', headers: {
-      'Content-Type': 'application/json',
-      'language': languageCode,
-      'Authorization': 'bearer $token',
+  }
+
+  // reset password
+  static Future<Map<String, dynamic>> resetPassword(body) async {
+    return client
+        .post(Constants.apiURL + "/users/reset-password",
+            body: json.encode(body))
+        .then((response) {
+      return json.decode(response.body);
     });
-    return json.decode(response.body);
+  }
+
+  // change password
+  static Future<Map<String, dynamic>> changePassword(body) async {
+    return client
+        .post(Constants.apiURL + "/users/change-password",
+            body: json.encode(body))
+        .then((response) {
+      return json.decode(response.body);
+    });
+  }
+
+  //get user info
+  static Future<Map<String, dynamic>> getUserInfo() async {
+    return client.get(Constants.apiURL + '/users/me').then((response) {
+      return json.decode(response.body);
+    });
+  }
+
+// user data update
+  static Future<Map<String, dynamic>> updateUserInfo(body) async {
+    return client
+        .put(Constants.apiURL + "/users/update/profile",
+            body: json.encode(body))
+        .then((response) {
+      return json.decode(response.body);
+    });
   }
 }

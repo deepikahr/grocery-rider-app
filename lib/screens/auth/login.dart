@@ -1,19 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:getflutter/getflutter.dart';
-import 'package:grocerydelivery/services/api_service.dart';
+import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/screens/auth/forgotpassword.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
-import 'package:grocerydelivery/widgets/loader.dart';
-import '../../services/common.dart';
+
 import '../../services/auth.dart';
-import '../home/tabs.dart';
+import '../../services/common.dart';
 import '../../styles/styles.dart';
+import '../home/tabs.dart';
 
 class LOGIN extends StatefulWidget {
   final Map localizedValues;
   final String locale;
+
   LOGIN({Key key, this.localizedValues, this.locale}) : super(key: key);
+
   @override
   _LOGINState createState() => _LOGINState();
 }
@@ -24,69 +26,8 @@ class _LOGINState extends State<LOGIN> {
 
   String email, password;
   bool isLoading = false;
-  bool isLoggedIn, isAboutUsData = false;
-  Map<String, dynamic> aboutUsDatails;
 
-  @override
-  void initState() {
-    checkAUthentication();
-    getAboutUsData();
-    super.initState();
-  }
-
-  void getAboutUsData() {
-    if (mounted) {
-      setState(() {
-        isAboutUsData = true;
-      });
-    }
-    APIService.aboutUs().then((value) {
-      try {
-        if (value['response_code'] == 200) {
-          if (mounted) {
-            setState(() {
-              aboutUsDatails = value['response_data'][0];
-              isAboutUsData = false;
-            });
-          }
-        }
-      } catch (error, _) {
-        if (mounted) {
-          setState(() {
-            isAboutUsData = false;
-          });
-        }
-      }
-    }).catchError((error) {
-      if (mounted) {
-        setState(() {
-          isAboutUsData = false;
-        });
-      }
-    });
-  }
-
-  void checkAUthentication() async {
-    await Common.getToken().then((token) async {
-      if (token != null) {
-        await AuthService.setLanguageCodeToProfile();
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (BuildContext context) => Tabs(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues),
-            ),
-            (Route<dynamic> route) => false);
-      } else {
-        setState(() {
-          isLoggedIn = false;
-        });
-      }
-    });
-  }
-
-  void lOGIN() async {
+  void loginMethod() async {
     if (_formKey.currentState.validate()) {
       setState(() {
         isLoading = true;
@@ -98,35 +39,31 @@ class _LOGINState extends State<LOGIN> {
           'password': password,
           "playerId": palyerId ?? 'no id found'
         };
-        AuthService.lOGIN(body).then((onValue) {
-          if (onValue['response_code'] == 401) {
-            Common.showSnackbar(_scaffoldKey, onValue['response_data']);
-          } else if (onValue['response_code'] == 200 &&
+        AuthService.login(body).then((onValue) {
+          if (onValue['response_data'] != null &&
               onValue['response_data']['token'] != null) {
-            if (onValue['response_data']['role'] == 'Delivery Boy') {
-              Common.setToken(onValue['response_data']['token']).then((_) {
-                Common.setAccountID(onValue['response_data']['_id'])
-                    .then((_) async {
-                  await AuthService.setLanguageCodeToProfile();
-                  if (mounted) {
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => Tabs(
-                              locale: widget.locale,
-                              localizedValues: widget.localizedValues),
-                        ),
-                        (Route<dynamic> route) => false);
-                  }
-                });
+            if (onValue['response_data']['role'] == 'DELIVERY_BOY') {
+              Common.setToken(onValue['response_data']['token'])
+                  .then((_) async {
+                Common.setAccountID(onValue['response_data']['id']);
+                if (mounted) {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => Tabs(
+                            locale: widget.locale,
+                            localizedValues: widget.localizedValues),
+                      ),
+                      (Route<dynamic> route) => false);
+                }
               });
             } else {
               Common.showSnackbar(_scaffoldKey,
-                  '$email ${MyLocalizations.of(context).authorizationError}');
+                  '$email ${MyLocalizations.of(context).getLocalizations("AUTHORICATION_ERROR")}');
             }
           } else {
-            Common.showSnackbar(
-                _scaffoldKey, MyLocalizations.of(context).wrongFormat);
+            Common.showSnackbar(_scaffoldKey,
+                MyLocalizations.of(context).getLocalizations("WRONG_FORMAT"));
           }
           setState(() {
             isLoading = false;
@@ -135,7 +72,6 @@ class _LOGINState extends State<LOGIN> {
           setState(() {
             isLoading = false;
           });
-          Common.showSnackbar(_scaffoldKey, onError);
         });
       });
     }
@@ -148,99 +84,97 @@ class _LOGINState extends State<LOGIN> {
       appBar: AppBar(
         backgroundColor: primary,
         title: Text(
-          isLoggedIn == null ? '' : MyLocalizations.of(context).lOGIN,
+          MyLocalizations.of(context).getLocalizations("LOGIN"),
           style: titleWPS(),
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       backgroundColor: Colors.white,
-      body: isLoggedIn == null
-          ? Column(
-              children: [
-                SizedBox(height: 90),
-                Center(
-                  child: isAboutUsData
-                      ? SquareLoader()
-                      : aboutUsDatails['deliveryAppLogo'] != null
-                          ? Image.network(
-                              aboutUsDatails['deliveryAppLogo']['imageUrl'],
-                              height: 100,
-                            )
-                          : Image.asset(
-                              'lib/assets/icons/logo_outline.png',
-                              height: 60,
-                            ),
-                ),
-                // Center(
-                //   child: Text(
-                //     MyLocalizations.of(context).groceryDelivery,
-                //     style: titleLargePPB(),
-                //   ),
-                // ),
-                SizedBox(height: 50),
-                Padding(
-                    padding: EdgeInsets.only(top: 50), child: SquareLoader())
-              ],
-            )
-          : ListView(
+      body: ListView(
+        children: <Widget>[
+          Container(
+            height: MediaQuery.of(context).size.height * 0.85,
+            child: Stack(
+              alignment: AlignmentDirectional.center,
               children: <Widget>[
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.85,
-                  child: Stack(
-                    alignment: AlignmentDirectional.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              SizedBox(height: 90),
-                              Center(
-                                child: isAboutUsData
-                                    ? SquareLoader()
-                                    : aboutUsDatails['deliveryAppLogo'] != null
-                                        ? Image.network(
-                                            aboutUsDatails['deliveryAppLogo']
-                                                ['imageUrl'],
-                                            height: 100,
-                                          )
-                                        : Image.asset(
-                                            'lib/assets/icons/logo_outline.png',
-                                            height: 60,
-                                          ),
-                              ),
-                              // Center(
-                              //     child: Text(
-                              //         MyLocalizations.of(context)
-                              //             .groceryDelivery,
-                              //         style: titleLargePPB())),
-                              SizedBox(height: 50),
-                              Text(
-                                MyLocalizations.of(context).emailId,
-                                style: titleSmallBPR(),
-                              ),
-                              SizedBox(height: 10),
-                              buildEmailTextFormField(),
-                              SizedBox(height: 25),
-                              Text(
-                                MyLocalizations.of(context).password,
-                                style: titleSmallBPR(),
-                              ),
-                              SizedBox(height: 10),
-                              buildPasswordextFormField(),
-                            ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(height: 50),
+                        Center(
+                          child: GFAvatar(
+                            backgroundImage:
+                                AssetImage('lib/assets/logo/logo.png'),
+                            radius: 60,
                           ),
                         ),
-                      ),
-                      buildlOGINButton()
-                    ],
+                        SizedBox(height: 50),
+                        Text(
+                          MyLocalizations.of(context)
+                              .getLocalizations("EMAIL", true),
+                          style: titleSmallBPR(),
+                        ),
+                        SizedBox(height: 10),
+                        buildEmailTextFormField(),
+                        SizedBox(height: 25),
+                        Text(
+                          MyLocalizations.of(context)
+                              .getLocalizations("PASSWORD", true),
+                          style: titleSmallBPR(),
+                        ),
+                        SizedBox(height: 10),
+                        buildPasswordextFormField(),
+                        SizedBox(height: 10),
+                        buildForgotPasswordLink(),
+                      ],
+                    ),
                   ),
                 ),
+                buildlOGINButton()
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildForgotPasswordLink() {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ForgotPassword(
+              locale: widget.locale,
+              localizedValues: widget.localizedValues,
+            ),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 10.0),
+        child: RichText(
+          text: TextSpan(
+            children: <TextSpan>[
+              TextSpan(
+                  text: MyLocalizations.of(context)
+                          .getLocalizations("FORGET_PASSWORD") +
+                      "?",
+                  style: titleSmallBPR()),
+              TextSpan(
+                text: '',
+                style: TextStyle(color: primary),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -268,7 +202,7 @@ class _LOGINState extends State<LOGIN> {
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty || !RegExp(Common.emailPattern).hasMatch(value)) {
-          return MyLocalizations.of(context).errorEmail;
+          return MyLocalizations.of(context).getLocalizations("ERROR_MAIL");
         } else
           return null;
       },
@@ -301,7 +235,7 @@ class _LOGINState extends State<LOGIN> {
       obscureText: true,
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
-          return MyLocalizations.of(context).errorPassword;
+          return MyLocalizations.of(context).getLocalizations("ERROR_PASSWORD");
         } else
           return null;
       },
@@ -318,13 +252,15 @@ class _LOGINState extends State<LOGIN> {
         height: 51,
         child: GFButton(
           onPressed: () {
-            if (!isLoading) lOGIN();
+            if (!isLoading) loginMethod();
           },
           size: GFSize.LARGE,
           child: isLoading
-              ? SquareLoader()
+              ? GFLoader(
+                  type: GFLoaderType.ios,
+                )
               : Text(
-                  MyLocalizations.of(context).lOGIN,
+                  MyLocalizations.of(context).getLocalizations("LOGIN"),
                   style: titleXLargeWPB(),
                 ),
           color: secondary,

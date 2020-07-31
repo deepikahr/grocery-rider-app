@@ -69,6 +69,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_dotenv:
+    dependency: "direct main"
+    description:
+      name: flutter_dotenv
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
   flutter_i18n:
     dependency: "direct main"
     description:
@@ -112,13 +119,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  getflutter:
+  fluttertoast:
     dependency: "direct main"
     description:
-      name: getflutter
+      name: fluttertoast
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.11"
+    version: "7.0.1+1"
+  getwidget:
+    dependency: "direct main"
+    description:
+      name: getwidget
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   google_maps_flutter:
     dependency: "direct main"
     description:
@@ -133,6 +147,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.0+4"
+  http_interceptor:
+    dependency: "direct main"
+    description:
+      name: http_interceptor
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2"
   http_parser:
     dependency: transitive
     description:
@@ -252,6 +273,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.0"
+  pin_entry_text_field:
+    dependency: "direct main"
+    description:
+      name: pin_entry_text_field
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.4"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -266,6 +294,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.5+1"
+  pull_to_refresh:
+    dependency: "direct main"
+    description:
+      name: pull_to_refresh
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.6.0"
   quiver:
     dependency: transitive
     description:
@@ -426,5 +461,5 @@ packages:
     source: hosted
     version: "2.2.0"
 sdks:
-  dart: ">=2.5.0 <3.0.0"
+  dart: ">=2.7.0 <3.0.0"
   flutter: ">=1.12.13+hotfix.5 <2.0.0"

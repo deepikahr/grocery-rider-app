@@ -1,83 +1,90 @@
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'common.dart';
-import 'package:http/http.dart' show Client;
-import 'constants.dart';
 import 'dart:convert';
 
+import 'package:grocerydelivery/services/interCepter.dart';
+import 'package:http/http.dart' show Client;
+import 'package:http_interceptor/http_interceptor.dart';
+
+import 'constants.dart';
+
+Client client =
+    HttpClientWithInterceptor.build(interceptors: [ApiInterceptor()]);
+
 class APIService {
-  static final Client client = Client();
-
+  // get location info
   static Future<Map<String, dynamic>> getLocationformation() async {
-    String token, languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-    await Common.getToken().then((onValue) {
-      token = onValue;
-    });
-    final response = await client
-        .get(Constants.BASE_URL + 'delivery/tax/settings/details', headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'bearer $token',
-      'language': languageCode
-    });
+    final response = await client.get(Constants.apiURL + '/settings/details');
     return json.decode(response.body);
   }
 
-  static Future<Map<String, dynamic>> getUserInfo() async {
-    String languageCode, token;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-
-    await Common.getToken().then((onValue) {
-      token = onValue;
-    });
-    final response =
-        await client.get(Constants.BASE_URL + 'users/me', headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'bearer $token',
-      'language': languageCode
-    });
-    return json.decode(response.body);
-  }
-
-  static Future<dynamic> getGlobalSettings() async {
-    String languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-
-    final response = await client.get(Constants.BASE_URL + 'setting/user/App',
-        headers: {
-          'Content-Type': 'application/json',
-          'language': languageCode
-        });
-    return json.decode(response.body);
-  }
-
-  static Future<Map<String, dynamic>> aboutUs() async {
-    String languageCode;
-    await Common.getSelectedLanguage().then((code) {
-      languageCode = code ?? "";
-    });
-
-    final response = await client
-        .get(Constants.BASE_URL + "business/business/about/us", headers: {
-      'Content-Type': 'application/json',
-      'language': languageCode
-    });
-    return json.decode(response.body);
-  }
-
+  // get json data
   static Future<Map<String, dynamic>> getLanguageJson(languageCode) async {
-    final response = await client.get(
-        Constants.BASE_URL +
-            "language/user/info?req_from=deliveyAppJson&language_code=$languageCode",
-        headers: {
-          'Content-Type': 'application/json',
-        });
-    return json.decode(response.body);
+    return client
+        .get(Constants.apiURL + "/languages/delivery?code=$languageCode")
+        .then((response) {
+      return json.decode(response.body);
+    });
+  }
+
+  // get languages list
+  static Future<dynamic> getLanguagesList() async {
+    return client.get(Constants.apiURL + "/languages/list").then((response) {
+      return json.decode(response.body);
+    });
+  }
+
+  //notification list
+  static Future<Map<String, dynamic>> getOrderHistory(orderId) async {
+    return client
+        .get(Constants.apiURL + "/orders/delivery-boy/detail/$orderId")
+        .then((response) {
+      return json.decode(response.body);
+    });
+  }
+
+  static Future<dynamic> orderStausChange(body, orderId) async {
+    return client
+        .put(Constants.apiURL + "/orders/delivery-boy/status-update/$orderId",
+            body: json.encode(body))
+        .then((response) {
+      return json.decode(response.body);
+    });
+  }
+
+  // get delivered order list
+  static Future<dynamic> getDeliverdOrder(limit, index) async {
+    return client
+        .get(Constants.apiURL +
+            "/orders/delivery-boy/delivered/list?limit=$limit&page=$index")
+        .then((response) {
+      return json.decode(response.body);
+    });
+  }
+
+  // get assigned order list
+  static Future<dynamic> getAssignedOrder(limit, index) async {
+    return client
+        .get(Constants.apiURL +
+            "/orders/delivery-boy/assigned/list?limit=$limit&page=$index")
+        .then((response) {
+      return json.decode(response.body);
+    });
+  }
+
+  // get order Accept api order
+  static Future<Map<String, dynamic>> orderAcceptApi(orderId) async {
+    return client
+        .put(Constants.apiURL + "/orders/delivery-boy/accept/$orderId")
+        .then((response) {
+      return json.decode(response.body);
+    });
+  }
+
+  // get RejectApi order
+  static Future<Map<String, dynamic>> orderRejectApi(orderId) async {
+    return client
+        .put(Constants.apiURL + "/orders/delivery-boy/reject/$orderId")
+        .then((response) {
+      return json.decode(response.body);
+    });
   }
 }

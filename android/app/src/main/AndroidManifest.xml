@@ -14,7 +14,7 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="Readymade grocery delivery app"
         android:icon="@mipmap/ic_launcher">
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyD6Q4UgAYOL203nuwNeBr4j_-yAd1U1gko"/>
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="${googleMapApiKey}"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
