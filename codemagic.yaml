@@ -4,8 +4,9 @@ workflows:
     max_build_duration: 60
     environment:
       vars:
-        ENV_FILE: QVBQX05BTUU9J1JlYWR5bWFkZSBHcm9jZXJ5IEFwcCcKQVBJX1VSTD1odHRwOi8vMTYyLjI0My4xNzEuODE6MzAwMApCQVNFX1VSTD1odHRwOi8vZDFhd3Nza2dpcWxvMDEuY2xvdWRmcm9udC5uZXQKT05FX1NJR05BTF9LRVk9YTc2YjY4NjctYmYxMi00NDBmLThiYzItMzA5NDZjNjUyYWY4ClNUUklQRV9LRVk9cGtfdGVzdF9SQmRBdTZqSWJFQnlZM0thQlFGYkg0TjEwMG5Na1ZpdjZnCklNQUdFX1VSTF9QQVRIPWh0dHBzOi8vaWsuaW1hZ2VraXQuaW8va3BsaHZ0aHFiaQpHT09HTEVfTUFQX0FQSV9LRVk9QUl6YVN5QkF3UEdPMG5PLXoxYVhWZ0VKZzVHX1hSQW82Um5lcFN3
-        PACKAGE_NAME: com.ionicfirebaseapp.readymadegroceryuserapp
+        ENV_FILE: QVBQTElDQVRJT05fTkFNRT0nUmVhZHltYWRlIGdyb2NlcnkgZGVsaXZlcnkgYXBwJwpBUElfVVJMPWh0dHA6Ly8xNjIuMjQzLjE3MS44MTozMDAwCk9ORV9TSUdOQUxfS0VZPTY2OTJlNDEzLTJiOGUtNDNlOC1hZTJkLWEyMjNkNDgxNzFjYQpHT09HTEVfTUFQX0FQSV9LRVk9QUl6YVN5QkF3UEdPMG5PLXoxYVhWZ0VKZzVHX1hSQW82Um5lcFN3
+        ANDROID_PACKAGE_NAME: com.ionicfirebaseapp.grocerydelivery
+        IOS_PACKAGE_NAME: com.ionicfirebaseapp.grocerydeliveryapp
         CERTIFICATE_PRIVATE_KEY: Encrypted(Z0FBQUFBQmZEVlM3NUhPR3lSM29KT29paXJWUW9XQk1KQ2lYV2dtckNISUVtZ3FuLWRKcEI3bWRBdWRNOHJIUEhISEFFeEpfOU5VeDFkOERISTNzU05TZndXRl9vOTlZR3NoMFNJUlJPOGxEc0JvYkdUWGx0blZQVU1FbEhaaGZMaGtlb01nZW5OaGhPR0x2MC1aZ19kWFRVcUxlZlhDbkRTMDNTbzIwa1U3Yy1maHRSRGNnOVNRb2JKVHlTWXFpM0pKLXk1UGF3LWIwV2plVU1oWnJpS3N1Qk1kdlFwMjhhS0ZpbThsSHhEaHF3cnNCUUp0Zk9scmpuLThQM2lLVWNYX29qUllTSDd3eGFBQVhzcWlMYi0tcXJkbjFKendyTHFUVk9IbW5FYjFsZjdNUUgxVWp5aUU4TTV2YWdzZGo4b1BMNFJJY0xnTktrT0dTSVIwd013XzdlazlJLW5nUkJ2R09wODV0VVhaOEFlT1gyN1cyYVpBSVBXd3U5azFlY19rT3paZ1kyVklFRl9IRVdaWGthaU1GTndVYTJsa2tOcS1ad0ZfQVF1cDROQnU4QnRaQXkxamVwWHh5MkxRT2NUbVNaRFB4cWFRUS1sc1pHUTBXcGh4ZlM2N2U3VTVlQ1lLUW41SWE0c04wOWIxZExjcjVlRVhwTTRhSXJFRFB1WGtOcGdjbmVUQ3pfR3UyUTFvUWZvRWoxNzhBRW5Oek55ZlY1ZWtYOG1SVi1kbE1XcUY5Z2dDeUZ6eWRFc05qRTI2WXV1V3dCSTZydUFSdHJIX3ZhbWFGVV96RjRRbzlXNVBEaGp3bm5ZYlhVb1ZncExXNXhlb3ZPbW1uT1h6RF9NTFQ1NmRURlhUNjNKRW03emx1VlM4LTV3VjhqdGxNaC1vaW1mNHdLYmNWR1l6akxJSENhaDNhU2I4SGpRVnM4YkFObnZydUxYMjFsb2pTVS1VZlV2MUNONFZwX1dHeW9VS3kwXzdZbmdnakFCQmNhT1o0TDl2V3JieWNpc2lvdkxyZDNFbWZIZ0U1a1E5czdlbk5aUzVjcS1ETkd1OV90bXp2NWFodEt1X1paNGlwSnBKSWsyWEszSEFaM00zZUpHRUV6QjEwLXZ4QWNxVzh6SmEteC1mNG5HR3dwNzV3UTdCVzlBc2M0ZXVKQXBPc1BOOFYtRDlQMldWSUwwWk9MUm40dTNNWUxXNnA1WUs0SGlkd1N0WW1rdnFWM3d1S09FSkVsZV9ZVHJYbTNGVWJXdGFKX1NVdlUtbmxHNUdENkYxbVdubG1NdkM3d1l4Y1FhUHhKODZsNG13S2JLeVAwOU9zdTBYcmlsWVNybTFBS0pLdUJYVElEQnlhZldadGozSU8zbG9JZTc3bHhVbEJRTXM4U2Y1Y3RJVGdhdkZqMVlNWEhyMEJoV3ZVaWM4TmlzeTRZUGhXRElFSHgwYVZKdGVxTTVDVnhKLVpuRXFTR3kzTWsxcERtRzlSZC1YWlhZNEVQMVN6QkpDcWp1Tm9zaklTbF9pWWZ0aFBrcXlXRURtSGJxVHdBS0RVNVRHUVNadWJPb25aYnc2a3BVTWhOLVEzRkxJckxWSVJOeGMwLWJUSGNheEpteEZSbkt0Ty1uSUlGSXZnaFRIalhTd0Y0YS1NSXZVa2xialJueDBVblpfSXYyRmFSRFZQUWlUWXBORmhKUVF2VHpKOUtvYXVrWURiMjQzMlZLMzg2TWkweEN2MjVYTzcyUHJSVjVrMm9ja0xIOHlveGZPbm13TEpxVVlzQmRxTnpESnlrVV9aUWNYZEJDWG56UkRyMzNsaGpHN05Ya3lxRjlxTlNXLVhwSWpjN1U5bFd2SUVVSzhYclgyY09naEl5UWxMcGpDZjVYREp4eXJVV09kRl9zTXVfekUzQmJHQzJHV3I3MDdURFBqTHFQTVNYMGVmSFZrN2UxT3VWUUNxQ3N6R0JCY3d5TWhNU2FkMnd1TjBhay1GWDBCUmU5dHZVLVBiUVFwcGtRVFhhclREaEp5RjBfcU92TU42NXRpdXp5b042b1k5ZWJrVmFGQnFpeGZhcnB1THNHTGItdWlFTXJOQ1hlLTlsa2VuREF1cWNEWW1ZN2h2cXFIZ25Yd3pzTGpGaXhTUlg4Y2w1Wm1kRFVsX29MMW9ZNUVHSnpBal9QV3hCbXJDVFAtRzNGYmpsd2JRbHlGVGEyUlZrcVl6Z25uODBhZG1DWmdKamlmVGYtSlhkdVNDckpmeFRsTklLdFRNWF8yV2tmYjlvNUQ0dlE4WDY3bVpsNXRUQ0d6YndjTlBHUU5aTjRZOFByTVY1WTVTSzk3aFE0Nm5tQm03bktjNWp1cE5KRFEyYXhMWHo0amxaNEVFVGNXak1iTzF6X0F6aDVTTjA1SUxOdTdLMXM4TWxDNGpUN3BadG1jNnFuaHR1WGp4U243eGNaUW13MkJvVm8xRVpNZzVQR2Utbm5vNHQ4QW5RMFpuTVFiM2M4cVFoN0libUlrTXBjcHdSS1NGcG5RSzl2OS0zbWZKTUlZTjBvR2dYWk12QzExRGh2Y21Xa0l0OXBuSEhkV2VHa04yc05fSHpldUVKNHlKX0M3SXJtcVcwYld1VXVjRGNFVDNWV2VRR0x5bkRzQlNvM3FxMHRTY3FNMk5YVU4xSGFPM1VyVFM0RGMxbk9XTjhTSGRBOEp1bFNtVGFSQ2Rma1R2UGRIYzNWWmY3WHNoSkJJYmJ2NGFDZEpSQVRFOV9zQTlrRlB2STllajJGVWlhLVdOZ3VfMGtJVTFJTC1hN2Z3MDFCaDhvNDdKNFdvaVlpaVFPX1RTZVAzcmJSRXBoMW11c3E0OElQRnBjQmQ3aEVqb215LTZJVFFxejJYMFozNTVaYjRCbENOOEJja0QtcUZSUjhmMHFnVDBNaDlWM2JfQW8yakhEVnBZWUY5Zkk3YzJNOXlIVHhoMFB6Z0l0Y1hmYnZsckR0cFU2LWJCeGNabHlXWFNvcXJNT05YR2FsdlFYXzlQa2M1X09GZEk4cTE4cjV6Zk1lanEteGRWRmpmOVpTaU10d01Bb3ZJU3lVYXh4MVVBXzk4VUFlSlUzV1Ba)
         APP_STORE_CONNECT_ISSUER_ID: Encrypted(Z0FBQUFBQmZEVlM3VVY5SmNuWU0ySVotWEc0VDJLR1NSbmdIVERKcGJPZ01rRVBzRzdrSC0xQmZHSmd2NS01NkRDUHRWRnNLS0NPRU5Vend5OVNjWnd1OU9HSVdyNThNUEthLWFPXzVubDJKUUpuMjFfZmFPa3N1alRxLWs2Q05ZVF91VHdlUUlWY0Q=)
         APP_STORE_CONNECT_KEY_IDENTIFIER: Encrypted(Z0FBQUFBQmZEVlM3LUxLeWpCVmJoRUF3RGMtamlhRzZkcmQ4a2IzLTc1bERuMTFHM0xxOTRYTXk0R1RDQXFCcmU5Vi0zT05wQV9GXzAzR1ZDSXhVTGpBVWRYZ0U3dUd6blE9PQ==)
@@ -25,9 +26,18 @@ workflows:
     scripts:
       - echo $ENV_FILE  | base64 --decode > .env
       - source .env
-      - sed -e "s|GOOGLE_MAP_API_KEY|$GOOGLE_MAP_API_KEY|g" ios/Runner/AppDelegate.swift > temp_file.txt
-      - mv temp_file.txt ios/Runner/AppDelegate.swift
+      - export APPLICATION_NAME=$APPLICATION_NAME; export GOOGLE_MAP_API_KEY=$GOOGLE_MAP_API_KEY; export LC_CTYPE=C; export LANG=C;
+      - cp lib/assets/splash.png android/app/src/main/res/drawable/splash.png
+      - find ios/Runner/AppDelegate.swift -type f -exec sed -i '.original' "s|GOOGLE_MAP_API_KEY|$GOOGLE_MAP_API_KEY|g" {} \;
+      - find ios/Runner/info.plist -type f -exec sed -i '.original' "s|<string>APPLICATION_NAME</string>|<string>$APPLICATION_NAME</string>|g" {} \;
+      - find ios/Runner.xcodeproj -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydeliveryapp|$IOS_PACKAGE_NAME|g" {} \;
+      - find android/app/build.gradle -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - find android/app/src/main/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - find android/app/src/debug/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - find android/app/src/profile/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - find android/app/src/main/kotlin/com/example/demoaddressmap/MainActivity.kt -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
       - flutter packages pub get
+      - flutter pub run flutter_launcher_icons:main
       - flutter build appbundle --target-platform android-arm,android-arm64,android-x64
       - find . -name "Podfile" -execdir pod install \;
       - keychain initialize
@@ -69,7 +79,9 @@ workflows:
       xcode: latest
       cocoapods: 1.8.4
       vars:
-        ENV_FILE: QVBQX05BTUU9J1JlYWR5bWFkZSBHcm9jZXJ5IEFwcCcKQVBJX1VSTD1odHRwOi8vMTYyLjI0My4xNzEuODE6NDAwMApCQVNFX1VSTD1odHRwOi8vZDFrNXF4bGlsZjExdS5jbG91ZGZyb250Lm5ldApPTkVfU0lHTkFMX0tFWT1hNzZiNjg2Ny1iZjEyLTQ0MGYtOGJjMi0zMDk0NmM2NTJhZjgKU1RSSVBFX0tFWT1wa190ZXN0X1JCZEF1NmpJYkVCeVkzS2FCUUZiSDROMTAwbk1rVml2NmcKSU1BR0VfVVJMX1BBVEg9aHR0cHM6Ly9pay5pbWFnZWtpdC5pby9rcGxodnRocWJpCkdPT0dMRV9NQVBfQVBJX0tFWT1BSXphU3lCQXdQR08wbk8tejFhWFZnRUpnNUdfWFJBbzZSbmVwU3c=
+        ENV_FILE: QVBQTElDQVRJT05fTkFNRT0nUmVhZHltYWRlIGdyb2NlcnkgZGVsaXZlcnkgYXBwJwpBUElfVVJMPWh0dHA6Ly8xNjIuMjQzLjE3MS44MTo0MDAwCk9ORV9TSUdOQUxfS0VZPTY2OTJlNDEzLTJiOGUtNDNlOC1hZTJkLWEyMjNkNDgxNzFjYQpHT09HTEVfTUFQX0FQSV9LRVk9QUl6YVN5QkF3UEdPMG5PLXoxYVhWZ0VKZzVHX1hSQW82Um5lcFN3
+        ANDROID_PACKAGE_NAME: com.ionicfirebaseapp.grocerydelivery
+        IOS_PACKAGE_NAME: com.ionicfirebaseapp.grocerydeliveryapp
     cache:
       cache_paths: []
     triggering:
@@ -82,6 +94,18 @@ workflows:
     scripts:
       - echo $ENV_FILE  | base64 --decode > .env
       - source .env
+      - export APPLICATION_NAME=$APPLICATION_NAME; export GOOGLE_MAP_API_KEY=$GOOGLE_MAP_API_KEY; export LC_CTYPE=C; export LANG=C;
+      - cp lib/assets/splash.png android/app/src/main/res/drawable/splash.png
+      - find ios/Runner/AppDelegate.swift -type f -exec sed -i '.original' "s|GOOGLE_MAP_API_KEY|$GOOGLE_MAP_API_KEY|g" {} \;
+      - find ios/Runner/info.plist -type f -exec sed -i '.original' "s|<string>APPLICATION_NAME</string>|<string>$APPLICATION_NAME</string>|g" {} \;
+      - find ios/Runner.xcodeproj -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydeliveryapp|$IOS_PACKAGE_NAME|g" {} \;
+      - find android/app/build.gradle -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - find android/app/src/main/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - find android/app/src/debug/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - find android/app/src/profile/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - find android/app/src/main/kotlin/com/example/demoaddressmap/MainActivity.kt -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - flutter packages pub get
+      - flutter pub run flutter_launcher_icons:main
       - flutter packages pub get
       - flutter build apk --release
     artifacts:

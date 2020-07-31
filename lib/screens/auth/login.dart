@@ -108,8 +108,7 @@ class _LOGINState extends State<LOGIN> {
                         SizedBox(height: 50),
                         Center(
                           child: GFAvatar(
-                            backgroundImage:
-                                AssetImage('lib/assets/logo/logo.png'),
+                            backgroundImage: AssetImage('lib/assets/logo.png'),
                             radius: 60,
                           ),
                         ),
@@ -180,7 +179,7 @@ class _LOGINState extends State<LOGIN> {
 
   Widget buildEmailTextFormField() {
     return TextFormField(
-      initialValue: Constants.APP_NAME.contains('Readymade')
+      initialValue: Constants.appName.contains('Readymade')
           ? "delivery1@ionicfirebaseapp.com"
           : null,
       cursorColor: primary,
@@ -214,7 +213,7 @@ class _LOGINState extends State<LOGIN> {
 
   Widget buildPasswordextFormField() {
     return TextFormField(
-      initialValue: Constants.APP_NAME.contains('Readymade') ? "123456" : null,
+      initialValue: Constants.appName.contains('Readymade') ? "123456" : null,
       cursorColor: primary,
       decoration: InputDecoration(
         filled: true,

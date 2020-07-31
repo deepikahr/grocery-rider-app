@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Readymade grocery delivery app</string>
+	<string>APPLICATION_NAME</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>NSLocationAlwaysUsageDescription</key>

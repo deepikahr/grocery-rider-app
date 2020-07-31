@@ -171,7 +171,7 @@ class _DeliveryAppState extends State<DeliveryApp> {
       ],
       supportedLocales: [Locale(widget.locale)],
       debugShowCheckedModeBanner: false,
-      title: Constants.APP_NAME,
+      title: Constants.appName,
       theme: ThemeData(primaryColor: primary, accentColor: primary),
       home: checkDeliveyDisOrNot
           ? AnimatedScreen()

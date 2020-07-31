@@ -179,7 +179,7 @@ class _ProfileState extends State<Profile> {
                           Center(
                             child: GFAvatar(
                               backgroundImage: profileInfo['profilePic'] == null
-                                  ? AssetImage('lib/assets/logo/logo.png')
+                                  ? AssetImage('lib/assets/logo.png')
                                   : NetworkImage(
                                       'https://cdn.pixabay.com/photo/2020/03/12/19/55/northern-gannet-4926108__340.jpg'),
                               radius: 60,

@@ -2,7 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Constants {
   // app name
-  static const APP_NAME = "Readymade Grocery Delivery App";
+  static String appName = DotEnv().env['APPLICATION_NAME'];
 
   // Base url
   static String apiURL = DotEnv().env['API_URL'];

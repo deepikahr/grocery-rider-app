@@ -35,6 +35,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.7.5"
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "lib/assets/logo.png"
 
 flutter:
   uses-material-design: true
@@ -44,7 +50,7 @@ flutter:
     - lib/assets/icons/history.svg
     - lib/assets/icons/home.svg
     - lib/assets/icons/profile.svg
-    - lib/assets/logo/logo.png
+    - lib/assets/logo.png
     - lib/assets/icons/logo_outline.png
     - lib/assets/icons/back_arrow.png
     - lib/assets/icons/hash.svg
