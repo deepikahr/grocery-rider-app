@@ -83,7 +83,7 @@ workflows:
       xcode: latest
       cocoapods: 1.8.4
       vars:
-        APPLICATION_NAME: "Readymade Grocery App"
+        APPLICATION_NAME: "Readymade Grocery Delivery App"
         API_URL: http://162.243.171.81:4000
         ANDROID_PACKAGE_NAME: com.ionicfirebaseapp.grocerydelivery
         IOS_PACKAGE_NAME: com.ionicfirebaseapp.grocerydeliveryapp
