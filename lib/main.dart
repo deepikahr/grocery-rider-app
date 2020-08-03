@@ -1,28 +1,41 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:getflutter/getflutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
+import 'package:grocerydelivery/screens/home/tabs.dart';
 import 'package:grocerydelivery/services/api_service.dart';
+import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
+import 'package:grocerydelivery/services/socket.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'models/admin_info.dart';
-import 'models/location.dart';
-import 'models/order.dart';
-import 'models/socket.dart';
 import 'package:provider/provider.dart';
-import 'styles/styles.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'models/location.dart';
+import 'models/socket.dart';
 import 'services/constants.dart';
 import 'services/localizations.dart';
+import 'styles/styles.dart';
 
+Timer onesignlTimer;
 void main() async {
+  await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
   initPlatformPlayerState();
-  runApp(MaterialApp(
-    home: AnimatedScreen(),
-    debugShowCheckedModeBanner: false,
-  ));
+  onesignlTimer = Timer.periodic(Duration(seconds: 4), (timer) {
+    initPlatformPlayerState();
+  });
+  runZoned<Future<Null>>(() {
+    runApp(MaterialApp(
+      home: AnimatedScreen(),
+      debugShowCheckedModeBanner: false,
+    ));
+    return Future.value(null);
+    // ignore: deprecated_member_use
+  }, onError: (error, stackTrace) {});
+
   Common.getSelectedLanguage().then((selectedLocale) {
     Map localizedValues;
     String defaultLocale = '';
@@ -30,30 +43,28 @@ void main() async {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.dark));
-
     APIService.getLanguageJson(locale).then((value) async {
       localizedValues = value['response_data']['json'];
-      if (locale == '') {
-        defaultLocale = value['response_data']['defaultCode']['languageCode'];
-        locale = defaultLocale;
-      }
+      defaultLocale = value['response_data']['languageCode'];
+      locale = defaultLocale;
+
       await Common.setSelectedLanguage(locale);
-      await Common.setAllLanguageNames(value['response_data']['langName']);
-      await Common.setAllLanguageCodes(value['response_data']['langCode']);
-      runApp(
-        MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (context) => OrderModel()),
-            ChangeNotifierProvider(create: (context) => AdminModel()),
-            ChangeNotifierProvider(create: (context) => SocketModel()),
-            ChangeNotifierProvider(create: (context) => LocationModel()),
-          ],
-          child: DeliveryApp(
-            locale: locale,
-            localizedValues: localizedValues,
+      runZoned<Future<Null>>(() {
+        runApp(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => SocketModel()),
+              ChangeNotifierProvider(create: (context) => LocationModel()),
+            ],
+            child: DeliveryApp(
+              locale: locale,
+              localizedValues: localizedValues,
+            ),
           ),
-        ),
-      );
+        );
+        return Future.value(null);
+        // ignore: deprecated_member_use
+      }, onError: (error, stackTrace) {});
     });
   });
 }
@@ -67,45 +78,112 @@ void initPlatformPlayerState() async {
       .setNotificationReceivedHandler((OSNotification notification) {});
   OneSignal.shared
       .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
-  await OneSignal.shared.init(Constants.ONE_SIGNAL_KEY, iOSSettings: settings);
+  await OneSignal.shared.init(Constants.oneSignalKey, iOSSettings: settings);
   OneSignal.shared
       .promptUserForPushNotificationPermission(fallbackToSettings: true);
   OneSignal.shared
       .setInFocusDisplayType(OSNotificationDisplayType.notification);
   var status = await OneSignal.shared.getPermissionSubscriptionState();
   String playerId = status.subscriptionStatus.userId;
-  if (playerId == null) {
-    initPlatformPlayerState();
-  } else {
-    await Common.setPlayerID(playerId).then((onValue) {});
+  if (playerId != null) {
+    await Common.setPlayerID(playerId);
+    setPlayerId();
+    if (onesignlTimer != null && onesignlTimer.isActive) onesignlTimer.cancel();
   }
 }
 
-class DeliveryApp extends StatelessWidget {
+void setPlayerId() async {
+  await Common.getToken().then((token) async {
+    if (token != null) {
+      Common.getPlayerId().then((palyerId) {
+        Common.getSelectedLanguage().then((selectedLocale) async {
+          Map body = {"language": selectedLocale, "playerId": palyerId};
+          await AuthService.updateUserInfo(body);
+        });
+      });
+    }
+  });
+}
+
+class DeliveryApp extends StatefulWidget {
   final String locale;
   final Map localizedValues;
+
   DeliveryApp({
     Key key,
     this.locale,
     this.localizedValues,
   });
+
+  @override
+  _DeliveryAppState createState() => _DeliveryAppState();
+}
+
+class _DeliveryAppState extends State<DeliveryApp> {
+  bool isLoggedIn = false, checkDeliveyDisOrNot = false;
+  SocketService socket = SocketService();
+
+  @override
+  void initState() {
+    checkAUthentication();
+    super.initState();
+  }
+
+  void checkAUthentication() async {
+    if (mounted) {
+      setState(() {
+        checkDeliveyDisOrNot = true;
+      });
+    }
+    await Common.getToken().then((token) async {
+      if (token != null) {
+        if (mounted) {
+          setState(() {
+            checkDeliveyDisOrNot = false;
+            isLoggedIn = true;
+            Common.getPlayerId().then((palyerId) {
+              Common.getSelectedLanguage().then((selectedLocale) async {
+                Map body = {"language": selectedLocale, "playerId": palyerId};
+                await AuthService.updateUserInfo(body);
+              });
+            });
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            checkDeliveyDisOrNot = false;
+            isLoggedIn = false;
+          });
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      locale: Locale(locale),
+      locale: Locale(widget.locale),
       localizationsDelegates: [
-        MyLocalizationsDelegate(localizedValues, [locale]),
+        MyLocalizationsDelegate(widget.localizedValues, [widget.locale]),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: [Locale(locale)],
+      supportedLocales: [Locale(widget.locale)],
       debugShowCheckedModeBanner: false,
-      title: Constants.APP_NAME,
+      title: Constants.appName,
       theme: ThemeData(primaryColor: primary, accentColor: primary),
-      home: LOGIN(
-        locale: locale,
-        localizedValues: localizedValues,
-      ),
+      home: checkDeliveyDisOrNot
+          ? AnimatedScreen()
+          : isLoggedIn == false
+              ? LOGIN(
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                )
+              : Tabs(
+                  locale: widget.locale,
+                  localizedValues: widget.localizedValues,
+                ),
     );
   }
 }
@@ -118,17 +196,12 @@ class AnimatedScreen extends StatelessWidget {
         color: Colors.white,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: Constants.APP_NAME.contains('Readymade')
-            ? Image.asset(
-                'lib/assets/splash.png',
-                fit: BoxFit.cover,
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-              )
-            : GFLoader(
-                type: GFLoaderType.ios,
-                size: 40,
-              ),
+        child: Image.asset(
+          'lib/assets/splash.png',
+          fit: BoxFit.cover,
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+        ),
       ),
     );
   }

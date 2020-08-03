@@ -1,16 +1,37 @@
-# Readymade grocery delivery app By ionicfirebase
+# Grocery Delivery App
 
-A new Flutter application.
+Grocery Delivery App
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Create `.env` file in root folder
 
-A few resources to get you started if this is your first Flutter project:
+Add these following in env variable 
+```
+APPLICATION_NAME='here_with_single_quotes'
+API_URL=
+ONE_SIGNAL_KEY=
+GOOGLE_MAP_API_KEY=
+```
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+### before doing flutter run. run this command once.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+if you close terminal you need to run this command again.
+
+```
+source .env; export APPLICATION_NAME=$APPLICATION_NAME; export GOOGLE_MAP_API_KEY=$GOOGLE_MAP_API_KEY;
+```
+
+for windows user need to set environment variables separately. using
+```
+set GOOGLE_MAP_API_KEY=
+set APPLICATION_NAME=
+```
+
+
+### to generate new launcher icons for android and ios.
+
+replace lib/assets/logo.png and run this command
+```
+flutter pub run flutter_launcher_icons:main
+```
