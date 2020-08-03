@@ -37,7 +37,7 @@ workflows:
       - find android/app/src/main/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
       - find android/app/src/debug/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
       - find android/app/src/profile/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
-      - find android/app/src/main/kotlin/com/example/demoaddressmap/MainActivity.kt -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - find android/app/src/main/kotlin/com/grocery/grocerydelivery/MainActivity.kt -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
       - echo Y2F0IDw8RU9UID4+IC5lbnYKQVBQTElDQVRJT05fTkFNRT0ke0FQUExJQ0FUSU9OX05BTUV9CkFQSV9VUkw9JHtBUElfVVJMfQpPTkVfU0lHTkFMX0tFWT0ke09ORV9TSUdOQUxfS0VZfQpHT09HTEVfTUFQX0FQSV9LRVk9JHtHT09HTEVfTUFQX0FQSV9LRVl9CkVPVA== | base64 --decode > temp
       - sh temp
       - flutter packages pub get
@@ -105,7 +105,7 @@ workflows:
       - find android/app/src/main/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
       - find android/app/src/debug/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
       - find android/app/src/profile/AndroidManifest.xml -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
-      - find android/app/src/main/kotlin/com/example/demoaddressmap/MainActivity.kt -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
+      - android/app/src/main/kotlin/com/grocery/grocerydelivery/MainActivity.kt -type f -exec sed -i '.original' "s|com.ionicfirebaseapp.grocerydelivery|$ANDROID_PACKAGE_NAME|g" {} \;
       - echo Y2F0IDw8RU9UID4+IC5lbnYKQVBQTElDQVRJT05fTkFNRT0ke0FQUExJQ0FUSU9OX05BTUV9CkFQSV9VUkw9JHtBUElfVVJMfQpPTkVfU0lHTkFMX0tFWT0ke09ORV9TSUdOQUxfS0VZfQpHT09HTEVfTUFQX0FQSV9LRVk9JHtHT09HTEVfTUFQX0FQSV9LRVl9CkVPVA== | base64 --decode > temp
       - sh temp
       - flutter packages pub get
