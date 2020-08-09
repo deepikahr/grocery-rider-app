@@ -8,30 +8,31 @@ Grocery Delivery App
 
 Add these following in env variable 
 ```
-APPLICATION_NAME='here_with_single_quotes'
 API_URL=
 ONE_SIGNAL_KEY=
-GOOGLE_MAP_API_KEY=
+ANDROID_GOOGLE_MAP_API_KEY=
+IOS_GOOGLE_MAP_API_KEY=
 ```
 
 ### before doing flutter run. run this command once.
 
 if you close terminal you need to run this command again.
-
 ```
-source .env; export APPLICATION_NAME=$APPLICATION_NAME; export GOOGLE_MAP_API_KEY=$GOOGLE_MAP_API_KEY;
+source .env; export ANDROID_GOOGLE_MAP_API_KEY=$ANDROID_GOOGLE_MAP_API_KEY;
 ```
 
 for windows user need to set environment variables separately. using
 ```
-set GOOGLE_MAP_API_KEY=
-set APPLICATION_NAME=
+set ANDROID_GOOGLE_MAP_API_KEY=
 ```
 
 
-### to generate new launcher icons for android and ios.
+### to generate new icons & splash for android and ios.
 
-replace lib/assets/logo.png and run this command
+replace new images on lib/assets/logo.png (1024px*1024px) & lib/assets/splash.png (375px*812px) and run following commands.
 ```
+cp lib/assets/logo.png ios/Runner/Assets.xcassets/AppIcon.appiconset/ItunesArtwork@2x.png
+cp lib/assets/splash.png android/app/src/main/res/drawable/splash.png
+flutter packages pub get
 flutter pub run flutter_launcher_icons:main
 ```
