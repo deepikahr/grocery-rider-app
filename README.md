@@ -12,6 +12,7 @@ API_URL=
 ONE_SIGNAL_KEY=
 ANDROID_GOOGLE_MAP_API_KEY=
 IOS_GOOGLE_MAP_API_KEY=
+IMAGE_URL_PATH=
 ```
 
 ### before doing flutter run. run this command once.

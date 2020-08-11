@@ -40,6 +40,7 @@ class _LOGINState extends State<LOGIN> {
           "playerId": palyerId ?? 'no id found'
         };
         AuthService.login(body).then((onValue) {
+          print(onValue);
           if (onValue['response_data'] != null &&
               onValue['response_data']['token'] != null) {
             if (onValue['response_data']['role'] == 'DELIVERY_BOY') {
