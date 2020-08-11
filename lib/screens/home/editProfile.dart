@@ -249,7 +249,7 @@ class _EditProfileState extends State<EditProfile> {
                       ],
                     ),
                   ),
-                  userInfo['filePath'] != null && userInfo['imageUrl'] != null
+                  userInfo['imageUrl'] != null
                       ? GFButton(
                           onPressed: removeImage,
                           type: GFButtonType.transparent,
@@ -321,8 +321,7 @@ class _EditProfileState extends State<EditProfile> {
                     child: Stack(
                       children: <Widget>[
                         image == null
-                            ? userInfo['filePath'] == null &&
-                                    userInfo['imageUrl'] == null
+                            ? userInfo['imageUrl'] == null
                                 ? Center(
                                     child: new Container(
                                       width: 200.0,
@@ -348,11 +347,7 @@ class _EditProfileState extends State<EditProfile> {
                                         image: new DecorationImage(
                                           fit: BoxFit.cover,
                                           image: new NetworkImage(
-                                              userInfo['filePath'] == null
-                                                  ? userInfo['imageUrl']
-                                                  : Constants.imageKitUrl +
-                                                      "/tr:dpr-auto,tr:w-500" +
-                                                      userInfo['filePath']),
+                                              userInfo['imageUrl']),
                                         ),
                                       ),
                                     ),

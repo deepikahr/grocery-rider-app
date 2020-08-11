@@ -4,11 +4,9 @@ import 'package:grocerydelivery/main.dart';
 import 'package:grocerydelivery/screens/auth/changePassword.dart';
 import 'package:grocerydelivery/screens/home/editProfile.dart';
 import 'package:grocerydelivery/services/auth.dart';
-import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:provider/provider.dart';
-
 import '../../models/socket.dart';
 import '../../services/api_service.dart';
 import '../../services/common.dart';
@@ -185,15 +183,9 @@ class _ProfileState extends State<Profile> {
                             SizedBox(height: 30),
                             Center(
                               child: GFAvatar(
-                                backgroundImage: profileInfo['filePath'] ==
-                                            null &&
-                                        profileInfo['imageUrl'] == null
+                                backgroundImage: profileInfo['imageUrl'] == null
                                     ? AssetImage('lib/assets/logo.png')
-                                    : profileInfo['filePath'] == null
-                                        ? NetworkImage(profileInfo['imageUrl'])
-                                        : NetworkImage(Constants.imageKitUrl +
-                                            "/tr:dpr-auto,tr:w-500" +
-                                            profileInfo['filePath']),
+                                    : NetworkImage(profileInfo['imageUrl']),
                                 radius: 60,
                               ),
                             ),
