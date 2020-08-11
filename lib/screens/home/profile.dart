@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/main.dart';
 import 'package:grocerydelivery/screens/auth/changePassword.dart';
+import 'package:grocerydelivery/screens/home/editProfile.dart';
 import 'package:grocerydelivery/services/auth.dart';
+import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +34,7 @@ class _ProfileState extends State<Profile> {
   SocketService socket;
 
   List languagesList;
-  bool languagesListLoading = false;
+  bool languagesListLoading = false, isProfileLoading = false;
 
   @override
   void initState() {
@@ -54,7 +56,6 @@ class _ProfileState extends State<Profile> {
           if (mounted) {
             setState(() {
               languagesList = value['response_data'];
-
               languagesListLoading = false;
             });
           }
@@ -78,21 +79,28 @@ class _ProfileState extends State<Profile> {
   }
 
   void getProfileInfo() {
+    if (mounted) {
+      setState(() {
+        isProfileLoading = true;
+      });
+    }
     AuthService.getUserInfo().then((value) {
       if (value['response_data'] != null && mounted) {
+        print(value);
         setState(() {
           profileInfo = value['response_data'];
           nameController.text =
               '${profileInfo['firstName']} ${profileInfo['lastName']}';
-          countController.text =
-              profileInfo['noOfOrderDelivered'].toString() ?? '';
+          countController.text = profileInfo['completedOrder'].toString() ?? 0;
           numberController.text = profileInfo['mobileNumber'] ?? '';
           emailController.text = profileInfo['email'] ?? '';
+          isProfileLoading = false;
         });
       }
     }).catchError((e) {
       setState(() {
         profileInfo = {};
+        isProfileLoading = false;
       });
     });
   }
@@ -161,224 +169,272 @@ class _ProfileState extends State<Profile> {
         automaticallyImplyLeading: false,
       ),
       backgroundColor: Colors.white,
-      body: ListView(
-        children: <Widget>[
-          profileInfo == null || languagesListLoading
-              ? Padding(
-                  padding: EdgeInsets.only(top: 50),
-                  child: SquareLoader(),
-                )
-              : profileInfo == {}
-                  ? buildlOGOUTButton()
-                  : Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(height: 30),
-                          Center(
-                            child: GFAvatar(
-                              backgroundImage: profileInfo['profilePic'] == null
-                                  ? AssetImage('lib/assets/logo.png')
-                                  : NetworkImage(
-                                      'https://cdn.pixabay.com/photo/2020/03/12/19/55/northern-gannet-4926108__340.jpg'),
-                              radius: 60,
-                            ),
-                          ),
-                          SizedBox(height: 30),
-                          Text(
-                            MyLocalizations.of(context)
-                                .getLocalizations("USER_NAME", true),
-                            style: titleSmallBPR(),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextFormField(
-                            enabled: false,
-                            controller: nameController,
-                            cursorColor: primary,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: greyA,
-                              contentPadding: EdgeInsets.all(15),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: greyA, width: 1.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: greyA, width: 1.0),
+      body: languagesListLoading || isProfileLoading
+          ? Center(
+              child: SquareLoader(),
+            )
+          : ListView(
+              children: <Widget>[
+                profileInfo == {}
+                    ? buildlOGOUTButton()
+                    : Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            SizedBox(height: 30),
+                            Center(
+                              child: GFAvatar(
+                                backgroundImage: profileInfo['filePath'] ==
+                                            null &&
+                                        profileInfo['imageUrl'] == null
+                                    ? AssetImage('lib/assets/logo.png')
+                                    : profileInfo['filePath'] == null
+                                        ? NetworkImage(profileInfo['imageUrl'])
+                                        : NetworkImage(Constants.imageKitUrl +
+                                            "/tr:dpr-auto,tr:w-500" +
+                                            profileInfo['filePath']),
+                                radius: 60,
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 25,
-                          ),
-                          Text(
-                            MyLocalizations.of(context)
-                                .getLocalizations("EMAIL_ID", true),
-                            style: titleSmallBPR(),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextFormField(
-                            cursorColor: primary,
-                            controller: emailController,
-                            enabled: false,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: greyA,
-                              contentPadding: EdgeInsets.all(15),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: greyA, width: 1.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: greyA, width: 1.0),
-                              ),
+                            SizedBox(height: 30),
+                            Text(
+                              MyLocalizations.of(context)
+                                  .getLocalizations("USER_NAME", true),
+                              style: titleSmallBPR(),
                             ),
-                          ),
-                          SizedBox(
-                            height: 25,
-                          ),
-                          Text(
-                            MyLocalizations.of(context)
-                                .getLocalizations("MOBILE_NUMBER", true),
-                            style: titleSmallBPR(),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextFormField(
-                            cursorColor: primary,
-                            controller: numberController,
-                            enabled: false,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: greyA,
-                              contentPadding: EdgeInsets.all(15),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: greyA, width: 1.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: greyA, width: 1.0),
-                              ),
+                            SizedBox(
+                              height: 10,
                             ),
-                          ),
-                          SizedBox(height: 25),
-                          Text(
-                            MyLocalizations.of(context)
-                                .getLocalizations("ORDER_COMPLETED", true),
-                            style: titleSmallBPR(),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextFormField(
-                            cursorColor: primary,
-                            enabled: false,
-                            controller: countController,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: greyA,
-                              contentPadding: EdgeInsets.all(15),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: greyA, width: 1.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: greyA, width: 1.0),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          languagesList.length > 0
-                              ? InkWell(
-                                  onTap: () {
-                                    selectLanguagesMethod();
-                                  },
-                                  child: Container(
-                                    height: 55,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFF7F7F7),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 10.0,
-                                              bottom: 10.0,
-                                              left: 20.0,
-                                              right: 20.0),
-                                          child: Text(
-                                            MyLocalizations.of(context)
-                                                .getLocalizations(
-                                                    "SELECT_LANGUAGE"),
-                                            style: titleSmallBPR(),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : Container(),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      ChangePassword(
-                                          locale: widget.locale,
-                                          localizedValues:
-                                              widget.localizedValues),
+                            TextFormField(
+                              enabled: false,
+                              controller: nameController,
+                              cursorColor: primary,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: greyA,
+                                contentPadding: EdgeInsets.all(15),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: greyA, width: 1.0),
                                 ),
-                              );
-                            },
-                            child: Container(
-                              height: 55,
-                              decoration: BoxDecoration(
-                                color: Color(0xFFF7F7F7),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 10.0,
-                                        bottom: 10.0,
-                                        left: 20.0,
-                                        right: 20.0),
-                                    child: Text(
-                                      MyLocalizations.of(context)
-                                          .getLocalizations("CHANGE_PASSWORD"),
-                                      style: titleSmallBPR(),
-                                    ),
-                                  ),
-                                ],
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: greyA, width: 1.0),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 30),
-                          buildlOGOUTButton(),
-                        ],
+                            SizedBox(
+                              height: 25,
+                            ),
+                            Text(
+                              MyLocalizations.of(context)
+                                  .getLocalizations("EMAIL_ID", true),
+                              style: titleSmallBPR(),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            TextFormField(
+                              cursorColor: primary,
+                              controller: emailController,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: greyA,
+                                contentPadding: EdgeInsets.all(15),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: greyA, width: 1.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: greyA, width: 1.0),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 25,
+                            ),
+                            Text(
+                              MyLocalizations.of(context)
+                                  .getLocalizations("MOBILE_NUMBER", true),
+                              style: titleSmallBPR(),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            TextFormField(
+                              cursorColor: primary,
+                              controller: numberController,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: greyA,
+                                contentPadding: EdgeInsets.all(15),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: greyA, width: 1.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: greyA, width: 1.0),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 25),
+                            Text(
+                              MyLocalizations.of(context)
+                                  .getLocalizations("ORDER_COMPLETED", true),
+                              style: titleSmallBPR(),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            TextFormField(
+                              cursorColor: primary,
+                              enabled: false,
+                              controller: countController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: greyA,
+                                contentPadding: EdgeInsets.all(15),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: greyA, width: 1.0),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: greyA, width: 1.0),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            InkWell(
+                              onTap: () {
+                                var result = Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        EditProfile(
+                                            locale: widget.locale,
+                                            localizedValues:
+                                                widget.localizedValues),
+                                  ),
+                                );
+                                result.then((value) {
+                                  if (value != null) {
+                                    socket = Provider.of<SocketModel>(context,
+                                            listen: false)
+                                        .getSocketInstance;
+                                    getProfileInfo();
+                                    getLanguages();
+                                  }
+                                });
+                              },
+                              child: Container(
+                                height: 55,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF7F7F7),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 10.0,
+                                          bottom: 10.0,
+                                          left: 20.0,
+                                          right: 20.0),
+                                      child: Text(
+                                        MyLocalizations.of(context)
+                                            .getLocalizations("EDIT_PROFILE"),
+                                        style: titleSmallBPR(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            languagesList.length > 0
+                                ? InkWell(
+                                    onTap: () {
+                                      selectLanguagesMethod();
+                                    },
+                                    child: Container(
+                                      height: 55,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFFF7F7F7),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 10.0,
+                                                bottom: 10.0,
+                                                left: 20.0,
+                                                right: 20.0),
+                                            child: Text(
+                                              MyLocalizations.of(context)
+                                                  .getLocalizations(
+                                                      "SELECT_LANGUAGE"),
+                                              style: titleSmallBPR(),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
+                            SizedBox(height: 20),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        ChangePassword(
+                                            locale: widget.locale,
+                                            localizedValues:
+                                                widget.localizedValues),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 55,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF7F7F7),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 10.0,
+                                          bottom: 10.0,
+                                          left: 20.0,
+                                          right: 20.0),
+                                      child: Text(
+                                        MyLocalizations.of(context)
+                                            .getLocalizations(
+                                                "CHANGE_PASSWORD"),
+                                        style: titleSmallBPR(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 30),
+                            buildlOGOUTButton(),
+                          ],
+                        ),
                       ),
-                    ),
-        ],
-      ),
+              ],
+            ),
     );
   }
 
