@@ -283,11 +283,9 @@ class _EditProfileState extends State<EditProfile> {
       if (mounted) {
         setState(() {
           isPicUploading = false;
+          Navigator.of(context).pop();
           showSnackbar(value['response_data']);
           updateUserInfo(null, null, null);
-          Future.delayed(Duration(milliseconds: 2500), () {
-            Navigator.of(context).pop(true);
-          });
         });
       }
     }).catchError((error) {
