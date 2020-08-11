@@ -61,7 +61,6 @@ class _ChangePasswordState extends State<ChangePassword> {
               AuthService.updateUserInfo(body).then((value) async {
                 await Common.setToken(null);
                 await Common.setAccountID(null);
-
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(

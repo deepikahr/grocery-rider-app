@@ -75,4 +75,13 @@ class AuthService {
       return json.decode(response.body);
     });
   }
+
+  // image delete
+  static Future imagedelete() async {
+    return client
+        .delete(Constants.apiURL + "/users/delete/image")
+        .then((response) {
+      return json.decode(response.body);
+    });
+  }
 }

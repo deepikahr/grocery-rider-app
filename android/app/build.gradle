@@ -34,6 +34,7 @@ def googleMapApiKey = System.getenv("ANDROID_GOOGLE_MAP_API_KEY")
 println "GOOGLE API KEY: ${googleMapApiKey}"
 android {
     compileSdkVersion 29
+    ndkVersion "21.3.6528147"
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
