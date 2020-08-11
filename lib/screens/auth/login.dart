@@ -41,7 +41,9 @@ class _LOGINState extends State<LOGIN> {
         };
         AuthService.login(body).then((onValue) {
           print(onValue);
-          if (onValue['response_data'] != null &&
+          if (onValue['response_code'] == 205) {
+            showAlert(onValue['response_data'], email.toLowerCase());
+          } else if (onValue['response_data'] != null &&
               onValue['response_data']['token'] != null) {
             if (onValue['response_data']['role'] == 'DELIVERY_BOY') {
               Common.setToken(onValue['response_data']['token'])
@@ -76,6 +78,52 @@ class _LOGINState extends State<LOGIN> {
         });
       });
     }
+  }
+
+  showAlert(message, email) {
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text(
+            message,
+            style: hintSfMediumredsmall(),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text(
+                MyLocalizations.of(context).getLocalizations("CANCEL"),
+                style: textbarlowRegularaPrimary(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text(
+                MyLocalizations.of(context).getLocalizations("VERI_LINK"),
+                style: textbarlowRegularaPrimary(),
+              ),
+              onPressed: () {
+                AuthService.verificationMailSendApi(email).then((response) {
+                  Navigator.of(context).pop();
+                  showSnackbar(response['response_data']);
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showSnackbar(message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(milliseconds: 3000),
+    );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
   @override

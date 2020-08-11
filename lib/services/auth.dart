@@ -84,4 +84,13 @@ class AuthService {
       return json.decode(response.body);
     });
   }
+
+  // verify mail send api
+  static Future<dynamic> verificationMailSendApi(email) async {
+    return client
+        .get(Constants.apiURL + '/users/resend-verify-email?email=$email')
+        .then((response) {
+      return json.decode(response.body);
+    });
+  }
 }

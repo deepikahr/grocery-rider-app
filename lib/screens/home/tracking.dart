@@ -440,7 +440,7 @@ class _TrackingState extends State<Tracking> {
               onPressed: () {
                 _launchMap(storeLocation);
               },
-              text: MyLocalizations.of(context).getLocalizations("TO_STORE"),
+              child: MyLocalizations.of(context).getLocalizations("TO_STORE"),
               textStyle: titleRPM(red),
               icon: Icon(Icons.directions, color: red),
               color: Colors.white,
