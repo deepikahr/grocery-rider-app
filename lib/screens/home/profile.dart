@@ -90,8 +90,8 @@ class _ProfileState extends State<Profile> {
           nameController.text =
               '${profileInfo['firstName']} ${profileInfo['lastName']}';
           countController.text = profileInfo['completedOrder'].toString() ?? 0;
-          numberController.text = profileInfo['mobileNumber'] ?? '';
-          emailController.text = profileInfo['email'] ?? '';
+          numberController.text = profileInfo['mobileNumber'].toString() ?? '';
+          emailController.text = profileInfo['email'].toString() ?? '';
           isProfileLoading = false;
         });
       }

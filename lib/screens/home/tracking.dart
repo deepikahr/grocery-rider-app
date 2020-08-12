@@ -386,36 +386,38 @@ class _TrackingState extends State<Tracking> {
                         style: titleWPM()),
                   ]),
                 ])),
-        Padding(
-          padding: const EdgeInsets.only(left: 15.0, right: 15.0),
-          child: GFButton(
-            onPressed: () async {
-              if (order['order']['orderStatus'] == "CONFIRMED") {
-                if (mounted) {
-                  setState(() {
-                    isOrderStatusOutForDeliveryLoading = true;
-                    orderStatusChange("OUT_FOR_DELIVERY");
-                  });
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+            child: GFButton(
+              onPressed: () async {
+                if (order['order']['orderStatus'] == "CONFIRMED") {
+                  if (mounted) {
+                    setState(() {
+                      isOrderStatusOutForDeliveryLoading = true;
+                      orderStatusChange("OUT_FOR_DELIVERY");
+                    });
+                  }
                 }
-              }
-            },
-            child: isOrderStatusOutForDeliveryLoading
-                ? GFLoader(type: GFLoaderType.ios)
-                : Text(startButtonText == 'START'
-                    ? MyLocalizations.of(context).getLocalizations("START")
-                    : startButtonText == 'STARTED'
-                        ? MyLocalizations.of(context)
-                            .getLocalizations("STARTED")
-                        : startButtonText),
-            textStyle: titleRPM(startButtonText == 'START' ? red : primary),
-            icon: Icon(
-              startButtonText == 'START' ? Icons.play_arrow : Icons.check,
-              color: startButtonText == 'START' ? red : primary,
+              },
+              child: isOrderStatusOutForDeliveryLoading
+                  ? GFLoader(type: GFLoaderType.ios)
+                  : Text(startButtonText == 'START'
+                      ? MyLocalizations.of(context).getLocalizations("START")
+                      : startButtonText == 'STARTED'
+                          ? MyLocalizations.of(context)
+                              .getLocalizations("STARTED")
+                          : startButtonText),
+              textStyle: titleRPM(startButtonText == 'START' ? red : primary),
+              icon: Icon(
+                startButtonText == 'START' ? Icons.play_arrow : Icons.check,
+                color: startButtonText == 'START' ? red : primary,
+              ),
+              color: Colors.white,
+              size: GFSize.MEDIUM,
+              borderShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
             ),
-            color: Colors.white,
-            size: GFSize.MEDIUM,
-            borderShape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
         ),
       ],
@@ -434,33 +436,46 @@ class _TrackingState extends State<Tracking> {
                     .getLocalizations("DIRECTIONS", true),
                 style: keyTextWhite()),
           ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <
-              Widget>[
-            GFButton(
-              onPressed: () {
-                _launchMap(storeLocation);
-              },
-              child: MyLocalizations.of(context).getLocalizations("TO_STORE"),
-              textStyle: titleRPM(red),
-              icon: Icon(Icons.directions, color: red),
-              color: Colors.white,
-              size: GFSize.MEDIUM,
-              borderShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-            ),
-            GFButton(
-              onPressed: () {
-                _launchMap(customerLocation);
-              },
-              text: MyLocalizations.of(context).getLocalizations("TO_CUSTOMER"),
-              textStyle: titleRPM(red),
-              icon: Icon(Icons.directions, color: Colors.red),
-              color: Colors.white,
-              size: GFSize.MEDIUM,
-              borderShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-            ),
-          ]),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                    child: GFButton(
+                      onPressed: () {
+                        _launchMap(storeLocation);
+                      },
+                      text: MyLocalizations.of(context)
+                          .getLocalizations("TO_STORE"),
+                      textStyle: titleRPM(red),
+                      icon: Icon(Icons.directions, color: red),
+                      color: Colors.white,
+                      size: GFSize.MEDIUM,
+                      borderShape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                    child: GFButton(
+                      onPressed: () {
+                        _launchMap(customerLocation);
+                      },
+                      text: MyLocalizations.of(context)
+                          .getLocalizations("TO_CUSTOMER"),
+                      textStyle: titleRPM(red),
+                      icon: Icon(Icons.directions, color: Colors.red),
+                      color: Colors.white,
+                      size: GFSize.MEDIUM,
+                      borderShape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ),
+              ]),
           SizedBox(height: 5),
         ]);
   }
@@ -506,7 +521,7 @@ class _TrackingState extends State<Tracking> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(fullName, style: keyText()),
-                      Text(mobileNumber, style: titleSmallBPR())
+                      Text(mobileNumber.toString(), style: titleSmallBPR())
                     ],
                   ),
                   InkWell(
