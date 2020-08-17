@@ -228,7 +228,7 @@ class _LOGINState extends State<LOGIN> {
 
   Widget buildEmailTextFormField() {
     return TextFormField(
-      initialValue: Constants.appName.contains('Readymade')
+      initialValue: Constants.predefined == "true"
           ? "delivery1@ionicfirebaseapp.com"
           : null,
       cursorColor: primary,
@@ -262,7 +262,7 @@ class _LOGINState extends State<LOGIN> {
 
   Widget buildPasswordextFormField() {
     return TextFormField(
-      initialValue: Constants.appName.contains('Readymade') ? "123456" : null,
+      initialValue: Constants.predefined == "true" ? "123456" : null,
       cursorColor: primary,
       decoration: InputDecoration(
         filled: true,
