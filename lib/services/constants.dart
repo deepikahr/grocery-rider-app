@@ -15,4 +15,7 @@ class Constants {
   static String googleMapApiKey = Platform.isIOS
       ? DotEnv().env['IOS_GOOGLE_MAP_API_KEY']
       : DotEnv().env['ANDROID_GOOGLE_MAP_API_KEY'];
+
+  // PREDEFINED
+  static String predefined = DotEnv().env['PREDEFINED'] ?? "false";
 }

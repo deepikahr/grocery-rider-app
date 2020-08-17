@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/services/auth.dart';
+import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
@@ -54,38 +56,23 @@ class _ChangePasswordState extends State<ChangePassword> {
                 isChangePasswordLoading = false;
               });
             }
-            if (onValue['response_data'] != null) {
-              showDialog<Null>(
-                context: context,
-                barrierDismissible: false, // user must tap button!
-                builder: (BuildContext context) {
-                  return new AlertDialog(
-                    content: new SingleChildScrollView(
-                      child: new ListBody(
-                        children: <Widget>[
-                          new Text(
-                            '${onValue['response_data']}',
-                            style: textBarlowRegularBlack(),
-                          ),
-                        ],
+            showSnackbar(onValue['response_data']);
+            Common.getSelectedLanguage().then((selectedLocale) async {
+              Map body = {"language": selectedLocale, "playerId": null};
+              AuthService.updateUserInfo(body).then((value) async {
+                await Common.setToken(null);
+                await Common.setAccountID(null);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => LOGIN(
+                        locale: widget.locale,
+                        localizedValues: widget.localizedValues,
                       ),
                     ),
-                    actions: <Widget>[
-                      new FlatButton(
-                        child: new Text(
-                          MyLocalizations.of(context).getLocalizations("OK"),
-                          style: textbarlowRegularaPrimary(),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            }
+                    (Route<dynamic> route) => false);
+              });
+            });
           } catch (error) {
             if (mounted) {
               setState(() {
