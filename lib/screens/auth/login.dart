@@ -4,6 +4,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/forgotpassword.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/appBar.dart';
 
 import '../../services/auth.dart';
 import '../../services/common.dart';
@@ -81,15 +82,7 @@ class _LOGINState extends State<LOGIN> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: primary,
-        title: Text(
-          MyLocalizations.of(context).getLocalizations("LOGIN"),
-          style: titleWPS(),
-        ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
+      appBar: appBarPrimary(context,"LOGIN"),
       backgroundColor: Colors.white,
       body: ListView(
         children: <Widget>[

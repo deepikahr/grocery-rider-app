@@ -5,6 +5,7 @@ import 'package:grocerydelivery/screens/auth/resetPas.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
+import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:pin_entry_text_field/pin_entry_text_field.dart';
 
@@ -189,21 +190,7 @@ class _OtpState extends State<Otp> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: GFAppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-        ),
-        title: Text(
-          MyLocalizations.of(context).getLocalizations("WELCOME"),
-          style: titleWPS(),
-        ),
-        centerTitle: true,
-        backgroundColor: primary,
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
+      appBar:appBarPrimary(context,"WELCOME"),
       body: ListView(
         children: <Widget>[
           Padding(

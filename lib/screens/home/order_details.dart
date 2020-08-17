@@ -4,6 +4,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 
 import '../../styles/styles.dart';
@@ -85,14 +86,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primary,
-        title: Text(
-          MyLocalizations.of(context).getLocalizations("ORDER_DETAILS"),
-          style: titleWPS(),
-        ),
-        centerTitle: true,
-      ),
+      appBar:appBarHome(context,"ORDER_DETAILS"),
       backgroundColor: greyA,
       body: orderDataLoading
           ? SquareLoader()
