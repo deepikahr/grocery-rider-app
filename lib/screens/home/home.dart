@@ -5,6 +5,7 @@ import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/services/socket.dart';
+import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -308,13 +309,14 @@ class _HomeState extends State<Home> {
     Provider.of<LocationModel>(context, listen: false).requestLocation();
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: primary,
-        title: Text(MyLocalizations.of(context).getLocalizations("HOME"),
-            style: titleWPS()),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
+      appBar:appBarHome(context,"HOME"),
+      // appBar: AppBar(
+      //   backgroundColor: primary,
+      //   title: Text(MyLocalizations.of(context).getLocalizations("HOME"),
+      //       style: titleWPS()),
+      //   centerTitle: true,
+      //   automaticallyImplyLeading: false,
+      // ),
       body: GFFloatingWidget(
         showblurness: newOrder == null ? false : true,
         verticalPosition: 50,
