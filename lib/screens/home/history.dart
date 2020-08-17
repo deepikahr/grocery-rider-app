@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 
 import '../../styles/styles.dart';
@@ -80,15 +81,16 @@ class _HistoryState extends State<History> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primary,
-        title: Text(
-          MyLocalizations.of(context).getLocalizations("HISTORY"),
-          style: titleWPS(),
-        ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
+      appBar:appBarPrimary(context,"HISTORY"),
+      // appBar: AppBar(
+      //   backgroundColor: primary,
+      //   title: Text(
+      //     MyLocalizations.of(context).getLocalizations("HISTORY"),
+      //     style: titleWPS(),
+      //   ),
+      //   centerTitle: true,
+      //   automaticallyImplyLeading: false,
+      // ),
       body: deliverdOrderLoading == true
           ? SquareLoader()
           : ListView(
