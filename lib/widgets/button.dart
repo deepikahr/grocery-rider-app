@@ -4,41 +4,6 @@ import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 
-Widget buttonPrimary(BuildContext context, title, bool isloading) {
-  return Container(
-    height: 55,
-    margin: EdgeInsets.only(top: 30, bottom: 20, right: 20, left: 20),
-    decoration: BoxDecoration(boxShadow: [
-      BoxShadow(color: Colors.black.withOpacity(0.29), blurRadius: 5)
-    ]),
-    child: Padding(
-      padding: const EdgeInsets.only(
-        left: 0.0,
-        right: 0.0,
-      ),
-      child: GFButton(
-        color: primary,
-        blockButton: true,
-        onPressed: null,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              MyLocalizations.of(context).getLocalizations(title),
-              style: titleXLargeWPB(),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            isloading ? GFLoader(type: GFLoaderType.ios) : Text("")
-          ],
-        ),
-        textStyle: textBarlowRegularrBlack(),
-      ),
-    ),
-  );
-}
-
 Widget buttonSecondry(BuildContext context, title, bool isloading) {
   return Container(
     height: 55,
@@ -50,7 +15,7 @@ Widget buttonSecondry(BuildContext context, title, bool isloading) {
       padding: const EdgeInsets.only(
         left: 0.0,
         right: 0.0,
-      ),
+      ), 
       child: GFButton(
         color: secondary,
         blockButton: true,
@@ -88,7 +53,7 @@ Widget loginButton(BuildContext context, title, bool isLoading) {
               MyLocalizations.of(context).getLocalizations(title),
               style: titleXLargeWPB(),
             ),
-      color: secondary,
+      color:secondary,
       blockButton: true,
     ),
   );
@@ -179,3 +144,4 @@ Widget trackButton(BuildContext context, title) {
     ),
   );
 }
+
