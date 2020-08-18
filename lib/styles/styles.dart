@@ -395,3 +395,12 @@ TextStyle keyValue() {
     fontFamily: 'PoppinsRegular',
   );
 }
+
+TextStyle hintSfboldBig() {
+  return TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 16.0,
+    color: Colors.black,
+    fontFamily: 'SfUiDBold',
+  );
+}

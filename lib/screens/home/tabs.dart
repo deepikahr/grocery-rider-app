@@ -43,8 +43,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   void getData() async {
     APIService.getLocationformation().then((onValue) async {
       if (onValue['response_data'] != null &&
-          onValue['response_data']['currencyCode'] != null) {
-        Common.setCurrency(onValue['response_data']['currencyCode']);
+          onValue['response_data']['currencySymbol'] != null) {
+        Common.setCurrency(onValue['response_data']['currencySymbol']);
       } else {
         Common.setCurrency("\$");
       }
