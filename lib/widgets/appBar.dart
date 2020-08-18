@@ -15,7 +15,7 @@ Widget appBarPrimary(BuildContext context, title) {
   );
 }
 
-Widget appBarHome(BuildContext context, title) {
+Widget appBar(BuildContext context, title) {
   return AppBar(
     backgroundColor: primary,
     title: Text(MyLocalizations.of(context).getLocalizations(title),
@@ -25,14 +25,3 @@ Widget appBarHome(BuildContext context, title) {
   );
 }
 
-Widget appBarProfile(BuildContext context, title) {
-  return AppBar(
-    backgroundColor: primary,
-    title: Text(
-      MyLocalizations.of(context).getLocalizations(title),
-      style: titleWPS(),
-    ),
-    centerTitle: true,
-    automaticallyImplyLeading: false,
-  );
-}

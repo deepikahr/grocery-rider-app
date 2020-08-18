@@ -82,15 +82,6 @@ class _HistoryState extends State<History> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:appBarPrimary(context,"HISTORY"),
-      // appBar: AppBar(
-      //   backgroundColor: primary,
-      //   title: Text(
-      //     MyLocalizations.of(context).getLocalizations("HISTORY"),
-      //     style: titleWPS(),
-      //   ),
-      //   centerTitle: true,
-      //   automaticallyImplyLeading: false,
-      // ),
       body: deliverdOrderLoading == true
           ? SquareLoader()
           : ListView(
