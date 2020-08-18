@@ -7,6 +7,7 @@ import 'package:grocerydelivery/widgets/loader.dart';
 Widget buttonPrimary(BuildContext context, title, bool isloading) {
   return Container(
     height: 55,
+    color: primary,
     margin: EdgeInsets.only(top: 30, bottom: 20, right: 20, left: 20),
     decoration: BoxDecoration(boxShadow: [
       BoxShadow(color: Colors.black.withOpacity(0.29), blurRadius: 5)
@@ -17,24 +18,23 @@ Widget buttonPrimary(BuildContext context, title, bool isloading) {
         right: 0.0,
       ),
       child: GFButton(
-        color: primary,
-        blockButton: true,
-        onPressed: null,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              MyLocalizations.of(context).getLocalizations(title),
-              style: titleXLargeWPB(),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            isloading ? GFLoader(type: GFLoaderType.ios) : Text("")
-          ],
-        ),
-        textStyle: textBarlowRegularrBlack(),
-      ),
+          color: primary,
+          blockButton: true,
+          onPressed: null,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                MyLocalizations.of(context).getLocalizations(title),
+                style: titleXLargeWPB(),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              isloading ? GFLoader(type: GFLoaderType.ios) : Text("")
+            ],
+          ),
+          textStyle: textBarlowRegularrBlack()),
     ),
   );
 }
@@ -42,6 +42,7 @@ Widget buttonPrimary(BuildContext context, title, bool isloading) {
 Widget buttonSecondry(BuildContext context, title, bool isloading) {
   return Container(
     height: 55,
+    color: secondary,
     margin: EdgeInsets.only(top: 30, bottom: 20, right: 20, left: 20),
     decoration: BoxDecoration(boxShadow: [
       BoxShadow(color: Colors.black.withOpacity(0.29), blurRadius: 5)
@@ -52,45 +53,40 @@ Widget buttonSecondry(BuildContext context, title, bool isloading) {
         right: 0.0,
       ),
       child: GFButton(
-        color: secondary,
-        blockButton: true,
-        onPressed: null,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              MyLocalizations.of(context).getLocalizations(title),
-              style: titleXLargeWPB(),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            isloading ? GFLoader(type: GFLoaderType.ios) : Text("")
-          ],
-        ),
-        textStyle: textBarlowRegularrBlack(),
-      ),
+          color: secondary,
+          blockButton: true,
+          onPressed: null,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                MyLocalizations.of(context).getLocalizations(title),
+                style: titleXLargeWPB(),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              isloading ? GFLoader(type: GFLoaderType.ios) : Text("")
+            ],
+          ),
+          textStyle: textBarlowRegularrBlack()),
     ),
   );
 }
 
 Widget loginButton(BuildContext context, title, bool isLoading) {
   return Container(
+    color: secondary,
     height: 51,
     child: GFButton(
-      onPressed: null,
-      size: GFSize.LARGE,
-      child: isLoading
-          ? GFLoader(
-              type: GFLoaderType.ios,
-            )
-          : Text(
-              MyLocalizations.of(context).getLocalizations(title),
-              style: titleXLargeWPB(),
-            ),
-      color: secondary,
-      blockButton: true,
-    ),
+        onPressed: null,
+        size: GFSize.LARGE,
+        child: isLoading
+            ? GFLoader(type: GFLoaderType.ios)
+            : Text(MyLocalizations.of(context).getLocalizations(title),
+                style: titleXLargeWPB()),
+        color: secondary,
+        blockButton: true),
   );
 }
 
@@ -98,16 +94,13 @@ Widget logoutButton(BuildContext context, title) {
   return Container(
     height: 51,
     child: GFButton(
-      onPressed: null,
-      size: GFSize.LARGE,
-      child: Text(
-        MyLocalizations.of(context).getLocalizations(title),
-        style: titleGPBSec(),
-      ),
-      type: GFButtonType.outline2x,
-      color: secondary,
-      blockButton: true,
-    ),
+        onPressed: null,
+        size: GFSize.LARGE,
+        child: Text(MyLocalizations.of(context).getLocalizations(title),
+            style: titleGPBSec()),
+        type: GFButtonType.outline2x,
+        color: secondary,
+        blockButton: true),
   );
 }
 
@@ -132,10 +125,8 @@ Widget acceptRejectButton(BuildContext context, title, bool isloading) {
       size: GFSize.LARGE,
       child: isloading
           ? SquareLoader()
-          : Text(
-              MyLocalizations.of(context).getLocalizations("title"),
-              style: titleGPBB(),
-            ),
+          : Text(MyLocalizations.of(context).getLocalizations("title"),
+              style: titleGPBB()),
       color: greyB,
       type: GFButtonType.outline2x,
     ),
@@ -147,15 +138,14 @@ Widget deliveredButton(
   return Container(
     margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
     child: GFButton(
-      onPressed: null,
-      size: GFSize.LARGE,
-      child: isOrderStatusDeliveredLoading
-          ? SquareLoader()
-          : Text(MyLocalizations.of(context).getLocalizations(title)),
-      textStyle: titleXLargeWPB(),
-      color: secondary,
-      blockButton: true,
-    ),
+        onPressed: null,
+        size: GFSize.LARGE,
+        child: isOrderStatusDeliveredLoading
+            ? SquareLoader()
+            : Text(MyLocalizations.of(context).getLocalizations(title)),
+        textStyle: titleXLargeWPB(),
+        color: secondary,
+        blockButton: true),
   );
 }
 
@@ -163,16 +153,13 @@ Widget trackButton(BuildContext context, title) {
   return Container(
     height: 51,
     child: GFButton(
-      onPressed: null,
-      size: GFSize.LARGE,
-      child: Text(
-        MyLocalizations.of(context).getLocalizations(title),
-        style: titleGPBB(),
-      ),
-      textStyle: titleGPBB(),
-      type: GFButtonType.outline2x,
-      color: primary,
-      blockButton: true,
-    ),
+        onPressed: null,
+        size: GFSize.LARGE,
+        child: Text(MyLocalizations.of(context).getLocalizations(title),
+            style: titleGPBB()),
+        textStyle: titleGPBB(),
+        type: GFButtonType.outline2x,
+        color: primary,
+        blockButton: true),
   );
 }
