@@ -5,6 +5,7 @@ import 'package:grocerydelivery/screens/auth/changePassword.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
+import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:provider/provider.dart';
 
@@ -123,7 +124,8 @@ class _ProfileState extends State<Profile> {
                           ? 0
                           : languagesList.length,
                       itemBuilder: (BuildContext context, int i) {
-                        return GFButton(
+                        return 
+                        GFButton(
                           onPressed: () async {
                             Common.setSelectedLanguage(
                                 languagesList[i]['languageCode']);
@@ -152,7 +154,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:appBarProfile(context,"PROFILE"),
+      appBar:appBar(context,"PROFILE"),
       backgroundColor: Colors.white,
       body: ListView(
         children: <Widget>[
@@ -376,10 +378,8 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget buildlOGOUTButton() {
-    return Container(
-      height: 51,
-      child: GFButton(
-        onPressed: () {
+    return  InkWell(
+        onTap: () {
           Common.getSelectedLanguage().then((selectedLocale) async {
             Map body = {"language": selectedLocale};
             await AuthService.updateUserInfo(body).then((onValue) {
@@ -391,16 +391,7 @@ class _ProfileState extends State<Profile> {
               });
             });
           });
-        },
-        size: GFSize.LARGE,
-        child: Text(
-          MyLocalizations.of(context).getLocalizations("LOGOUT"),
-          style: titleGPBSec(),
-        ),
-        type: GFButtonType.outline2x,
-        color: secondary,
-        blockButton: true,
-      ),
-    );
+        }, 
+        child: logoutButton(context, "LOGOUT"));
   }
 }

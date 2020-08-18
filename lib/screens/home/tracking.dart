@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
@@ -434,33 +435,20 @@ class _TrackingState extends State<Tracking> {
                     .getLocalizations("DIRECTIONS", true),
                 style: keyTextWhite()),
           ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <
-              Widget>[
-            GFButton(
-              onPressed: () {
-                _launchMap(storeLocation);
-              },
-              text: MyLocalizations.of(context).getLocalizations("TO_STORE"),
-              textStyle: titleRPM(red),
-              icon: Icon(Icons.directions, color: red),
-              color: Colors.white,
-              size: GFSize.MEDIUM,
-              borderShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-            ),
-            GFButton(
-              onPressed: () {
-                _launchMap(customerLocation);
-              },
-              text: MyLocalizations.of(context).getLocalizations("TO_CUSTOMER"),
-              textStyle: titleRPM(red),
-              icon: Icon(Icons.directions, color: Colors.red),
-              color: Colors.white,
-              size: GFSize.MEDIUM,
-              borderShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-            ),
-          ]),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                InkWell(
+                    onTap: () {
+                      _launchMap(storeLocation);
+                    },
+                    child: tostoreCustomerButton(context, "TO_STORE")),
+                InkWell(
+                    onTap: () {
+                      _launchMap(customerLocation);
+                    },
+                    child: tostoreCustomerButton(context, "TO_CUSTOMER")),
+              ]),
           SizedBox(height: 5),
         ]);
   }
@@ -730,29 +718,19 @@ class _TrackingState extends State<Tracking> {
 
   Widget buildDeliveredButton() {
     return order['order']['orderStatus'] == 'OUT_FOR_DELIVERY'
-        ? Container(
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: GFButton(
-              onPressed: () async {
-                if (order['order']['orderStatus'] == "OUT_FOR_DELIVERY") {
-                  if (mounted) {
-                    setState(() {
-                      isOrderStatusDeliveredLoading = true;
-                      orderStatusChange("DELIVERED");
-                    });
-                  }
+        ? InkWell(
+            onTap: () async {
+              if (order['order']['orderStatus'] == "OUT_FOR_DELIVERY") {
+                if (mounted) {
+                  setState(() {
+                    isOrderStatusDeliveredLoading = true;
+                    orderStatusChange("DELIVERED");
+                  });
                 }
-              },
-              size: GFSize.LARGE,
-              child: isOrderStatusDeliveredLoading
-                  ? SquareLoader()
-                  : Text(MyLocalizations.of(context)
-                      .getLocalizations("ORDER_DELIVERED")),
-              textStyle: titleXLargeWPB(),
-              color: secondary,
-              blockButton: true,
-            ),
-          )
+              }
+            },
+            child: deliveredButton(
+                context, "ORDER_DELIVERED", isOrderStatusDeliveredLoading))
         : Container();
   }
 }

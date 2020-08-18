@@ -86,7 +86,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:appBarHome(context,"ORDER_DETAILS"),
+      appBar:appBar(context,"ORDER_DETAILS"),
       backgroundColor: greyA,
       body: orderDataLoading
           ? SquareLoader()

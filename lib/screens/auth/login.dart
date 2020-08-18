@@ -5,6 +5,7 @@ import 'package:grocerydelivery/screens/auth/forgotpassword.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
+import 'package:grocerydelivery/widgets/button.dart';
 
 import '../../services/auth.dart';
 import '../../services/common.dart';
@@ -82,7 +83,7 @@ class _LOGINState extends State<LOGIN> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBarPrimary(context,"LOGIN"),
+      appBar: appBarPrimary(context, "LOGIN"),
       backgroundColor: Colors.white,
       body: ListView(
         children: <Widget>[
@@ -238,27 +239,15 @@ class _LOGINState extends State<LOGIN> {
   }
 
   Widget buildlOGINButton() {
-    return Positioned(
+    return
+    Positioned(
       bottom: 10.0,
-      child: Container(
-        height: 51,
-        child: GFButton(
-          onPressed: () {
+      child:  InkWell(
+        onTap:
+         () {
             if (!isLoading) loginMethod();
           },
-          size: GFSize.LARGE,
-          child: isLoading
-              ? GFLoader(
-                  type: GFLoaderType.ios,
-                )
-              : Text(
-                  MyLocalizations.of(context).getLocalizations("LOGIN"),
-                  style: titleXLargeWPB(),
-                ),
-          color: secondary,
-          blockButton: true,
-        ),
-      ),
+          child: loginButton(context, "LOGIN", isLoading))
     );
   }
 }
