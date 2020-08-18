@@ -6,6 +6,7 @@ import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/services/socket.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
+import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -309,14 +310,7 @@ class _HomeState extends State<Home> {
     Provider.of<LocationModel>(context, listen: false).requestLocation();
     return Scaffold(
       key: _scaffoldKey,
-      appBar:appBarHome(context,"HOME"),
-      // appBar: AppBar(
-      //   backgroundColor: primary,
-      //   title: Text(MyLocalizations.of(context).getLocalizations("HOME"),
-      //       style: titleWPS()),
-      //   centerTitle: true,
-      //   automaticallyImplyLeading: false,
-      // ),
+      appBar: appBar(context, "HOME"),
       body: GFFloatingWidget(
         showblurness: newOrder == null ? false : true,
         verticalPosition: 50,
@@ -495,47 +489,20 @@ class _HomeState extends State<Home> {
 
   Widget buildNeworderRejectButton(order) {
     return Expanded(
-      child: Container(
-        height: 51,
-        child: GFButton(
-          onPressed: () {
-            newOrderReject(order);
-          },
-          size: GFSize.LARGE,
-          child: isNewOrderReject
-              ? SquareLoader()
-              : Text(
-                  MyLocalizations.of(context).getLocalizations("REJECT"),
-                  style: titleGPBB(),
-                ),
-          color: greyB,
-          type: GFButtonType.outline2x,
-        ),
-      ),
-    );
+        child: InkWell(
+            onTap: () {
+              newOrderReject(order);
+            },
+            child: acceptRejectButton(context, "REJECT", isNewOrderReject)));
   }
 
   Widget buildNeworderAcceptButton(order) {
     return Expanded(
-      child: Container(
-        height: 51,
-        child: GFButton(
-          onPressed: () {
-            newOrderAccept(order);
-          },
-          size: GFSize.LARGE,
-          child: isNewOrderAccept
-              ? SquareLoader()
-              : Text(
-                  MyLocalizations.of(context).getLocalizations("ACCEPT"),
-                  style: titleGPBB(),
-                ),
-          textStyle: titleGPBB(),
-          type: GFButtonType.outline2x,
-          color: secondary,
-        ),
-      ),
-    );
+        child: InkWell(
+            onTap: () {
+              newOrderAccept(order);
+            },
+            child: acceptRejectButton(context, "ACCEPT", isNewOrderAccept)));
   }
 
   Widget buildOrderCard(order, index, context) {
@@ -691,10 +658,8 @@ class _HomeState extends State<Home> {
   }
 
   Widget buildViewDetailsButton(context, order, index) {
-    return Container(
-      height: 51,
-      child: GFButton(
-        onPressed: () {
+    return InkWell(
+        onTap: () {
           var result = Navigator.push(
             context,
             MaterialPageRoute(
@@ -715,17 +680,7 @@ class _HomeState extends State<Home> {
             }
           });
         },
-        size: GFSize.LARGE,
-        child: Text(
-          MyLocalizations.of(context).getLocalizations("TRACK"),
-          style: titleGPBB(),
-        ),
-        textStyle: titleGPBB(),
-        type: GFButtonType.outline2x,
-        color: primary,
-        blockButton: true,
-      ),
-    );
+        child: trackButton(context, "TRACK"));
   }
 
   Widget buildAcceptButton(context, order, index, service) {
