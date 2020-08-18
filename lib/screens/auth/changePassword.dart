@@ -102,7 +102,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar:appBarPrimary(context,"CHANGE_PASSWORD"),
+      appBar: appBarPrimary(context, "CHANGE_PASSWORD"),
       body: Form(
         key: _formKey,
         child: Container(
