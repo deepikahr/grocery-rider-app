@@ -129,9 +129,6 @@ Widget acceptRejectButton(BuildContext context, title, bool isloading) {
     height: 51,
     child: GFButton(
       onPressed: null,
-      // () {
-      //   newOrderReject(order);
-      // },
       size: GFSize.LARGE,
       child: isloading
           ? SquareLoader()

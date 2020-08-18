@@ -155,24 +155,23 @@ class _LOGINState extends State<LOGIN> {
                             radius: 60,
                           ),
                         ),
-                        SizedBox(height: 50),
+                        SizedBox(height: 30),
                         Text(
-                          MyLocalizations.of(context)
-                              .getLocalizations("EMAIL", true),
-                          style: titleSmallBPR(),
-                        ),
+                            MyLocalizations.of(context)
+                                .getLocalizations("EMAIL", true),
+                            style: titleSmallBPR()),
                         SizedBox(height: 10),
                         buildEmailTextFormField(),
                         SizedBox(height: 25),
                         Text(
-                          MyLocalizations.of(context)
-                              .getLocalizations("PASSWORD", true),
-                          style: titleSmallBPR(),
-                        ),
+                            MyLocalizations.of(context)
+                                .getLocalizations("PASSWORD", true),
+                            style: titleSmallBPR()),
                         SizedBox(height: 10),
                         buildPasswordextFormField(),
                         SizedBox(height: 10),
                         buildForgotPasswordLink(),
+                        SizedBox(height: 10),
                       ],
                     ),
                   ),
@@ -288,15 +287,14 @@ class _LOGINState extends State<LOGIN> {
   }
 
   Widget buildlOGINButton() {
-    return
-    Positioned(
+    return Positioned(
       bottom: 10.0,
-      child:  InkWell(
-        onTap:
-         () {
-            if (!isLoading) loginMethod();
-          },
-          child: loginButton(context, "LOGIN", isLoading))
+      child: InkWell(
+        onTap: () {
+          if (!isLoading) loginMethod();
+        },
+        child: loginButton(context, "LOGIN", isLoading),
+      ),
     );
   }
 }
