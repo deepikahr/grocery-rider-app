@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:getwidget/getwidget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/constants.dart';
@@ -15,7 +14,6 @@ import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../models/location.dart';
 import '../../models/socket.dart';
 import '../../services/common.dart';
