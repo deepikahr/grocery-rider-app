@@ -3,7 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:grocerydelivery/widgets/normalText.dart';
 
 import '../../styles/styles.dart';
 import 'order_details.dart';
@@ -80,15 +82,7 @@ class _HistoryState extends State<History> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primary,
-        title: Text(
-          MyLocalizations.of(context).getLocalizations("HISTORY"),
-          style: titleWPS(),
-        ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
+      appBar: appBarPrimary(context, "HISTORY"),
       body: deliverdOrderLoading == true
           ? SquareLoader()
           : ListView(
@@ -150,42 +144,28 @@ class _HistoryState extends State<History> {
         content: Column(
           children: <Widget>[
             SizedBox(height: 5),
-            Row(
-              children: <Widget>[
+            buildOrder(
+                context,
                 Container(
                     height: 15,
                     width: 20,
                     child: Icon(Icons.timer, color: greyB, size: 15)),
-                Text(MyLocalizations.of(context).getLocalizations("DATE", true),
-                    style: keyText()),
-                Expanded(
-                  child: Text(
-                    order['deliveryDate'] + ', ' + order['deliveryTime'],
-                    style: keyValue(),
-                  ),
-                )
-              ],
-            ),
+                "DATE",
+                order['deliveryDate'] + ', ' + order['deliveryTime'],
+                false),
             SizedBox(height: 5),
-            Row(
-              children: <Widget>[
+            buildOrder(
+                context,
                 Container(
                   height: 15,
                   child: SvgPicture.asset(
                     'lib/assets/icons/hash.svg',
                   ),
                 ),
-                Text(
-                  MyLocalizations.of(context)
-                      .getLocalizations("ORDER_ID", true),
-                  style: keyText(),
-                ),
-                Text(
-                  "#" + order['orderID'].toString(),
-                  style: titleXSmallBBPR(),
-                )
-              ],
-            ),
+                "ORDER_ID",
+                "#${order['orderID'].toString()}",
+                false),
+            SizedBox(height: 5),
           ],
         ),
       ),
