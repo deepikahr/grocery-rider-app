@@ -107,7 +107,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar:appBarPrimary(context,"FORGET_PASSWORD"),
+      appBar: appBarPrimary(context, "FORGET_PASSWORD"),
       body: Form(
         key: _formKey,
         child: Container(

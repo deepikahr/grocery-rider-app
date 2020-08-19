@@ -129,9 +129,6 @@ class _TrackingState extends State<Tracking> {
     _controller.complete(ctr);
   }
 
-  // Map<String, dynamic> findOrderByID(List orders, String orderID) =>
-  //     orders.firstWhere((element) => element['_id'] == orderID);
-
   void setSourceAndDestinationIcons() async {
     agentIcon = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: 2.5),
@@ -345,7 +342,6 @@ class _TrackingState extends State<Tracking> {
                 color: Colors.white,
                 child: ListView(
                   shrinkWrap: true,
-                  //         physics: ScrollPhysics(),
                   children: <Widget>[
                     buildAddressBox(),
                     SizedBox(height: 20),
@@ -354,7 +350,6 @@ class _TrackingState extends State<Tracking> {
                     buildPaymentInfoBlock(),
                     SizedBox(height: 20),
                     buildDeliveredButton(),
-                    //   SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -364,7 +359,6 @@ class _TrackingState extends State<Tracking> {
 
   Widget buildTimingInfoBlock() {
     return Row(
-      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
