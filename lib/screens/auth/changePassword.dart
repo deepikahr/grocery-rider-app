@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/services/auth.dart';
+import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
+import 'package:grocerydelivery/widgets/appBar.dart';
+import 'package:grocerydelivery/widgets/button.dart';
 
 class ChangePassword extends StatefulWidget {
   final String token, locale;
@@ -53,38 +57,23 @@ class _ChangePasswordState extends State<ChangePassword> {
                 isChangePasswordLoading = false;
               });
             }
-            if (onValue['response_data'] != null) {
-              showDialog<Null>(
-                context: context,
-                barrierDismissible: false, // user must tap button!
-                builder: (BuildContext context) {
-                  return new AlertDialog(
-                    content: new SingleChildScrollView(
-                      child: new ListBody(
-                        children: <Widget>[
-                          new Text(
-                            '${onValue['response_data']}',
-                            style: textBarlowRegularBlack(),
-                          ),
-                        ],
+            showSnackbar(onValue['response_data']);
+            Common.getSelectedLanguage().then((selectedLocale) async {
+              Map body = {"language": selectedLocale, "playerId": null};
+              AuthService.updateUserInfo(body).then((value) async {
+                await Common.setToken(null);
+                await Common.setAccountID(null);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => LOGIN(
+                        locale: widget.locale,
+                        localizedValues: widget.localizedValues,
                       ),
                     ),
-                    actions: <Widget>[
-                      new FlatButton(
-                        child: new Text(
-                          MyLocalizations.of(context).getLocalizations("OK"),
-                          style: textbarlowRegularaPrimary(),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            }
+                    (Route<dynamic> route) => false);
+              });
+            });
           } catch (error) {
             if (mounted) {
               setState(() {
@@ -114,21 +103,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: GFAppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-        ),
-        title: Text(
-          MyLocalizations.of(context).getLocalizations("CHANGE_PASSWORD"),
-          style: titleWPS(),
-        ),
-        centerTitle: true,
-        backgroundColor: primary,
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
+      appBar: appBarPrimary(context, "CHANGE_PASSWORD"),
       body: Form(
         key: _formKey,
         child: Container(
@@ -356,45 +331,10 @@ class _ChangePasswordState extends State<ChangePassword> {
                   ),
                 ),
               ),
-              Container(
-                height: 55,
-                margin:
-                    EdgeInsets.only(top: 30, bottom: 20, right: 20, left: 20),
-                decoration: BoxDecoration(boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.29), blurRadius: 5)
-                ]),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 0.0,
-                    right: 0.0,
-                  ),
-                  child: GFButton(
-                    color: secondary,
-                    blockButton: true,
-                    onPressed: changePassword,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          MyLocalizations.of(context)
-                              .getLocalizations("SUBMIT"),
-                          style: titleXLargeWPB(),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        isChangePasswordLoading
-                            ? GFLoader(
-                                type: GFLoaderType.ios,
-                              )
-                            : Text("")
-                      ],
-                    ),
-                    textStyle: textBarlowRegularrBlack(),
-                  ),
-                ),
-              ),
+              InkWell(
+                  onTap: changePassword,
+                  child:
+                      buttonSecondry(context, "SUBMIT", isChangePasswordLoading)),
             ],
           ),
         ),
