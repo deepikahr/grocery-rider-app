@@ -20,6 +20,8 @@
 	<string>This app requires access to your current location to show map view between store and customer.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app requires access to your current location to show map view between store and customer.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to the photo library to set profile picture.</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>

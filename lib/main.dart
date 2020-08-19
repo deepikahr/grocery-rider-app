@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -166,8 +166,10 @@ class _DeliveryAppState extends State<DeliveryApp> {
       locale: Locale(widget.locale),
       localizationsDelegates: [
         MyLocalizationsDelegate(widget.localizedValues, [widget.locale]),
-        GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        DefaultCupertinoLocalizations.delegate
       ],
       supportedLocales: [Locale(widget.locale)],
       debugShowCheckedModeBanner: false,
