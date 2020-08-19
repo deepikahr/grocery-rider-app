@@ -6,6 +6,7 @@ import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
+import 'package:grocerydelivery/widgets/button.dart';
 
 class ForgotPassword extends StatefulWidget {
   ForgotPassword({Key key, this.title, this.locale, this.localizedValues})
@@ -106,7 +107,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar:appBarPrimary(context,"FORGET_PASSWORD"),
+      appBar: appBarPrimary(context, "FORGET_PASSWORD"),
       body: Form(
         key: _formKey,
         child: Container(
@@ -189,38 +190,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   ),
                 ),
               ),
-              Container(
-                height: 55,
-                margin:
-                    EdgeInsets.only(top: 30, bottom: 20, right: 20, left: 20),
-                decoration: BoxDecoration(boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.29), blurRadius: 5)
-                ]),
-                child: GFButton(
-                  color: secondary,
-                  size: GFSize.LARGE,
-                  blockButton: true,
-                  onPressed: verifyEmail,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        MyLocalizations.of(context).getLocalizations("SUBMIT"),
-                        style: titleXLargeWPB(),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      isVerfyEmailLoading
-                          ? GFLoader(
-                              type: GFLoaderType.ios,
-                            )
-                          : Text("")
-                    ],
-                  ),
-                ),
-              ),
+              InkWell(
+                  onTap: verifyEmail,
+                  child:
+                      buttonSecondry(context, "SUBMIT", isVerfyEmailLoading)),
             ],
           ),
         ),
