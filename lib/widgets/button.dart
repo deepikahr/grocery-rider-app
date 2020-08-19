@@ -117,7 +117,24 @@ Widget tostoreCustomerButton(BuildContext context, title) {
   );
 }
 
-Widget acceptRejectButton(BuildContext context, title, bool isloading) {
+Widget acceptRejectButton(
+    BuildContext context, title, bool isloading, orderIndex, index) {
+  return Container(
+    height: 51,
+    child: GFButton(
+      onPressed: null,
+      size: GFSize.LARGE,
+      child: isloading && orderIndex == index
+          ? SquareLoader()
+          : Text(MyLocalizations.of(context).getLocalizations(title),
+              style: titleGPBB()),
+      color: greyB,
+      type: GFButtonType.outline2x,
+    ),
+  );
+}
+
+Widget alartAcceptRejectButton(BuildContext context, title, bool isloading) {
   return Container(
     height: 51,
     child: GFButton(
@@ -125,7 +142,7 @@ Widget acceptRejectButton(BuildContext context, title, bool isloading) {
       size: GFSize.LARGE,
       child: isloading
           ? SquareLoader()
-          : Text(MyLocalizations.of(context).getLocalizations("title"),
+          : Text(MyLocalizations.of(context).getLocalizations(title),
               style: titleGPBB()),
       color: greyB,
       type: GFButtonType.outline2x,
@@ -161,5 +178,50 @@ Widget trackButton(BuildContext context, title) {
         type: GFButtonType.outline2x,
         color: primary,
         blockButton: true),
+  );
+}
+
+Widget mapButton(BuildContext context, title) {
+  return Container(
+      height: 30,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: GFButton(
+        onPressed: null,
+        text: MyLocalizations.of(context).getLocalizations(title),
+        textStyle: titleRPM(red),
+        icon: Icon(Icons.directions, color: red),
+        color: Colors.white,
+        size: GFSize.MEDIUM,
+        borderShape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ));
+}
+
+Widget startAndStartedButton(BuildContext context, String startButtonText,
+    bool isOrderStatusOutForDeliveryLoading) {
+  return Container(
+    height: 30,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: GFButton(
+      onPressed: null,
+      child: isOrderStatusOutForDeliveryLoading
+          ? GFLoader(type: GFLoaderType.ios)
+          : Text(startButtonText),
+      textStyle: titleRPM(startButtonText == 'START' ? red : primary),
+      icon: Icon(
+        startButtonText == 'START' ? Icons.play_arrow : Icons.check,
+        color: startButtonText == 'START' ? red : primary,
+      ),
+      color: Colors.white,
+      size: GFSize.MEDIUM,
+      borderShape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    ),
   );
 }

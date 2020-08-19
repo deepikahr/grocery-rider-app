@@ -42,3 +42,53 @@ Widget buildContainerField(BuildContext context, title) {
     ),
   );
 }
+
+Widget alertText(BuildContext context, title, Icon icon) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: <Widget>[
+      Text(
+        MyLocalizations.of(context).getLocalizations(title),
+        style: hintSfboldBig(),
+      ),
+      icon != null ? icon : Container()
+    ],
+  );
+}
+
+Widget orderSummary(BuildContext context, title, value) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: <Widget>[
+      Text(MyLocalizations.of(context).getLocalizations(title, true),
+          style: keyText()),
+      Expanded(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              value,
+              style: titleLargeBPM(),
+            ),
+          ],
+        ),
+      )
+    ],
+  );
+}
+
+Widget buildOrder(
+    BuildContext context, Widget icon, title, value, bool container) {
+  return Row(
+    children: <Widget>[
+      icon,
+      Text(MyLocalizations.of(context).getLocalizations(title, true),
+          style: keyText()),
+      container
+          ? value
+          : Expanded(
+              child: Text(value, style: keyValue()),
+            )
+    ],
+  );
+}
