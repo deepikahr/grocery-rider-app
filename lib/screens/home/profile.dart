@@ -136,23 +136,14 @@ class _ProfileState extends State<Profile> {
                           : languagesList.length,
                       itemBuilder: (BuildContext context, int i) {
                         return GFButton(
-                          onPressed: () async {
-                            Common.setSelectedLanguage(
-                                languagesList[i]['languageCode']);
-                            main();
-                          },
-                          type: GFButtonType.transparent,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                languagesList[i]['languageName'],
-                                style: titleSmallBPR(),
-                              ),
-                              Container()
-                            ],
-                          ),
-                        );
+                            onPressed: () async {
+                              Common.setSelectedLanguage(
+                                  languagesList[i]['languageCode']);
+                              main();
+                            },
+                            type: GFButtonType.transparent,
+                            child: alertText(context,
+                                languagesList[i]['languageName'], null));
                       }),
                 ],
               ),
