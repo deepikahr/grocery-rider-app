@@ -518,7 +518,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
             ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         child: Container(
           height: 51,
           child: GFButton(
