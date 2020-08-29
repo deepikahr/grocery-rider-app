@@ -333,8 +333,8 @@ class _ChangePasswordState extends State<ChangePassword> {
               ),
               InkWell(
                   onTap: changePassword,
-                  child:
-                      buttonSecondry(context, "SUBMIT", isChangePasswordLoading)),
+                  child: buttonSecondry(
+                      context, "SUBMIT", isChangePasswordLoading)),
             ],
           ),
         ),
