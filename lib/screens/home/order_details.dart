@@ -6,6 +6,7 @@ import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:grocerydelivery/widgets/normalText.dart';
 
 import '../../styles/styles.dart';
 
@@ -20,12 +21,11 @@ class OrderDetails extends StatefulWidget {
   @override
   _OrderDetailsState createState() => _OrderDetailsState();
 }
-
 class _OrderDetailsState extends State<OrderDetails> {
   Map order;
-  String currency;
+  String currency,mobileNumber;
   bool orderDataLoading = false;
-  var mobileNumber, fullName, deliveryAddress;
+  var fullName, deliveryAddress;
 
   @override
   void initState() {
@@ -86,7 +86,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:appBarHome(context,"ORDER_DETAILS"),
+      appBar: appBar(context, "ORDER_DETAILS"),
       backgroundColor: greyA,
       body: orderDataLoading
           ? SquareLoader()
@@ -147,176 +147,32 @@ class _OrderDetailsState extends State<OrderDetails> {
         Container(
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("ORDER_ID", true),
-                      style: keyText()),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "#${order['order']['orderID'].toString()}",
-                          style: titleLargeBPM(),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("DATE", true),
-                      style: keyText()),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          order['order']['deliveryDate'],
-                          style: titleLargeBPM(),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("TIME", true),
-                      style: keyText()),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          order['order']['deliveryTime'],
-                          style: titleLargeBPM(),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("PAYMENT", true),
-                      style: keyText()),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          order['order']['paymentType'] == 'COD'
-                              ? MyLocalizations.of(context)
-                                  .getLocalizations("CASH_ON_DELIVERY")
-                              : order['order']['paymentType'] == 'CARD'
-                                  ? MyLocalizations.of(context)
-                                      .getLocalizations("PAYBYCARD")
-                                  : order['order']['paymentType'],
-                          style: titleLargeBPM(),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("SUB_TOTAL", true),
-                      style: keyText()),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}",
-                          style: titleLargeBPM(),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+              orderSummary(context, "ORDER_ID",
+                  "#${order['order']['orderID'].toString()}"),
+              orderSummary(context, "DATE", order['order']['deliveryDate']),
+              orderSummary(context, "TIME", order['order']['deliveryTime']),
+              orderSummary(
+                  context,
+                  "PAYMENT",
+                  order['order']['paymentType'] == 'COD'
+                      ? MyLocalizations.of(context)
+                          .getLocalizations("CASH_ON_DELIVERY")
+                      : order['order']['paymentType'] == 'CARD'
+                          ? MyLocalizations.of(context)
+                              .getLocalizations("PAYBYCARD")
+                          : order['order']['paymentType']),
+              orderSummary(context, "SUB_TOTAL",
+                  "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
               order['cart']['tax'] == 0
                   ? Container()
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                            MyLocalizations.of(context)
-                                .getLocalizations("TAX", true),
-                            style: keyText()),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                "$currency${order['cart']['tax'].toDouble().toStringAsFixed(2)}",
-                                style: titleLargeBPM(),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                  : orderSummary(context, "TAX",
+                      "$currency${order['cart']['tax'].toDouble().toStringAsFixed(2)}"),
               order['cart']['deliveryCharges'] == 0
                   ? Container()
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                            MyLocalizations.of(context)
-                                .getLocalizations("DELIVERY_CHARGES", true),
-                            style: keyText()),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                "$currency${order['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}",
-                                style: titleLargeBPM(),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("TOTAL", true),
-                      style: keyText()),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}",
-                          style: titleLargeBPM(),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                  : orderSummary(context, "DELIVERY_CHARGES",
+                      "$currency${order['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}"),
+              orderSummary(context, "TOTAL",
+                  "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
             ],
           ),
         )

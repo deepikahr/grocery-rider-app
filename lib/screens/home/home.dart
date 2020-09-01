@@ -6,7 +6,9 @@ import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/services/socket.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
+import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:grocerydelivery/widgets/normalText.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -309,14 +311,7 @@ class _HomeState extends State<Home> {
     Provider.of<LocationModel>(context, listen: false).requestLocation();
     return Scaffold(
       key: _scaffoldKey,
-      appBar:appBarHome(context,"HOME"),
-      // appBar: AppBar(
-      //   backgroundColor: primary,
-      //   title: Text(MyLocalizations.of(context).getLocalizations("HOME"),
-      //       style: titleWPS()),
-      //   centerTitle: true,
-      //   automaticallyImplyLeading: false,
-      // ),
+      appBar: appBar(context, "HOME"),
       body: GFFloatingWidget(
         showblurness: newOrder == null ? false : true,
         verticalPosition: 50,
@@ -412,69 +407,56 @@ class _HomeState extends State<Home> {
       margin: EdgeInsets.symmetric(vertical: 1, horizontal: 1),
       content: Column(
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                      height: 15,
-                      child: SvgPicture.asset('lib/assets/icons/customer.svg')),
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("CUSTOMER", true),
-                      style: keyText()),
-                  Text(fullName, style: keyValue())
-                ],
-              ),
-            ],
-          ),
+          buildOrder(
+              context,
+              Container(
+                  height: 15,
+                  child: SvgPicture.asset('lib/assets/icons/customer.svg')),
+              "CUSTOMER",
+              fullName,
+              false),
           SizedBox(height: 5),
-          Row(
-            children: <Widget>[
+          buildOrder(
+              context,
               Container(
                   height: 15,
                   width: 20,
                   child: Icon(Icons.timer, color: greyB, size: 15)),
-              Text(MyLocalizations.of(context).getLocalizations("DATE", true),
-                  style: keyText()),
-              Expanded(
-                child: Text(
-                  order['deliveryDate'] + ', ' + order['deliveryTime'],
-                  style: keyValue(),
-                ),
-              )
-            ],
-          ),
+              "DATE",
+              order['deliveryDate'] + ', ' + order['deliveryTime'],
+              false),
           SizedBox(height: 5),
-          Row(
-            children: <Widget>[
+          buildOrder(
+              context,
+              Container(
+                height: 15,
+                child: SvgPicture.asset('lib/assets/icons/hash.svg'),
+              ),
+              "ORDER_ID",
+              "#${order['orderID'].toString()}",
+              false),
+          SizedBox(height: 5),
+          buildOrder(
+              context,
               Container(
                 height: 15,
                 child: SvgPicture.asset('lib/assets/icons/location.svg'),
               ),
-              Row(children: [
-                Text(
-                    MyLocalizations.of(context)
-                        .getLocalizations("ADDRESS", true),
-                    style: keyText()),
-                SizedBox(width: 20),
-                order['address'] != null
-                    ? Container(
-                        decoration: BoxDecoration(
-                          color: secondary,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-                        child: Text(order['address']['addressType'],
-                            style: TextStyle(
-                                color: greyA,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500)))
-                    : Container(),
-              ])
-            ],
-          ),
+              "ADDRESS",
+              order['address'] != null
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: secondary,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                      child: Text(order['address']['addressType'],
+                          style: TextStyle(
+                              color: greyA,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500)))
+                  : Container(),
+              true),
           Container(
             alignment: AlignmentDirectional.center,
             decoration: BoxDecoration(
@@ -495,47 +477,22 @@ class _HomeState extends State<Home> {
 
   Widget buildNeworderRejectButton(order) {
     return Expanded(
-      child: Container(
-        height: 51,
-        child: GFButton(
-          onPressed: () {
-            newOrderReject(order);
-          },
-          size: GFSize.LARGE,
-          child: isNewOrderReject
-              ? SquareLoader()
-              : Text(
-                  MyLocalizations.of(context).getLocalizations("REJECT"),
-                  style: titleGPBB(),
-                ),
-          color: greyB,
-          type: GFButtonType.outline2x,
-        ),
-      ),
-    );
+        child: InkWell(
+            onTap: () {
+              newOrderReject(order);
+            },
+            child:
+                alartAcceptRejectButton(context, "REJECT", isNewOrderReject)));
   }
 
   Widget buildNeworderAcceptButton(order) {
     return Expanded(
-      child: Container(
-        height: 51,
-        child: GFButton(
-          onPressed: () {
-            newOrderAccept(order);
-          },
-          size: GFSize.LARGE,
-          child: isNewOrderAccept
-              ? SquareLoader()
-              : Text(
-                  MyLocalizations.of(context).getLocalizations("ACCEPT"),
-                  style: titleGPBB(),
-                ),
-          textStyle: titleGPBB(),
-          type: GFButtonType.outline2x,
-          color: secondary,
-        ),
-      ),
-    );
+        child: InkWell(
+            onTap: () {
+              newOrderAccept(order);
+            },
+            child:
+                alartAcceptRejectButton(context, "ACCEPT", isNewOrderAccept)));
   }
 
   Widget buildOrderCard(order, index, context) {
@@ -556,84 +513,57 @@ class _HomeState extends State<Home> {
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       content: Column(
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                      height: 15,
-                      child: SvgPicture.asset('lib/assets/icons/customer.svg')),
-                  Text(
-                      MyLocalizations.of(context)
-                          .getLocalizations("CUSTOMER", true),
-                      style: keyText()),
-                  Text(fullName, style: keyValue())
-                ],
-              ),
-            ],
-          ),
+          buildOrder(
+              context,
+              Container(
+                  height: 15,
+                  child: SvgPicture.asset('lib/assets/icons/customer.svg')),
+              "CUSTOMER",
+              fullName,
+              false),
           SizedBox(height: 5),
-          Row(
-            children: <Widget>[
+          buildOrder(
+              context,
               Container(
                   height: 15,
                   width: 20,
                   child: Icon(Icons.timer, color: greyB, size: 15)),
-              Text(MyLocalizations.of(context).getLocalizations("DATE", true),
-                  style: keyText()),
-              Expanded(
-                child: Text(
-                  order['deliveryDate'] + ', ' + order['deliveryTime'],
-                  style: keyValue(),
-                ),
-              )
-            ],
-          ),
+              "DATE",
+              order['deliveryDate'] + ', ' + order['deliveryTime'],
+              false),
           SizedBox(height: 5),
-          Row(
-            children: <Widget>[
+          buildOrder(
+              context,
               Container(
                 height: 15,
                 child: SvgPicture.asset('lib/assets/icons/hash.svg'),
               ),
-              Text(
-                  MyLocalizations.of(context)
-                      .getLocalizations("ORDER_ID", true),
-                  style: keyText()),
-              Text("#${order['orderID'].toString()}", style: keyValue())
-            ],
-          ),
+              "ORDER_ID",
+              "#${order['orderID'].toString()}",
+              false),
           SizedBox(height: 5),
-          Row(
-            children: <Widget>[
+          buildOrder(
+              context,
               Container(
                 height: 15,
                 child: SvgPicture.asset('lib/assets/icons/location.svg'),
               ),
-              Row(children: [
-                Text(
-                    MyLocalizations.of(context)
-                        .getLocalizations("ADDRESS", true),
-                    style: keyText()),
-                SizedBox(width: 20),
-                order['address'] != null
-                    ? Container(
-                        decoration: BoxDecoration(
-                          color: secondary,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-                        child: Text(order['address']['addressType'],
-                            style: TextStyle(
-                                color: greyA,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500)))
-                    : Container(),
-              ])
-            ],
-          ),
+              "ADDRESS",
+              order['address'] != null
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: secondary,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                      child: Text(order['address']['addressType'],
+                          style: TextStyle(
+                              color: greyA,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500)))
+                  : Container(),
+              true),
+          SizedBox(height: 5),
           Container(
             alignment: AlignmentDirectional.center,
             decoration: BoxDecoration(
@@ -667,34 +597,20 @@ class _HomeState extends State<Home> {
 
   Widget buildRejectButton(context, order, index, service) {
     return Expanded(
-      child: Container(
-        height: 51,
-        child: GFButton(
-          onPressed: () {
-            setState(() {
-              orderIndex = index;
-            });
-            orderReject(order, index);
-          },
-          size: GFSize.LARGE,
-          child: isOrderReject && orderIndex == index
-              ? SquareLoader()
-              : Text(
-                  MyLocalizations.of(context).getLocalizations("REJECT"),
-                  style: titleGPBB(),
-                ),
-          color: greyB,
-          type: GFButtonType.outline2x,
-        ),
-      ),
-    );
+        child: InkWell(
+            onTap: () {
+              setState(() {
+                orderIndex = index;
+              });
+              orderReject(order, index);
+            },
+            child: acceptRejectButton(
+                context, "REJECT", isOrderReject, orderIndex, index)));
   }
 
   Widget buildViewDetailsButton(context, order, index) {
-    return Container(
-      height: 51,
-      child: GFButton(
-        onPressed: () {
+    return InkWell(
+        onTap: () {
           var result = Navigator.push(
             context,
             MaterialPageRoute(
@@ -715,42 +631,20 @@ class _HomeState extends State<Home> {
             }
           });
         },
-        size: GFSize.LARGE,
-        child: Text(
-          MyLocalizations.of(context).getLocalizations("TRACK"),
-          style: titleGPBB(),
-        ),
-        textStyle: titleGPBB(),
-        type: GFButtonType.outline2x,
-        color: primary,
-        blockButton: true,
-      ),
-    );
+        child: trackButton(context, "TRACK"));
   }
 
   Widget buildAcceptButton(context, order, index, service) {
     return Expanded(
-      child: Container(
-        height: 51,
-        child: GFButton(
-          onPressed: () {
-            setState(() {
-              orderIndex = index;
-            });
-            orderAccept(order);
-          },
-          size: GFSize.LARGE,
-          child: isOrderAccept && orderIndex == index
-              ? SquareLoader()
-              : Text(
-                  MyLocalizations.of(context).getLocalizations("ACCEPT_TRACK"),
-                  style: titleGPBB(),
-                ),
-          textStyle: titleGPBB(),
-          type: GFButtonType.outline2x,
-          color: secondary,
-        ),
-      ),
-    );
+        child: InkWell(
+      onTap: () {
+        setState(() {
+          orderIndex = index;
+        });
+        orderAccept(order);
+      },
+      child: acceptRejectButton(
+          context, "ACCEPT_TRACK", isOrderAccept, orderIndex, index),
+    ));
   }
 }

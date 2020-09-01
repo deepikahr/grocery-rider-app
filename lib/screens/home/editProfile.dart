@@ -9,6 +9,7 @@ import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:grocerydelivery/widgets/normalText.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:path/path.dart' as path;
@@ -32,7 +33,7 @@ class _EditProfileState extends State<EditProfile> {
   Map<String, dynamic> userInfo;
   bool isLoading = false, isPicUploading = false, profileEdit = false;
   String firstName, lastName;
-  int mobileNumber;
+  String mobileNumber;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var image;
   @override
@@ -221,51 +222,21 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                   GFButton(
-                    onPressed: selectCamera,
-                    type: GFButtonType.transparent,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          MyLocalizations.of(context)
-                              .getLocalizations("TAKE_PHOTO"),
-                          style: hintSfboldBig(),
-                        ),
-                        Icon(Icons.camera_alt),
-                      ],
-                    ),
-                  ),
+                      onPressed: selectCamera,
+                      type: GFButtonType.transparent,
+                      child: alertText(
+                          context, "TAKE_PHOTO", Icon(Icons.camera_alt))),
                   GFButton(
-                    onPressed: selectGallary,
-                    type: GFButtonType.transparent,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          MyLocalizations.of(context)
-                              .getLocalizations("CHOOSE_FROM_PHOTOS"),
-                          style: hintSfboldBig(),
-                        ),
-                        Icon(Icons.image),
-                      ],
-                    ),
-                  ),
-                  userInfo['imageUrl'] != null
+                      onPressed: selectGallary,
+                      type: GFButtonType.transparent,
+                      child: alertText(
+                          context, "CHOOSE_FROM_PHOTOS", Icon(Icons.image))),
+                  userInfo['filePath'] != null && userInfo['imageUrl'] != null
                       ? GFButton(
                           onPressed: removeImage,
                           type: GFButtonType.transparent,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                MyLocalizations.of(context)
-                                    .getLocalizations("REMOVE_PHOTO"),
-                                style: hintSfboldBig(),
-                              ),
-                              Icon(Icons.delete_forever),
-                            ],
-                          ),
-                        )
+                          child: alertText(context, "REMOVE_PHOTO",
+                              Icon(Icons.delete_forever)))
                       : Container(),
                 ],
               ),
@@ -529,7 +500,7 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
                       onSaved: (String value) {
-                        mobileNumber = int.parse(value);
+                        mobileNumber = value;
                       },
                       validator: (String value) {
                         if (value.isEmpty) {
@@ -547,7 +518,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
             ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         child: Container(
           height: 51,
           child: GFButton(

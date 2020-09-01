@@ -6,7 +6,9 @@ import 'package:grocerydelivery/screens/home/editProfile.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
+import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:grocerydelivery/widgets/normalText.dart';
 import 'package:provider/provider.dart';
 import '../../models/socket.dart';
 import '../../services/api_service.dart';
@@ -25,6 +27,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Map<String, dynamic> profileInfo;
   TextEditingController nameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
@@ -90,7 +93,11 @@ class _ProfileState extends State<Profile> {
           profileInfo = value['response_data'];
           nameController.text =
               '${profileInfo['firstName']} ${profileInfo['lastName']}';
-          countController.text = profileInfo['completedOrder'].toString() ?? 0;
+          if (profileInfo['completedOrder'] == null) {
+            countController.text = "";
+          } else {
+            countController.text = profileInfo['completedOrder'].toString();
+          }
           numberController.text = profileInfo['mobileNumber'].toString() ?? '';
           emailController.text = profileInfo['email'].toString() ?? '';
           isProfileLoading = false;
@@ -130,23 +137,14 @@ class _ProfileState extends State<Profile> {
                           : languagesList.length,
                       itemBuilder: (BuildContext context, int i) {
                         return GFButton(
-                          onPressed: () async {
-                            Common.setSelectedLanguage(
-                                languagesList[i]['languageCode']);
-                            main();
-                          },
-                          type: GFButtonType.transparent,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                languagesList[i]['languageName'],
-                                style: titleSmallBPR(),
-                              ),
-                              Container()
-                            ],
-                          ),
-                        );
+                            onPressed: () async {
+                              Common.setSelectedLanguage(
+                                  languagesList[i]['languageCode']);
+                              main();
+                            },
+                            type: GFButtonType.transparent,
+                            child: alertText(context,
+                                languagesList[i]['languageName'], null));
                       }),
                 ],
               ),
@@ -158,7 +156,8 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:appBarProfile(context,"PROFILE"),
+      key: _scaffoldKey,
+      appBar: appBar(context, "PROFILE"),
       backgroundColor: Colors.white,
       body: languagesListLoading || isProfileLoading
           ? Center(
@@ -184,235 +183,82 @@ class _ProfileState extends State<Profile> {
                             ),
                             SizedBox(height: 30),
                             Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("USER_NAME", true),
-                              style: titleSmallBPR(),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            TextFormField(
-                              enabled: false,
-                              controller: nameController,
-                              cursorColor: primary,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: greyA,
-                                contentPadding: EdgeInsets.all(15),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: greyA, width: 1.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: greyA, width: 1.0),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 25,
-                            ),
-                            Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("EMAIL_ID", true),
-                              style: titleSmallBPR(),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            TextFormField(
-                              cursorColor: primary,
-                              controller: emailController,
-                              enabled: false,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: greyA,
-                                contentPadding: EdgeInsets.all(15),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: greyA, width: 1.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: greyA, width: 1.0),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 25,
-                            ),
-                            Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("MOBILE_NUMBER", true),
-                              style: titleSmallBPR(),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            TextFormField(
-                              cursorColor: primary,
-                              controller: numberController,
-                              enabled: false,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: greyA,
-                                contentPadding: EdgeInsets.all(15),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: greyA, width: 1.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: greyA, width: 1.0),
-                                ),
-                              ),
-                            ),
+                                MyLocalizations.of(context)
+                                    .getLocalizations("USER_NAME", true),
+                                style: titleSmallBPR()),
+                            SizedBox(height: 10),
+                            buildTextField(context, nameController),
                             SizedBox(height: 25),
                             Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("ORDER_COMPLETED", true),
-                              style: titleSmallBPR(),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            TextFormField(
-                              cursorColor: primary,
-                              enabled: false,
-                              controller: countController,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: greyA,
-                                contentPadding: EdgeInsets.all(15),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: greyA, width: 1.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: greyA, width: 1.0),
-                                ),
-                              ),
-                            ),
+                                MyLocalizations.of(context)
+                                    .getLocalizations("EMAIL_ID", true),
+                                style: titleSmallBPR()),
+                            SizedBox(height: 10),
+                            buildTextField(context, emailController),
+                            SizedBox(height: 25),
+                            Text(
+                                MyLocalizations.of(context)
+                                    .getLocalizations("MOBILE_NUMBER", true),
+                                style: titleSmallBPR()),
+                            SizedBox(height: 10),
+                            buildTextField(context, numberController),
+                            SizedBox(height: 25),
+                            Text(
+                                MyLocalizations.of(context)
+                                    .getLocalizations("ORDER_COMPLETED", true),
+                                style: titleSmallBPR()),
+                            SizedBox(height: 10),
+                            buildTextField(context, countController),
                             SizedBox(height: 20),
                             InkWell(
-                              onTap: () {
-                                var result = Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        EditProfile(
-                                            locale: widget.locale,
-                                            localizedValues:
-                                                widget.localizedValues),
-                                  ),
-                                );
-                                result.then((value) {
-                                  if (value != null) {
-                                    socket = Provider.of<SocketModel>(context,
-                                            listen: false)
-                                        .getSocketInstance;
-                                    getProfileInfo();
-                                    getLanguages();
-                                  }
-                                });
-                              },
-                              child: Container(
-                                height: 55,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFF7F7F7),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10.0,
-                                          bottom: 10.0,
-                                          left: 20.0,
-                                          right: 20.0),
-                                      child: Text(
-                                        MyLocalizations.of(context)
-                                            .getLocalizations("EDIT_PROFILE"),
-                                        style: titleSmallBPR(),
-                                      ),
+                                onTap: () {
+                                  var result = Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          EditProfile(
+                                              locale: widget.locale,
+                                              localizedValues:
+                                                  widget.localizedValues),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                                  );
+                                  result.then((value) {
+                                    if (value != null) {
+                                      socket = Provider.of<SocketModel>(context,
+                                              listen: false)
+                                          .getSocketInstance;
+                                      getProfileInfo();
+                                      getLanguages();
+                                    }
+                                  });
+                                },
+                                child: buildContainerField(
+                                    context, "EDIT_PROFILE")),
                             SizedBox(height: 20),
                             languagesList.length > 0
                                 ? InkWell(
                                     onTap: () {
                                       selectLanguagesMethod();
                                     },
-                                    child: Container(
-                                      height: 55,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFFF7F7F7),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 10.0,
-                                                bottom: 10.0,
-                                                left: 20.0,
-                                                right: 20.0),
-                                            child: Text(
-                                              MyLocalizations.of(context)
-                                                  .getLocalizations(
-                                                      "SELECT_LANGUAGE"),
-                                              style: titleSmallBPR(),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
+                                    child: buildContainerField(
+                                        context, "SELECT_LANGUAGE"))
                                 : Container(),
                             SizedBox(height: 20),
                             InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        ChangePassword(
-                                            locale: widget.locale,
-                                            localizedValues:
-                                                widget.localizedValues),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                height: 55,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFF7F7F7),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10.0,
-                                          bottom: 10.0,
-                                          left: 20.0,
-                                          right: 20.0),
-                                      child: Text(
-                                        MyLocalizations.of(context)
-                                            .getLocalizations(
-                                                "CHANGE_PASSWORD"),
-                                        style: titleSmallBPR(),
-                                      ),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          ChangePassword(
+                                              locale: widget.locale,
+                                              localizedValues:
+                                                  widget.localizedValues),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                                  );
+                                },
+                                child: buildContainerField(
+                                    context, "CHANGE_PASSWORD")),
                             SizedBox(height: 30),
                             buildlOGOUTButton(),
                           ],
@@ -424,15 +270,14 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget buildlOGOUTButton() {
-    return Container(
-      height: 51,
-      child: GFButton(
-        onPressed: () {
+    return InkWell(
+        onTap: () {
           Common.getSelectedLanguage().then((selectedLocale) async {
-            Map body = {"language": selectedLocale};
-            await AuthService.updateUserInfo(body).then((onValue) {
-              Map body = {"playerId": null};
-              AuthService.updateUserInfo(body).then((value) async {
+            Map body = {"language": selectedLocale, "playerId": null};
+            AuthService.updateUserInfo(body).then((value) async {
+              showSnackbar(MyLocalizations.of(context)
+                  .getLocalizations("LOGOUT_SUCCESSFULL"));
+              Future.delayed(Duration(milliseconds: 1500), () async {
                 await Common.setToken(null);
                 await Common.setAccountID(null);
                 main();
@@ -440,15 +285,14 @@ class _ProfileState extends State<Profile> {
             });
           });
         },
-        size: GFSize.LARGE,
-        child: Text(
-          MyLocalizations.of(context).getLocalizations("LOGOUT"),
-          style: titleGPBSec(),
-        ),
-        type: GFButtonType.outline2x,
-        color: secondary,
-        blockButton: true,
-      ),
+        child: logoutButton(context, "LOGOUT"));
+  }
+
+  void showSnackbar(message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(milliseconds: 3000),
     );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }

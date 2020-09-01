@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:getwidget/getwidget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:grocerydelivery/widgets/normalText.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../models/location.dart';
 import '../../models/socket.dart';
 import '../../services/common.dart';
@@ -55,6 +55,8 @@ class _TrackingState extends State<Tracking> {
   bool orderDataLoading = false,
       isOrderStatusOutForDeliveryLoading = false,
       isOrderStatusDeliveredLoading = false;
+
+  get cf6a849bad0428d4860deca01a29048fc4a0 => null;
 
   @override
   void initState() {
@@ -125,9 +127,6 @@ class _TrackingState extends State<Tracking> {
   void _onMapCreated(GoogleMapController ctr) {
     _controller.complete(ctr);
   }
-
-  // Map<String, dynamic> findOrderByID(List orders, String orderID) =>
-  //     orders.firstWhere((element) => element['_id'] == orderID);
 
   void setSourceAndDestinationIcons() async {
     agentIcon = await BitmapDescriptor.fromAssetImage(
@@ -338,22 +337,18 @@ class _TrackingState extends State<Tracking> {
                   ],
                 ),
               ),
-              body: Container(
-                color: Colors.white,
-                child: ListView(
-                  shrinkWrap: true,
-                  //         physics: ScrollPhysics(),
-                  children: <Widget>[
-                    buildAddressBox(),
-                    SizedBox(height: 20),
-                    buildItemsBlock(),
-                    SizedBox(height: 20),
-                    buildPaymentInfoBlock(),
-                    SizedBox(height: 20),
-                    buildDeliveredButton(),
-                    //   SizedBox(height: 20),
-                  ],
-                ),
+              body: ListView(
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                children: <Widget>[
+                  buildAddressBox(),
+                  SizedBox(height: 20),
+                  buildItemsBlock(),
+                  SizedBox(height: 20),
+                  buildPaymentInfoBlock(),
+                  SizedBox(height: 20),
+                  buildDeliveredButton(),
+                ],
               ),
             ),
     );
@@ -361,7 +356,6 @@ class _TrackingState extends State<Tracking> {
 
   Widget buildTimingInfoBlock() {
     return Row(
-      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -388,37 +382,21 @@ class _TrackingState extends State<Tracking> {
                 ])),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(left: 15.0, right: 15.0),
-            child: GFButton(
-              onPressed: () async {
-                if (order['order']['orderStatus'] == "CONFIRMED") {
-                  if (mounted) {
-                    setState(() {
-                      isOrderStatusOutForDeliveryLoading = true;
-                      orderStatusChange("OUT_FOR_DELIVERY");
-                    });
+              padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+              child: InkWell(
+                onTap: () {
+                  if (order['order']['orderStatus'] == "CONFIRMED") {
+                    if (mounted) {
+                      setState(() {
+                        isOrderStatusOutForDeliveryLoading = true;
+                        orderStatusChange("OUT_FOR_DELIVERY");
+                      });
+                    }
                   }
-                }
-              },
-              child: isOrderStatusOutForDeliveryLoading
-                  ? GFLoader(type: GFLoaderType.ios)
-                  : Text(startButtonText == 'START'
-                      ? MyLocalizations.of(context).getLocalizations("START")
-                      : startButtonText == 'STARTED'
-                          ? MyLocalizations.of(context)
-                              .getLocalizations("STARTED")
-                          : startButtonText),
-              textStyle: titleRPM(startButtonText == 'START' ? red : primary),
-              icon: Icon(
-                startButtonText == 'START' ? Icons.play_arrow : Icons.check,
-                color: startButtonText == 'START' ? red : primary,
-              ),
-              color: Colors.white,
-              size: GFSize.MEDIUM,
-              borderShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-            ),
-          ),
+                },
+                child: startAndStartedButton(context, startButtonText,
+                    isOrderStatusOutForDeliveryLoading),
+              )),
         ),
       ],
     );
@@ -442,36 +420,22 @@ class _TrackingState extends State<Tracking> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                    child: GFButton(
-                      onPressed: () {
+                    child: InkWell(
+                      onTap: () {
                         _launchMap(storeLocation);
                       },
-                      text: MyLocalizations.of(context)
-                          .getLocalizations("TO_STORE"),
-                      textStyle: titleRPM(red),
-                      icon: Icon(Icons.directions, color: red),
-                      color: Colors.white,
-                      size: GFSize.MEDIUM,
-                      borderShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      child: mapButton(context, "TO_STORE"),
                     ),
                   ),
                 ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                    child: GFButton(
-                      onPressed: () {
+                    child: InkWell(
+                      onTap: () {
                         _launchMap(customerLocation);
                       },
-                      text: MyLocalizations.of(context)
-                          .getLocalizations("TO_CUSTOMER"),
-                      textStyle: titleRPM(red),
-                      icon: Icon(Icons.directions, color: Colors.red),
-                      color: Colors.white,
-                      size: GFSize.MEDIUM,
-                      borderShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      child: mapButton(context, "TO_CUSTOMER"),
                     ),
                   ),
                 ),
@@ -613,128 +577,28 @@ class _TrackingState extends State<Tracking> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                        MyLocalizations.of(context)
-                            .getLocalizations("PAYMENT", true),
-                        style: keyText()),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            order['order']['paymentType'] == 'COD'
-                                ? MyLocalizations.of(context)
-                                    .getLocalizations("CASH_ON_DELIVERY")
-                                : order['order']['paymentType'] == 'CARD'
-                                    ? MyLocalizations.of(context)
-                                        .getLocalizations("PAYBYCARD")
-                                    : order['order']['paymentType'],
-                            style: titleLargeBPM(),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                        MyLocalizations.of(context)
-                            .getLocalizations("SUB_TOTAL", true),
-                        style: keyText()),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            currency +
-                                order['cart']['subTotal']
-                                    .toDouble()
-                                    .toStringAsFixed(2),
-                            style: titleLargeBPM(),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                orderSummary(
+                    context,
+                    "PAYMENT",
+                    order['order']['paymentType'] == 'COD'
+                        ? MyLocalizations.of(context)
+                            .getLocalizations("CASH_ON_DELIVERY")
+                        : order['order']['paymentType'] == 'CARD'
+                            ? MyLocalizations.of(context)
+                                .getLocalizations("PAYBYCARD")
+                            : order['order']['paymentType']),
+                orderSummary(context, "SUB_TOTAL",
+                    "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
                 order['cart']['tax'] == 0
                     ? Container()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("TAX", true),
-                              style: keyText()),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  currency +
-                                      order['cart']['tax']
-                                          .toDouble()
-                                          .toStringAsFixed(2),
-                                  style: titleLargeBPM(),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
+                    : orderSummary(context, "TAX",
+                        "$currency${order['cart']['tax'].toDouble().toStringAsFixed(2)}"),
                 order['cart']['deliveryCharges'] == 0
                     ? Container()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                              MyLocalizations.of(context)
-                                  .getLocalizations("DELIVERY_CHARGES", true),
-                              style: keyText()),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  currency +
-                                      order['cart']['deliveryCharges']
-                                          .toDouble()
-                                          .toStringAsFixed(2),
-                                  style: titleLargeBPM(),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                        MyLocalizations.of(context)
-                            .getLocalizations("TOTAL", true),
-                        style: keyText()),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            currency +
-                                order['cart']['grandTotal']
-                                    .toDouble()
-                                    .toStringAsFixed(2),
-                            style: titleLargeBPM(),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                    : orderSummary(context, "DELIVERY_CHARGES",
+                        "$currency${order['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}"),
+                orderSummary(context, "TOTAL",
+                    "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
               ],
             ),
           ),
@@ -745,29 +609,19 @@ class _TrackingState extends State<Tracking> {
 
   Widget buildDeliveredButton() {
     return order['order']['orderStatus'] == 'OUT_FOR_DELIVERY'
-        ? Container(
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: GFButton(
-              onPressed: () async {
-                if (order['order']['orderStatus'] == "OUT_FOR_DELIVERY") {
-                  if (mounted) {
-                    setState(() {
-                      isOrderStatusDeliveredLoading = true;
-                      orderStatusChange("DELIVERED");
-                    });
-                  }
+        ? InkWell(
+            onTap: () async {
+              if (order['order']['orderStatus'] == "OUT_FOR_DELIVERY") {
+                if (mounted) {
+                  setState(() {
+                    isOrderStatusDeliveredLoading = true;
+                    orderStatusChange("DELIVERED");
+                  });
                 }
-              },
-              size: GFSize.LARGE,
-              child: isOrderStatusDeliveredLoading
-                  ? SquareLoader()
-                  : Text(MyLocalizations.of(context)
-                      .getLocalizations("ORDER_DELIVERED")),
-              textStyle: titleXLargeWPB(),
-              color: secondary,
-              blockButton: true,
-            ),
-          )
+              }
+            },
+            child: deliveredButton(
+                context, "ORDER_DELIVERED", isOrderStatusDeliveredLoading))
         : Container();
   }
 }
