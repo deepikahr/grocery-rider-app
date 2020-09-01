@@ -21,12 +21,11 @@ class OrderDetails extends StatefulWidget {
   @override
   _OrderDetailsState createState() => _OrderDetailsState();
 }
-
 class _OrderDetailsState extends State<OrderDetails> {
   Map order;
-  String currency;
+  String currency,mobileNumber;
   bool orderDataLoading = false;
-  var mobileNumber, fullName, deliveryAddress;
+  var fullName, deliveryAddress;
 
   @override
   void initState() {
