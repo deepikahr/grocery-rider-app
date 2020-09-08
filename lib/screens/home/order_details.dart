@@ -158,7 +158,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   order['order']['paymentType'] == 'COD'
                       ? MyLocalizations.of(context)
                           .getLocalizations("CASH_ON_DELIVERY")
-                      : order['order']['paymentType'] == 'CARD'
+                      : order['order']['paymentType'] == 'STRIPE'
                           ? MyLocalizations.of(context)
                               .getLocalizations("PAYBYCARD")
                           : order['order']['paymentType']),
