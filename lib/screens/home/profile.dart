@@ -27,6 +27,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Map<String, dynamic> profileInfo;
   TextEditingController nameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
@@ -155,6 +156,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: appBar(context, "PROFILE"),
       backgroundColor: Colors.white,
       body: languagesListLoading || isProfileLoading
@@ -271,10 +273,11 @@ class _ProfileState extends State<Profile> {
     return InkWell(
         onTap: () {
           Common.getSelectedLanguage().then((selectedLocale) async {
-            Map body = {"language": selectedLocale};
-            await AuthService.updateUserInfo(body).then((onValue) {
-              Map body = {"playerId": null};
-              AuthService.updateUserInfo(body).then((value) async {
+            Map body = {"language": selectedLocale, "playerId": null};
+            AuthService.updateUserInfo(body).then((value) async {
+              showSnackbar(MyLocalizations.of(context)
+                  .getLocalizations("LOGOUT_SUCCESSFULL"));
+              Future.delayed(Duration(milliseconds: 1500), () async {
                 await Common.setToken(null);
                 await Common.setAccountID(null);
                 main();
@@ -283,5 +286,13 @@ class _ProfileState extends State<Profile> {
           });
         },
         child: logoutButton(context, "LOGOUT"));
+  }
+
+  void showSnackbar(message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(milliseconds: 3000),
+    );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }

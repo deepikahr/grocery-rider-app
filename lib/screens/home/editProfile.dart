@@ -33,7 +33,7 @@ class _EditProfileState extends State<EditProfile> {
   Map<String, dynamic> userInfo;
   bool isLoading = false, isPicUploading = false, profileEdit = false;
   String firstName, lastName;
-  int mobileNumber;
+  String mobileNumber;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var image;
   @override
@@ -500,7 +500,7 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
                       onSaved: (String value) {
-                        mobileNumber = int.parse(value);
+                        mobileNumber = value;
                       },
                       validator: (String value) {
                         if (value.isEmpty) {
@@ -518,7 +518,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
             ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         child: Container(
           height: 51,
           child: GFButton(

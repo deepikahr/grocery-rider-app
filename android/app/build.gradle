@@ -33,7 +33,6 @@ if (keystorePropertiesFile.exists()) {
 def googleMapApiKey = System.getenv("ANDROID_GOOGLE_MAP_API_KEY")
 android {
     compileSdkVersion 29
-   
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
