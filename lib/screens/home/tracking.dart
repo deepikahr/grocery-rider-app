@@ -348,6 +348,7 @@ class _TrackingState extends State<Tracking> {
                   buildPaymentInfoBlock(),
                   SizedBox(height: 20),
                   buildDeliveredButton(),
+                  SizedBox(height: 300),
                 ],
               ),
             ),
@@ -583,7 +584,7 @@ class _TrackingState extends State<Tracking> {
                     order['order']['paymentType'] == 'COD'
                         ? MyLocalizations.of(context)
                             .getLocalizations("CASH_ON_DELIVERY")
-                        : order['order']['paymentType'] == 'CARD'
+                        : order['order']['paymentType'] == 'STRIPE'
                             ? MyLocalizations.of(context)
                                 .getLocalizations("PAYBYCARD")
                             : order['order']['paymentType']),
@@ -597,6 +598,10 @@ class _TrackingState extends State<Tracking> {
                     ? Container()
                     : orderSummary(context, "DELIVERY_CHARGES",
                         "$currency${order['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}"),
+                order['cart']['couponAmount'] == 0
+                    ? Container()
+                    : orderSummary(context, "DISCOUNT",
+                        "$currency${order['cart']['couponAmount'].toDouble().toStringAsFixed(2)}"),
                 orderSummary(context, "TOTAL",
                     "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
               ],
