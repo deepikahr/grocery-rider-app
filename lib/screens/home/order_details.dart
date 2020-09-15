@@ -21,9 +21,10 @@ class OrderDetails extends StatefulWidget {
   @override
   _OrderDetailsState createState() => _OrderDetailsState();
 }
+
 class _OrderDetailsState extends State<OrderDetails> {
   Map order;
-  String currency,mobileNumber;
+  String currency, mobileNumber;
   bool orderDataLoading = false;
   var fullName, deliveryAddress;
 
@@ -171,6 +172,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                   ? Container()
                   : orderSummary(context, "DELIVERY_CHARGES",
                       "$currency${order['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}"),
+              order['cart']['couponAmount'] == 0
+                  ? Container()
+                  : orderSummary(context, "DISCOUNT",
+                      "$currency${order['cart']['couponAmount'].toDouble().toStringAsFixed(2)}"),
               orderSummary(context, "TOTAL",
                   "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
             ],

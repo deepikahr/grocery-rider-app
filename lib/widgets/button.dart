@@ -13,10 +13,7 @@ Widget buttonPrimary(BuildContext context, title, bool isloading) {
       BoxShadow(color: Colors.black.withOpacity(0.29), blurRadius: 5)
     ]),
     child: Padding(
-      padding: const EdgeInsets.only(
-        left: 0.0,
-        right: 0.0,
-      ),
+      padding: const EdgeInsets.only(left: 0.0, right: 0.0),
       child: GFButton(
           color: primary,
           blockButton: true,
@@ -44,14 +41,11 @@ Widget buttonSecondry(BuildContext context, title, bool isloading) {
     height: 55,
     color: secondary,
     margin: EdgeInsets.only(top: 30, bottom: 20, right: 20, left: 20),
-    decoration: BoxDecoration(boxShadow: [
-      BoxShadow(color: Colors.black.withOpacity(0.29), blurRadius: 5)
-    ]),
+    // decoration: BoxDecoration(boxShadow: [
+    //   BoxShadow(color: Colors.black.withOpacity(0.29), blurRadius: 5)
+    // ]),
     child: Padding(
-      padding: const EdgeInsets.only(
-        left: 0.0,
-        right: 0.0,
-      ),
+      padding: const EdgeInsets.only(left: 0.0, right: 0.0),
       child: GFButton(
           color: secondary,
           blockButton: true,
@@ -153,6 +147,7 @@ Widget alartAcceptRejectButton(BuildContext context, title, bool isloading) {
 Widget deliveredButton(
     BuildContext context, title, bool isOrderStatusDeliveredLoading) {
   return Container(
+    color: secondary,
     margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
     child: GFButton(
         onPressed: null,
