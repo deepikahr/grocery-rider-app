@@ -44,7 +44,6 @@ class _OrderDetailsState extends State<OrderDetails> {
       });
     }
     await APIService.getOrderHistory(widget.orderID).then((value) {
-      print(value);
       if (value['response_data'] != null && mounted) {
         setState(() {
           if (mounted) {
