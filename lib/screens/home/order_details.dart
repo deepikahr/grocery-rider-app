@@ -162,6 +162,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                           ? MyLocalizations.of(context)
                               .getLocalizations("PAYBYCARD")
                           : order['order']['paymentType']),
+              orderSummary(
+                  context,
+                  "PAYMENT_STATUS",MyLocalizations.of(context).getLocalizations(order['order']['paymentStatus'])
+                ),
               orderSummary(context, "SUB_TOTAL",
                   "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
               order['cart']['tax'] == 0
