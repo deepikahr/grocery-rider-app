@@ -44,6 +44,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       });
     }
     await APIService.getOrderHistory(widget.orderID).then((value) {
+      print(value);
       if (value['response_data'] != null && mounted) {
         setState(() {
           if (mounted) {
@@ -162,6 +163,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                           ? MyLocalizations.of(context)
                               .getLocalizations("PAYBYCARD")
                           : order['order']['paymentType']),
+              orderSummary(context, "PAYMENT_STATUS", order['order']['paymentStatus']),           
               orderSummary(context, "SUB_TOTAL",
                   "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
               order['cart']['tax'] == 0
