@@ -602,8 +602,14 @@ class _TrackingState extends State<Tracking> {
                     ? Container()
                     : orderSummary(context, "DISCOUNT",
                         "$currency${order['cart']['couponAmount'].toDouble().toStringAsFixed(2)}"),
+                order['cart']['walletAmount'] == 0
+                    ? Container()
+                    : orderSummary(context, "WALLET",
+                        "$currency${order['cart']['walletAmount'].toDouble().toStringAsFixed(2)}"),
+                Divider(),
                 orderSummary(context, "TOTAL",
                     "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
+                Divider(),
               ],
             ),
           ),

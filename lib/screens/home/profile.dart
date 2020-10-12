@@ -93,10 +93,10 @@ class _ProfileState extends State<Profile> {
           profileInfo = value['response_data'];
           nameController.text =
               '${profileInfo['firstName']} ${profileInfo['lastName']}';
-          if (profileInfo['completedOrder'] == null) {
-            countController.text = "";
+          if (profileInfo['orderDelivered'] == null) {
+            countController.text = "0";
           } else {
-            countController.text = profileInfo['completedOrder'].toString();
+            countController.text = profileInfo['orderDelivered'].toString();
           }
           numberController.text = profileInfo['mobileNumber'].toString() ?? '';
           emailController.text = profileInfo['email'].toString() ?? '';
