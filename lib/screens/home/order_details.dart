@@ -162,6 +162,11 @@ class _OrderDetailsState extends State<OrderDetails> {
                           ? MyLocalizations.of(context)
                               .getLocalizations("PAYBYCARD")
                           : order['order']['paymentType']),
+              orderSummary(
+                  context,
+                  "PAYMENT_STATUS",
+                  MyLocalizations.of(context)
+                      .getLocalizations(order['order']['paymentStatus'])),
               orderSummary(context, "SUB_TOTAL",
                   "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
               order['cart']['tax'] == 0
@@ -176,8 +181,14 @@ class _OrderDetailsState extends State<OrderDetails> {
                   ? Container()
                   : orderSummary(context, "DISCOUNT",
                       "$currency${order['cart']['couponAmount'].toDouble().toStringAsFixed(2)}"),
+              order['cart']['walletAmount'] == 0
+                  ? Container()
+                  : orderSummary(context, "WALLET",
+                      "$currency${order['cart']['walletAmount'].toDouble().toStringAsFixed(2)}"),
+              Divider(),
               orderSummary(context, "TOTAL",
                   "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
+              Divider(),
             ],
           ),
         )

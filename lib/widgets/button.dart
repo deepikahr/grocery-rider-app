@@ -207,7 +207,7 @@ Widget startAndStartedButton(BuildContext context, String startButtonText,
       onPressed: null,
       child: isOrderStatusOutForDeliveryLoading
           ? GFLoader(type: GFLoaderType.ios)
-          : Text(startButtonText),
+          : Text(MyLocalizations.of(context).getLocalizations(startButtonText)),
       textStyle: titleRPM(startButtonText == 'START' ? red : primary),
       icon: Icon(
         startButtonText == 'START' ? Icons.play_arrow : Icons.check,
