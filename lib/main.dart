@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:grocerydelivery/models/no-connection.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/screens/home/tabs.dart';
 import 'package:grocerydelivery/services/api_service.dart';
@@ -19,13 +21,17 @@ import 'services/constants.dart';
 import 'services/localizations.dart';
 import 'styles/styles.dart';
 
-Timer onesignlTimer;
+Timer onesignlTimer, connectivityTimer;
 void main() async {
   await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
   initPlatformPlayerState();
   onesignlTimer = Timer.periodic(Duration(seconds: 4), (timer) {
     initPlatformPlayerState();
+  });
+  checkInternatConnection();
+  connectivityTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+    checkInternatConnection();
   });
   runZoned<Future<Null>>(() {
     runApp(MaterialApp(
@@ -45,9 +51,21 @@ void main() async {
         statusBarIconBrightness: Brightness.dark));
     APIService.getLanguageJson(locale).then((value) async {
       localizedValues = value['response_data']['json'];
-      defaultLocale = value['response_data']['languageCode'];
-      locale = defaultLocale;
-
+      locale = value['response_data']['languageCode'];
+      String title, msg;
+      if (value['response_data']['json'][locale]['NO_INTERNET'] == null) {
+        title = "No Internet connection";
+      } else {
+        title = value['response_data']['json'][locale]['NO_INTERNET'];
+      }
+      if (value['response_data']['json'][locale]['NO_INTERNET_MSG'] == null) {
+        msg =
+            "requires an internet connection. Chcek you connection then try again.";
+      } else {
+        msg = value['response_data']['json'][locale]['NO_INTERNET_MSG'];
+      }
+      await Common.setNoConnection(
+          {"NO_INTERNET": title, "NO_INTERNET_MSG": msg});
       await Common.setSelectedLanguage(locale);
       runZoned<Future<Null>>(() {
         runApp(
@@ -67,6 +85,33 @@ void main() async {
       }, onError: (error, stackTrace) {});
     });
   });
+}
+
+checkInternatConnection() async {
+  var connectivityResult = await (Connectivity().checkConnectivity());
+  if (connectivityResult == ConnectivityResult.none) {
+    Common.getNoConnection().then((value) {
+      String title, msg;
+      if (value == null) {
+        title = "No Internet connection";
+        msg =
+            "requires an internet connection. Chcek you connection then try again.";
+      } else {
+        title = value["NO_INTERNET"];
+        msg = value["NO_INTERNET_MSG"];
+      }
+      Common.setNoConnection({"NO_INTERNET": title, "NO_INTERNET_MSG": msg});
+      Common.getNoConnection().then((value) {
+        runZoned<Future<Null>>(() {
+          runApp(MaterialApp(
+              home: ConnectivityPage(
+                  title: value['NO_INTERNET'], msg: value['NO_INTERNET_MSG']),
+              debugShowCheckedModeBanner: false));
+          return Future.value(null);
+        }, onError: (error, stackTrace) {});
+      });
+    });
+  }
 }
 
 void initPlatformPlayerState() async {

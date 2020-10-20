@@ -30,6 +30,7 @@ dependencies:
   http_interceptor: ^0.3.2
   fluttertoast: ^7.0.1
   image_picker: ^0.6.3+1
+  connectivity: ^0.4.9+5
   flutter_localizations:
     sdk: flutter
 
@@ -64,6 +65,8 @@ flutter:
     - lib/assets/icons/storepin.png
     - lib/assets/icons/timer.png
     - lib/assets/splash.png
+    - lib/assets/noconnection.png
+    
   fonts:
     - family: PoppinsBold
       fonts:
