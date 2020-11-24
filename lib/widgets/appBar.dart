@@ -19,6 +19,6 @@ Widget appBar(BuildContext context, title) {
       backgroundColor: primary,
       title: Text(MyLocalizations.of(context).getLocalizations(title),
           style: titleWPS()),
-      centerTitle: true,
-      automaticallyImplyLeading: false);
+      iconTheme: IconThemeData(color: Colors.white),
+      centerTitle: true);
 }

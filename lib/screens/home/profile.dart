@@ -34,10 +34,9 @@ class _ProfileState extends State<Profile> {
   TextEditingController countController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   SocketService socket;
-
   List languagesList;
   bool languagesListLoading = false, isProfileLoading = false;
-
+  var selectedLanguages;
   @override
   void initState() {
     socket = Provider.of<SocketModel>(context, listen: false).getSocketInstance;
@@ -58,6 +57,11 @@ class _ProfileState extends State<Profile> {
           if (mounted) {
             setState(() {
               languagesList = value['response_data'];
+              for (int i = 0; i < languagesList.length; i++) {
+                if (languagesList[i]['languageCode'] == widget.locale) {
+                  selectedLanguages = languagesList[i]['languageName'];
+                }
+              }
               languagesListLoading = false;
             });
           }
@@ -88,7 +92,6 @@ class _ProfileState extends State<Profile> {
     }
     AuthService.getUserInfo().then((value) {
       if (value['response_data'] != null && mounted) {
-        print(value);
         setState(() {
           profileInfo = value['response_data'];
           nameController.text =
@@ -138,9 +141,18 @@ class _ProfileState extends State<Profile> {
                       itemBuilder: (BuildContext context, int i) {
                         return GFButton(
                             onPressed: () async {
-                              Common.setSelectedLanguage(
+                              setState(() {
+                                selectedLanguages =
+                                    languagesList[i]['languageName'];
+                              });
+                              await Common.setSelectedLanguage(
                                   languagesList[i]['languageCode']);
-                              main();
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          DeliveryApp()),
+                                  (Route<dynamic> route) => false);
                             },
                             type: GFButtonType.transparent,
                             child: alertText(context,
@@ -240,8 +252,16 @@ class _ProfileState extends State<Profile> {
                                     onTap: () {
                                       selectLanguagesMethod();
                                     },
-                                    child: buildContainerField(
-                                        context, "SELECT_LANGUAGE"))
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        buildContainerField(
+                                            context, "CHANGE_LANGUAGE"),
+                                        buildContainerField(
+                                            context, selectedLanguages ?? ""),
+                                      ],
+                                    ))
                                 : Container(),
                             SizedBox(height: 20),
                             InkWell(
@@ -280,7 +300,11 @@ class _ProfileState extends State<Profile> {
               Future.delayed(Duration(milliseconds: 1500), () async {
                 await Common.setToken(null);
                 await Common.setAccountID(null);
-                main();
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => DeliveryApp()),
+                    (Route<dynamic> route) => false);
               });
             });
           });

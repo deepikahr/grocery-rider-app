@@ -8,6 +8,7 @@ import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
+import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:grocerydelivery/widgets/normalText.dart';
 import 'package:image_picker/image_picker.dart';
@@ -181,7 +182,6 @@ class _EditProfileState extends State<EditProfile> {
       await response.stream.transform(utf8.decoder).listen((value) async {
         Map<String, dynamic> data;
         data = json.decode(value);
-        print(data);
         updateUserInfo(data['response_data']['url'],
             data['response_data']['key'], data['response_data']['filePath']);
       });
@@ -273,15 +273,7 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: primary,
-        title: Text(
-          MyLocalizations.of(context).getLocalizations("EDIT_PROFILE"),
-          style: titleWPS(),
-        ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
+      appBar: appBar(context, "EDIT_PROFILE"),
       body: isLoading
           ? SquareLoader()
           : Form(
