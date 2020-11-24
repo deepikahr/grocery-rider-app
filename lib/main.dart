@@ -12,6 +12,7 @@ import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
+import 'package:grocerydelivery/services/json-data.dart';
 import 'package:grocerydelivery/services/socket.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
@@ -34,57 +35,14 @@ void main() async {
     checkInternatConnection();
   });
   runZoned<Future<Null>>(() {
-    runApp(MaterialApp(
-      home: AnimatedScreen(),
-      debugShowCheckedModeBanner: false,
-    ));
+    runApp(
+      MultiProvider(providers: [
+        ChangeNotifierProvider(create: (context) => SocketModel()),
+        ChangeNotifierProvider(create: (context) => LocationModel()),
+      ], child: DeliveryApp()),
+    );
     return Future.value(null);
-    // ignore: deprecated_member_use
   }, onError: (error, stackTrace) {});
-
-  Common.getSelectedLanguage().then((selectedLocale) {
-    Map localizedValues;
-    String defaultLocale = '';
-    String locale = selectedLocale ?? defaultLocale;
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.dark));
-    APIService.getLanguageJson(locale).then((value) async {
-      localizedValues = value['response_data']['json'];
-      locale = value['response_data']['languageCode'];
-      String title, msg;
-      if (value['response_data']['json'][locale]['NO_INTERNET'] == null) {
-        title = "No Internet connection";
-      } else {
-        title = value['response_data']['json'][locale]['NO_INTERNET'];
-      }
-      if (value['response_data']['json'][locale]['NO_INTERNET_MSG'] == null) {
-        msg =
-            "requires an internet connection. Chcek you connection then try again.";
-      } else {
-        msg = value['response_data']['json'][locale]['NO_INTERNET_MSG'];
-      }
-      await Common.setNoConnection(
-          {"NO_INTERNET": title, "NO_INTERNET_MSG": msg});
-      await Common.setSelectedLanguage(locale);
-      runZoned<Future<Null>>(() {
-        runApp(
-          MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (context) => SocketModel()),
-              ChangeNotifierProvider(create: (context) => LocationModel()),
-            ],
-            child: DeliveryApp(
-              locale: locale,
-              localizedValues: localizedValues,
-            ),
-          ),
-        );
-        return Future.value(null);
-        // ignore: deprecated_member_use
-      }, onError: (error, stackTrace) {});
-    });
-  });
 }
 
 checkInternatConnection() async {
@@ -151,15 +109,6 @@ void setPlayerId() async {
 }
 
 class DeliveryApp extends StatefulWidget {
-  final String locale;
-  final Map localizedValues;
-
-  DeliveryApp({
-    Key key,
-    this.locale,
-    this.localizedValues,
-  });
-
   @override
   _DeliveryAppState createState() => _DeliveryAppState();
 }
@@ -167,11 +116,58 @@ class DeliveryApp extends StatefulWidget {
 class _DeliveryAppState extends State<DeliveryApp> {
   bool isLoggedIn = false, checkDeliveyDisOrNot = false;
   SocketService socket = SocketService();
-
+  Map localizedValues;
+  String locale;
+  bool isGetJsonLoading = false;
   @override
   void initState() {
+    getJson();
     checkAUthentication();
     super.initState();
+  }
+
+  getJson() async {
+    setState(() {
+      isGetJsonLoading = true;
+    });
+    await Common.getSelectedLanguage().then((selectedLocale) async {
+      String defaultLocale = '';
+      locale = selectedLocale ?? defaultLocale;
+      await APIService.getLanguageJson(locale).then((value) async {
+        setState(() {
+          isGetJsonLoading = false;
+        });
+        localizedValues = value['response_data']['json'];
+        locale = value['response_data']['languageCode'];
+        Common.setNoConnection({
+          "NO_INTERNET": value['response_data']['json'][locale]["NO_INTERNET"],
+          "ONLINE_MSG": value['response_data']['json'][locale]["ONLINE_MSG"],
+          "NO_INTERNET_MSG": value['response_data']['json'][locale]
+              ["NO_INTERNET_MSG"]
+        });
+
+        // localizedValues = JsonData.englishJson;
+        // locale = JsonData.englishJsonCode;
+        // Common.setNoConnection({
+        //   "NO_INTERNET": JsonData.englishJson[locale]["NO_INTERNET"],
+        //   "ONLINE_MSG": JsonData.englishJson[locale]["ONLINE_MSG"],
+        //   "NO_INTERNET_MSG": JsonData.englishJson[locale]["NO_INTERNET_MSG"]
+        // });
+        await Common.setSelectedLanguage(locale);
+      });
+    }).catchError((onError) {
+      setState(() async {
+        isGetJsonLoading = false;
+        localizedValues = JsonData.englishJson;
+        locale = JsonData.englishJsonCode;
+        Common.setNoConnection({
+          "NO_INTERNET": JsonData.englishJson[locale]["NO_INTERNET"],
+          "ONLINE_MSG": JsonData.englishJson[locale]["ONLINE_MSG"],
+          "NO_INTERNET_MSG": JsonData.englishJson[locale]["NO_INTERNET_MSG"]
+        });
+        await Common.setSelectedLanguage(locale);
+      });
+    });
   }
 
   void checkAUthentication() async {
@@ -207,31 +203,30 @@ class _DeliveryAppState extends State<DeliveryApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: Locale(widget.locale),
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues, [widget.locale]),
-        GlobalWidgetsLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        DefaultCupertinoLocalizations.delegate
-      ],
-      supportedLocales: [Locale(widget.locale)],
-      debugShowCheckedModeBanner: false,
-      title: Constants.appName,
-      theme: ThemeData(primaryColor: primary, accentColor: primary),
-      home: checkDeliveyDisOrNot
-          ? AnimatedScreen()
-          : isLoggedIn == false
-              ? LOGIN(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues,
-                )
-              : Tabs(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues,
-                ),
-    );
+    return isGetJsonLoading || checkDeliveyDisOrNot
+        ? MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: Constants.appName,
+            theme: ThemeData(primaryColor: primary, accentColor: primary),
+            darkTheme: ThemeData(brightness: Brightness.dark),
+            home: AnimatedScreen())
+        : MaterialApp(
+            locale: Locale(locale),
+            localizationsDelegates: [
+              MyLocalizationsDelegate(localizedValues, [locale]),
+              GlobalWidgetsLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              DefaultCupertinoLocalizations.delegate
+            ],
+            supportedLocales: [Locale(locale)],
+            debugShowCheckedModeBanner: false,
+            title: Constants.appName,
+            theme: ThemeData(primaryColor: primary, accentColor: primary),
+            home: isLoggedIn == false
+                ? LOGIN(locale: locale, localizedValues: localizedValues)
+                : Tabs(locale: locale, localizedValues: localizedValues),
+          );
   }
 }
 
@@ -243,12 +238,10 @@ class AnimatedScreen extends StatelessWidget {
         color: Colors.white,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: Image.asset(
-          'lib/assets/splash.png',
-          fit: BoxFit.cover,
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-        ),
+        child: Image.asset('lib/assets/splash.png',
+            fit: BoxFit.cover,
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width),
       ),
     );
   }

@@ -42,7 +42,6 @@ class _LOGINState extends State<LOGIN> {
           "playerId": palyerId ?? 'no id found'
         };
         AuthService.login(body).then((onValue) {
-          print(onValue);
           if (onValue['response_code'] == 205) {
             showAlert(onValue['response_data'], email.toLowerCase());
           } else if (onValue['response_data'] != null &&
