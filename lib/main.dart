@@ -12,7 +12,6 @@ import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
-import 'package:grocerydelivery/services/json-data.dart';
 import 'package:grocerydelivery/services/socket.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
@@ -144,26 +143,6 @@ class _DeliveryAppState extends State<DeliveryApp> {
           "ONLINE_MSG": value['response_data']['json'][locale]["ONLINE_MSG"],
           "NO_INTERNET_MSG": value['response_data']['json'][locale]
               ["NO_INTERNET_MSG"]
-        });
-
-        // localizedValues = JsonData.englishJson;
-        // locale = JsonData.englishJsonCode;
-        // Common.setNoConnection({
-        //   "NO_INTERNET": JsonData.englishJson[locale]["NO_INTERNET"],
-        //   "ONLINE_MSG": JsonData.englishJson[locale]["ONLINE_MSG"],
-        //   "NO_INTERNET_MSG": JsonData.englishJson[locale]["NO_INTERNET_MSG"]
-        // });
-        await Common.setSelectedLanguage(locale);
-      });
-    }).catchError((onError) {
-      setState(() async {
-        isGetJsonLoading = false;
-        localizedValues = JsonData.englishJson;
-        locale = JsonData.englishJsonCode;
-        Common.setNoConnection({
-          "NO_INTERNET": JsonData.englishJson[locale]["NO_INTERNET"],
-          "ONLINE_MSG": JsonData.englishJson[locale]["ONLINE_MSG"],
-          "NO_INTERNET_MSG": JsonData.englishJson[locale]["NO_INTERNET_MSG"]
         });
         await Common.setSelectedLanguage(locale);
       });
