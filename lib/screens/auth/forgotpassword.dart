@@ -19,7 +19,7 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
-  String email;
+  String mobileNumber;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool isVerfyEmailLoading = false;
@@ -33,7 +33,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           isVerfyEmailLoading = true;
         });
       }
-      await AuthService.forgetPassword(email.toLowerCase()).then((onValue) {
+      await AuthService.forgetPassword(mobileNumber).then((onValue) {
         try {
           if (mounted) {
             setState(() {
@@ -66,9 +66,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => Otp(
-                              email: email.toLowerCase(),
                               locale: widget.locale,
                               localizedValues: widget.localizedValues,
+                              mobileNumber: mobileNumber,
+                              sId: onValue['sId'],
                             ),
                           ),
                         );
@@ -127,7 +128,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     left: 18.0, bottom: 25.0, right: 20.0),
                 child: Text(
                   MyLocalizations.of(context)
-                      .getLocalizations("FORET_PASS_MESSAGE"),
+                      .getLocalizations("FORET_PASS_OTP_MSG"),
                   style: textbarlowRegularBlack(),
                 ),
               ),
@@ -141,7 +142,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       children: <TextSpan>[
                         TextSpan(
                             text: MyLocalizations.of(context)
-                                .getLocalizations("EMAIL"),
+                                .getLocalizations("MOBILE_NUMBER"),
                             style: textbarlowRegularBlack()),
                         TextSpan(
                           text: ' *',
@@ -158,22 +159,17 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 child: Container(
                   child: TextFormField(
                     onSaved: (String value) {
-                      email = value;
+                      mobileNumber = value;
                     },
                     validator: (String value) {
                       if (value.isEmpty) {
                         return MyLocalizations.of(context)
-                            .getLocalizations("ENTER_YOUR_EMAIL");
-                      } else if (!RegExp(
-                              r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                          .hasMatch(value)) {
-                        return MyLocalizations.of(context)
-                            .getLocalizations("ERROR_MAIL");
+                            .getLocalizations("ENTER_MOBILE_NUMBER");
                       } else
                         return null;
                     },
                     style: textBarlowRegularBlack(),
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                         errorBorder: OutlineInputBorder(
                             borderSide:
@@ -199,13 +195,5 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         ),
       ),
     );
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }

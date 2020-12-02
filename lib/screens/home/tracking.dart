@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
@@ -228,13 +229,15 @@ class _TrackingState extends State<Tracking> {
   void _initCall(number) async {
     await canLaunch('tel:$number')
         ? launch('tel:$number')
-        : Common.showSnackbar(_scaffoldKey, '$number dialing failed');
+        : AlertService()
+            .showSnackbar('$number dialing failed', context, _scaffoldKey);
   }
 
   void _launchURL(url) async {
     await canLaunch(url)
         ? launch(url)
-        : Common.showSnackbar(_scaffoldKey, '$url lauch failed');
+        : AlertService()
+            .showSnackbar('$url lauch failed', context, _scaffoldKey);
   }
 
   void _launchMap(LatLng location) async {
@@ -252,7 +255,8 @@ class _TrackingState extends State<Tracking> {
     Map body = {"status": status};
     APIService.orderStausChange(body, order['order']['_id'].toString())
         .then((value) {
-      showSnackbar(value['response_data']);
+      AlertService()
+          .showSnackbar(value['response_data'], context, _scaffoldKey);
       if (value['response_data'] != null && mounted) {
         setState(() {
           if (status == "DELIVERED") {
@@ -280,14 +284,6 @@ class _TrackingState extends State<Tracking> {
         });
       }
     });
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
   @override

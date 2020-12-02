@@ -65,7 +65,6 @@ flutter:
     - lib/assets/icons/storepin.png
     - lib/assets/icons/timer.png
     - lib/assets/splash.png
-    - lib/assets/noconnection.png
     
   fonts:
     - family: PoppinsBold

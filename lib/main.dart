@@ -1,13 +1,12 @@
 import 'dart:async';
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:grocerydelivery/models/no-connection.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/screens/home/tabs.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
@@ -21,53 +20,35 @@ import 'services/constants.dart';
 import 'services/localizations.dart';
 import 'styles/styles.dart';
 
-Timer onesignlTimer, connectivityTimer;
-void main() async {
-  await DotEnv().load('.env');
-  WidgetsFlutterBinding.ensureInitialized();
-  initPlatformPlayerState();
-  onesignlTimer = Timer.periodic(Duration(seconds: 4), (timer) {
-    initPlatformPlayerState();
-  });
-  checkInternatConnection();
-  connectivityTimer = Timer.periodic(Duration(seconds: 10), (timer) {
-    checkInternatConnection();
-  });
-  runZoned<Future<Null>>(() {
-    runApp(
-      MultiProvider(providers: [
-        ChangeNotifierProvider(create: (context) => SocketModel()),
-        ChangeNotifierProvider(create: (context) => LocationModel()),
-      ], child: DeliveryApp()),
-    );
-    return Future.value(null);
-  }, onError: (error, stackTrace) {});
+Timer oneSignalTimer, connectivityTimer;
+
+void main() {
+  initializeMain(isTest: false);
 }
 
-checkInternatConnection() async {
-  var connectivityResult = await (Connectivity().checkConnectivity());
-  if (connectivityResult == ConnectivityResult.none) {
-    Common.getNoConnection().then((value) {
-      String title, msg;
-      if (value == null) {
-        title = "No Internet connection";
-        msg =
-            "requires an internet connection. Chcek you connection then try again.";
-      } else {
-        title = value["NO_INTERNET"];
-        msg = value["NO_INTERNET_MSG"];
-      }
-      Common.setNoConnection({"NO_INTERNET": title, "NO_INTERNET_MSG": msg});
-      Common.getNoConnection().then((value) {
-        runZoned<Future<Null>>(() {
-          runApp(MaterialApp(
-              home: ConnectivityPage(
-                  title: value['NO_INTERNET'], msg: value['NO_INTERNET_MSG']),
-              debugShowCheckedModeBanner: false));
-          return Future.value(null);
-        }, onError: (error, stackTrace) {});
-      });
+void initializeMain({bool isTest}) async {
+  await DotEnv().load('.env');
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark));
+  AlertService().checkConnectionMethod();
+  runZoned<Future>(() {
+    runApp(MultiProvider(providers: [
+      ChangeNotifierProvider(create: (context) => SocketModel()),
+      ChangeNotifierProvider(create: (context) => LocationModel())
+    ], child: DeliveryApp()));
+    return Future.value(null);
+  }, onError: (error, stackTrace) {});
+  initializeLanguage(isTest: isTest);
+}
+
+void initializeLanguage({bool isTest}) async {
+  if (isTest != null && !isTest) {
+    oneSignalTimer = Timer.periodic(Duration(seconds: 4), (timer) {
+      initPlatformPlayerState();
     });
+    initPlatformPlayerState();
   }
 }
 
@@ -90,7 +71,8 @@ void initPlatformPlayerState() async {
   if (playerId != null) {
     await Common.setPlayerID(playerId);
     setPlayerId();
-    if (onesignlTimer != null && onesignlTimer.isActive) onesignlTimer.cancel();
+    if (oneSignalTimer != null && oneSignalTimer.isActive)
+      oneSignalTimer.cancel();
   }
 }
 

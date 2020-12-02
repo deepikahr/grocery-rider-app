@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/services/socket.dart';
 
@@ -59,7 +60,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
 
     APIService.orderAcceptApi(order['_id'].toString()).then((value) {
-      showSnackbar(value['response_data']);
+      AlertService()
+          .showSnackbar(value['response_data'], context, _scaffoldKey);
       if (value['response_data'] != null && mounted) {
         setState(() {
           isOrderAccept = false;
@@ -98,7 +100,8 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
     }
 
     APIService.orderRejectApi(order['_id'].toString()).then((value) {
-      showSnackbar(value['response_data']);
+      AlertService()
+          .showSnackbar(value['response_data'], context, _scaffoldKey);
       if (value['response_data'] != null && mounted) {
         setState(() {
           isOrderReject = false;
@@ -118,14 +121,6 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
         });
       }
     });
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
   @override
