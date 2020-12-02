@@ -251,19 +251,11 @@ class _ProfileState extends State<Profile> {
                             SizedBox(height: 20),
                             languagesList.length > 0
                                 ? InkWell(
-                                    onTap: () {
-                                      selectLanguagesMethod();
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        buildContainerField(
-                                            context, "CHANGE_LANGUAGE"),
-                                        buildContainerField(
-                                            context, selectedLanguages ?? ""),
-                                      ],
-                                    ))
+                                    onTap: selectLanguagesMethod,
+                                    child: buildContainerFieldRow(
+                                        context,
+                                        "CHANGE_LANGUAGE",
+                                        selectedLanguages ?? ""))
                                 : Container(),
                             SizedBox(height: 20),
                             InkWell(

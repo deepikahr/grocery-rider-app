@@ -43,6 +43,28 @@ Widget buildContainerField(BuildContext context, title) {
   );
 }
 
+Widget buildContainerFieldRow(BuildContext context, title, subTitle) {
+  return Container(
+    height: 55,
+    decoration: BoxDecoration(
+      color: Color(0xFFF7F7F7),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.only(
+          top: 10.0, bottom: 10.0, left: 20.0, right: 20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(MyLocalizations.of(context).getLocalizations(title),
+              style: titleSmallBPR()),
+          Text(MyLocalizations.of(context).getLocalizations(subTitle),
+              style: titleSmallBPR()),
+        ],
+      ),
+    ),
+  );
+}
+
 Widget alertText(BuildContext context, title, Icon icon) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
