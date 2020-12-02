@@ -447,7 +447,9 @@ class _HomeState extends State<Home> {
                         borderRadius: BorderRadius.circular(5),
                       ),
                       padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-                      child: Text(order['address']['addressType'],
+                      child: Text(
+                          MyLocalizations.of(context).getLocalizations(
+                              order['address']['addressType'] ?? ""),
                           style: TextStyle(
                               color: greyA,
                               fontSize: 12,
@@ -553,7 +555,9 @@ class _HomeState extends State<Home> {
                         borderRadius: BorderRadius.circular(5),
                       ),
                       padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-                      child: Text(order['address']['addressType'],
+                      child: Text(
+                          MyLocalizations.of(context).getLocalizations(
+                              order['address']['addressType'] ?? ""),
                           style: TextStyle(
                               color: greyA,
                               fontSize: 12,

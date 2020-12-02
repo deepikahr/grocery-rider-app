@@ -37,67 +37,48 @@ class _ChangePasswordState extends State<ChangePassword> {
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
-      if (newPassword == oldPassword) {
-        AlertService()
-            .showSnackbar("DO_NOT_ENTER_SAME_PASS", context, _scaffoldKey);
-      } else {
-        if (mounted) {
-          setState(() {
-            isChangePasswordLoading = true;
-          });
-        }
-        Map<String, dynamic> body = {
-          "currentPassword": oldPassword,
-          "newPassword": newPassword,
-          "confirmPassword": confirmPassword
-        };
-        await AuthService.changePassword(body).then((onValue) {
-          try {
-            if (mounted) {
-              setState(() {
-                isChangePasswordLoading = false;
-              });
-            }
-            AlertService()
-                .showSnackbar(onValue['response_data'], context, _scaffoldKey);
-            Common.getSelectedLanguage().then((selectedLocale) async {
-              Map body = {"language": selectedLocale, "playerId": null};
-              AuthService.updateUserInfo(body).then((value) async {
-                await Common.setToken(null);
-                await Common.setAccountID(null);
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => LOGIN(
-                        locale: widget.locale,
-                        localizedValues: widget.localizedValues,
-                      ),
-                    ),
-                    (Route<dynamic> route) => false);
-              });
-            });
-          } catch (error) {
-            if (mounted) {
-              setState(() {
-                isChangePasswordLoading = false;
-              });
-            }
-          }
-        }).catchError((error) {
-          if (mounted) {
-            setState(() {
-              isChangePasswordLoading = false;
-            });
-          }
-        });
-      }
-    } else {
+
       if (mounted) {
         setState(() {
-          isChangePasswordLoading = false;
+          isChangePasswordLoading = true;
         });
       }
-      return;
+      Map<String, dynamic> body = {
+        "currentPassword": oldPassword,
+        "newPassword": newPassword,
+        "confirmPassword": confirmPassword
+      };
+      await AuthService.changePassword(body).then((onValue) {
+        if (mounted) {
+          setState(() {
+            isChangePasswordLoading = false;
+          });
+        }
+        AlertService()
+            .showSnackbar(onValue['response_data'], context, _scaffoldKey);
+        Common.getSelectedLanguage().then((selectedLocale) async {
+          Map body = {"language": selectedLocale, "playerId": null};
+          AuthService.updateUserInfo(body).then((value) async {
+            await Common.setToken(null);
+            await Common.setAccountID(null);
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => LOGIN(
+                    locale: widget.locale,
+                    localizedValues: widget.localizedValues,
+                  ),
+                ),
+                (Route<dynamic> route) => false);
+          });
+        });
+      }).catchError((error) {
+        if (mounted) {
+          setState(() {
+            isChangePasswordLoading = false;
+          });
+        }
+      });
     }
   }
 
