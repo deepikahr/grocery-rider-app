@@ -3,6 +3,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/main.dart';
 import 'package:grocerydelivery/screens/auth/changePassword.dart';
 import 'package:grocerydelivery/screens/home/editProfile.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
@@ -101,7 +102,8 @@ class _ProfileState extends State<Profile> {
           } else {
             countController.text = profileInfo['orderDelivered'].toString();
           }
-          numberController.text = profileInfo['mobileNumber'].toString() ?? '';
+          numberController.text =
+              "${profileInfo['countryCode'] ?? ""} ${profileInfo['mobileNumber'] ?? ""}";
           emailController.text = profileInfo['email'].toString() ?? '';
           isProfileLoading = false;
         });
@@ -295,8 +297,8 @@ class _ProfileState extends State<Profile> {
           Common.getSelectedLanguage().then((selectedLocale) async {
             Map body = {"language": selectedLocale, "playerId": null};
             AuthService.updateUserInfo(body).then((value) async {
-              showSnackbar(MyLocalizations.of(context)
-                  .getLocalizations("LOGOUT_SUCCESSFULL"));
+              AlertService()
+                  .showSnackbar("LOGOUT_SUCCESSFULL", context, _scaffoldKey);
               Future.delayed(Duration(milliseconds: 1500), () async {
                 await Common.setToken(null);
                 await Common.setAccountID(null);
@@ -310,13 +312,5 @@ class _ProfileState extends State<Profile> {
           });
         },
         child: logoutButton(context, "LOGOUT"));
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }

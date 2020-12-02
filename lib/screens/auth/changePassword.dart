@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
@@ -37,8 +38,8 @@ class _ChangePasswordState extends State<ChangePassword> {
     if (form.validate()) {
       form.save();
       if (newPassword == oldPassword) {
-        showSnackbar(MyLocalizations.of(context)
-            .getLocalizations("DO_NOT_ENTER_SAME_PASS"));
+        AlertService()
+            .showSnackbar("DO_NOT_ENTER_SAME_PASS", context, _scaffoldKey);
       } else {
         if (mounted) {
           setState(() {
@@ -57,7 +58,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                 isChangePasswordLoading = false;
               });
             }
-            showSnackbar(onValue['response_data']);
+            AlertService()
+                .showSnackbar(onValue['response_data'], context, _scaffoldKey);
             Common.getSelectedLanguage().then((selectedLocale) async {
               Map body = {"language": selectedLocale, "playerId": null};
               AuthService.updateUserInfo(body).then((value) async {
@@ -340,13 +342,5 @@ class _ChangePasswordState extends State<ChangePassword> {
         ),
       ),
     );
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }
