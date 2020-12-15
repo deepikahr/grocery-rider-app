@@ -9,7 +9,7 @@ import 'package:grocerydelivery/styles/styles.dart';
 
 class AlertService {
   Timer checkConnectionTimer;
-  bool isFirstTime = true;
+  bool isFirstTime = false;
   AppLifecycleState state;
   checkConnectionMethod() async {
     if (checkConnectionTimer != null && checkConnectionTimer.isActive)
