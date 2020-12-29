@@ -6,7 +6,7 @@ import 'package:grocerydelivery/styles/styles.dart';
 Widget appBarPrimary(BuildContext context, title) {
   return GFAppBar(
       title: Text(
-        MyLocalizations.of(context).getLocalizations(title),
+        MyLocalizations.of(context).getLocalizations(title ?? ""),
         style: titleWPS(),
       ),
       centerTitle: true,
@@ -17,8 +17,8 @@ Widget appBarPrimary(BuildContext context, title) {
 Widget appBar(BuildContext context, title) {
   return AppBar(
       backgroundColor: primary,
-      title: Text(MyLocalizations.of(context).getLocalizations(title),
+      title: Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
           style: titleWPS()),
-      iconTheme: IconThemeData(color: Colors.white),
-      centerTitle: true);
+      centerTitle: true,
+      automaticallyImplyLeading: false);
 }

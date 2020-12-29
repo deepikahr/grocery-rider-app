@@ -255,8 +255,7 @@ class _TrackingState extends State<Tracking> {
     Map body = {"status": status};
     APIService.orderStausChange(body, order['order']['_id'].toString())
         .then((value) {
-      AlertService()
-          .showSnackbar(value['response_data'], context, _scaffoldKey);
+      showSnackbar(value['response_data']);
       if (value['response_data'] != null && mounted) {
         setState(() {
           if (status == "DELIVERED") {
@@ -284,6 +283,14 @@ class _TrackingState extends State<Tracking> {
         });
       }
     });
+  }
+
+  void showSnackbar(message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(milliseconds: 3000),
+    );
+    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
   @override
@@ -574,16 +581,7 @@ class _TrackingState extends State<Tracking> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                orderSummary(
-                    context,
-                    "PAYMENT",
-                    order['order']['paymentType'] == 'COD'
-                        ? MyLocalizations.of(context)
-                            .getLocalizations("CASH_ON_DELIVERY")
-                        : order['order']['paymentType'] == 'STRIPE'
-                            ? MyLocalizations.of(context)
-                                .getLocalizations("PAYBYCARD")
-                            : order['order']['paymentType']),
+                orderSummary(context, "PAYMENT", order['order']['paymentType']),
                 orderSummary(context, "SUB_TOTAL",
                     "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
                 order['cart']['tax'] == 0
