@@ -21,9 +21,10 @@ class OrderDetails extends StatefulWidget {
   @override
   _OrderDetailsState createState() => _OrderDetailsState();
 }
+
 class _OrderDetailsState extends State<OrderDetails> {
   Map order;
-  String currency,mobileNumber;
+  String currency, mobileNumber;
   bool orderDataLoading = false;
   var fullName, deliveryAddress;
 
@@ -86,7 +87,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(context, "ORDER_DETAILS"),
+      appBar: appBarPrimary(context, "ORDER_DETAILS"),
       backgroundColor: greyA,
       body: orderDataLoading
           ? SquareLoader()
@@ -105,24 +106,14 @@ class _OrderDetailsState extends State<OrderDetails> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            fullName,
-            style: titleXLargeBPSB(),
-          ),
+          Text(fullName, style: titleXLargeBPSB()),
           SizedBox(height: 20),
-          Text(
-            MyLocalizations.of(context).getLocalizations("ADDRESS", true),
-            style: keyText(),
-          ),
-          Text(
-            deliveryAddress,
-            style: titleLargeBPM(),
-          ),
+          Text(MyLocalizations.of(context).getLocalizations("ADDRESS", true),
+              style: keyText()),
+          Text(deliveryAddress, style: titleLargeBPM()),
           SizedBox(height: 20),
-          Text(
-            MyLocalizations.of(context).getLocalizations("ITEMS", true),
-            style: keyText(),
-          ),
+          Text(MyLocalizations.of(context).getLocalizations("ITEMS", true),
+              style: keyText()),
           ListView.builder(
               physics: ScrollPhysics(),
               shrinkWrap: true,
@@ -151,16 +142,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                   "#${order['order']['orderID'].toString()}"),
               orderSummary(context, "DATE", order['order']['deliveryDate']),
               orderSummary(context, "TIME", order['order']['deliveryTime']),
+              orderSummary(context, "PAYMENT", order['order']['paymentType']),
               orderSummary(
-                  context,
-                  "PAYMENT",
-                  order['order']['paymentType'] == 'COD'
-                      ? MyLocalizations.of(context)
-                          .getLocalizations("CASH_ON_DELIVERY")
-                      : order['order']['paymentType'] == 'STRIPE'
-                          ? MyLocalizations.of(context)
-                              .getLocalizations("PAYBYCARD")
-                          : order['order']['paymentType']),
+                  context, "PAYMENT_STATUS", order['order']['paymentStatus']),
               orderSummary(context, "SUB_TOTAL",
                   "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
               order['cart']['tax'] == 0
@@ -171,8 +155,18 @@ class _OrderDetailsState extends State<OrderDetails> {
                   ? Container()
                   : orderSummary(context, "DELIVERY_CHARGES",
                       "$currency${order['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}"),
+              order['cart']['couponAmount'] == 0
+                  ? Container()
+                  : orderSummary(context, "DISCOUNT",
+                      "$currency${order['cart']['couponAmount'].toDouble().toStringAsFixed(2)}"),
+              order['cart']['walletAmount'] == 0
+                  ? Container()
+                  : orderSummary(context, "WALLET",
+                      "$currency${order['cart']['walletAmount'].toDouble().toStringAsFixed(2)}"),
+              Divider(),
               orderSummary(context, "TOTAL",
                   "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
+              Divider(),
             ],
           ),
         )

@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
+import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:grocerydelivery/widgets/normalText.dart';
 import 'package:image_picker/image_picker.dart';
@@ -32,8 +34,7 @@ class _EditProfileState extends State<EditProfile> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Map<String, dynamic> userInfo;
   bool isLoading = false, isPicUploading = false, profileEdit = false;
-  String firstName, lastName;
-  String mobileNumber;
+  String firstName, lastName, email;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var image;
   @override
@@ -74,7 +75,9 @@ class _EditProfileState extends State<EditProfile> {
           isPicUploading = false;
         });
       }
-      showSnackbar(onValue['response_data']);
+      AlertService()
+          .showSnackbar(onValue['response_data'], context, _scaffoldKey);
+
       Future.delayed(Duration(milliseconds: 2500), () {
         Navigator.of(context).pop(true);
       });
@@ -104,7 +107,7 @@ class _EditProfileState extends State<EditProfile> {
       Map<String, dynamic> body = {
         "firstName": firstName,
         "lastName": lastName,
-        "mobileNumber": mobileNumber
+        "email": email.toLowerCase()
       };
 
       await AuthService.updateUserInfo(body).then((onValue) {
@@ -113,7 +116,8 @@ class _EditProfileState extends State<EditProfile> {
             profileEdit = false;
           });
         }
-        showSnackbar(onValue['response_data']);
+        AlertService()
+            .showSnackbar(onValue['response_data'], context, _scaffoldKey);
         Future.delayed(Duration(milliseconds: 2500), () {
           Navigator.of(context).pop(true);
         });
@@ -181,7 +185,6 @@ class _EditProfileState extends State<EditProfile> {
       await response.stream.transform(utf8.decoder).listen((value) async {
         Map<String, dynamic> data;
         data = json.decode(value);
-        print(data);
         updateUserInfo(data['response_data']['url'],
             data['response_data']['key'], data['response_data']['filePath']);
       });
@@ -256,7 +259,8 @@ class _EditProfileState extends State<EditProfile> {
         setState(() {
           isPicUploading = false;
           Navigator.of(context).pop();
-          showSnackbar(value['response_data']);
+          AlertService()
+              .showSnackbar(value['response_data'], context, _scaffoldKey);
           updateUserInfo(null, null, null);
         });
       }
@@ -273,15 +277,7 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: primary,
-        title: Text(
-          MyLocalizations.of(context).getLocalizations("EDIT_PROFILE"),
-          style: titleWPS(),
-        ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
+      appBar: appBar(context, "EDIT_PROFILE"),
       body: isLoading
           ? SquareLoader()
           : Form(
@@ -359,10 +355,12 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                   Center(
-                    child: Text(
-                      userInfo['email'] ?? "",
-                      style: textBarlowRegularBlack(),
-                    ),
+                    child: Text((userInfo['mobileNumber'] ?? "").toString(),
+                        style: textBarlowRegularBlack()),
+                  ),
+                  Center(
+                    child: Text(userInfo['email'] ?? "",
+                        style: textBarlowRegularBlack()),
                   ),
                   SizedBox(height: 20),
                   Padding(
@@ -465,19 +463,19 @@ class _EditProfileState extends State<EditProfile> {
                   SizedBox(height: 25),
                   Padding(
                     padding: const EdgeInsets.only(
-                        left: 18.0, bottom: 5.0, right: 18.0),
+                        left: 18.0, right: 18.0, bottom: 5, top: 5),
                     child: Text(
                       MyLocalizations.of(context)
-                          .getLocalizations("CONTACT_NUMBER", true),
+                          .getLocalizations("EMAIL", true),
                       style: textbarlowRegularBlack(),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 15.0, right: 15.0),
                     child: TextFormField(
-                      initialValue: userInfo['mobileNumber'].toString() ?? "",
+                      initialValue: userInfo['email'] ?? "",
                       style: textBarlowRegularBlack(),
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         errorBorder: OutlineInputBorder(
                             borderSide:
@@ -486,11 +484,7 @@ class _EditProfileState extends State<EditProfile> {
                         fillColor: Colors.black,
                         focusColor: Colors.black,
                         contentPadding: EdgeInsets.only(
-                          left: 15.0,
-                          right: 15.0,
-                          top: 10.0,
-                          bottom: 10.0,
-                        ),
+                            left: 15.0, right: 15.0, top: 10.0, bottom: 10.0),
                         enabledBorder: const OutlineInputBorder(
                           borderSide:
                               const BorderSide(color: Colors.grey, width: 0.0),
@@ -500,20 +494,21 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
                       onSaved: (String value) {
-                        mobileNumber = value;
+                        email = value;
                       },
                       validator: (String value) {
                         if (value.isEmpty) {
+                          return null;
+                        } else if (!RegExp(Constants.emailValidation)
+                            .hasMatch(value)) {
                           return MyLocalizations.of(context)
-                              .getLocalizations("ENTER_CONTACT_NUMBER");
+                              .getLocalizations("ERROR_EMAIL");
                         } else
                           return null;
                       },
                     ),
                   ),
-                  SizedBox(
-                    height: 25,
-                  ),
+                  SizedBox(height: 25)
                 ],
               ),
             ),
@@ -522,31 +517,18 @@ class _EditProfileState extends State<EditProfile> {
         child: Container(
           height: 51,
           child: GFButton(
-            onPressed: () {
-              if (!isLoading) updateUserInformation();
-            },
-            size: GFSize.LARGE,
-            child: profileEdit
-                ? GFLoader(
-                    type: GFLoaderType.ios,
-                  )
-                : Text(
-                    MyLocalizations.of(context).getLocalizations("SUBMIT"),
-                    style: titleXLargeWPB(),
-                  ),
-            color: secondary,
-            blockButton: true,
-          ),
+              onPressed: () {
+                if (!isLoading) updateUserInformation();
+              },
+              size: GFSize.LARGE,
+              child: profileEdit
+                  ? GFLoader(type: GFLoaderType.ios)
+                  : Text(MyLocalizations.of(context).getLocalizations("SUBMIT"),
+                      style: titleXLargeWPB()),
+              color: secondary,
+              blockButton: true),
         ),
       ),
     );
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }

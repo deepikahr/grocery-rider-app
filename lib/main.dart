@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/screens/home/tabs.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
@@ -19,54 +20,36 @@ import 'services/constants.dart';
 import 'services/localizations.dart';
 import 'styles/styles.dart';
 
-Timer onesignlTimer;
-void main() async {
+Timer oneSignalTimer, connectivityTimer;
+
+void main() {
+  initializeMain(isTest: false);
+}
+
+void initializeMain({bool isTest}) async {
   await DotEnv().load('.env');
   WidgetsFlutterBinding.ensureInitialized();
-  initPlatformPlayerState();
-  onesignlTimer = Timer.periodic(Duration(seconds: 4), (timer) {
-    initPlatformPlayerState();
-  });
-  runZoned<Future<Null>>(() {
-    runApp(MaterialApp(
-      home: AnimatedScreen(),
-      debugShowCheckedModeBanner: false,
-    ));
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark));
+  AlertService().checkConnectionMethod();
+  runZoned<Future>(() {
+    runApp(MultiProvider(providers: [
+      ChangeNotifierProvider(create: (context) => SocketModel()),
+      ChangeNotifierProvider(create: (context) => LocationModel())
+    ], child: DeliveryApp()));
     return Future.value(null);
-    // ignore: deprecated_member_use
   }, onError: (error, stackTrace) {});
+  initializeLanguage(isTest: isTest);
+}
 
-  Common.getSelectedLanguage().then((selectedLocale) {
-    Map localizedValues;
-    String defaultLocale = '';
-    String locale = selectedLocale ?? defaultLocale;
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.dark));
-    APIService.getLanguageJson(locale).then((value) async {
-      localizedValues = value['response_data']['json'];
-      defaultLocale = value['response_data']['languageCode'];
-      locale = defaultLocale;
-
-      await Common.setSelectedLanguage(locale);
-      runZoned<Future<Null>>(() {
-        runApp(
-          MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (context) => SocketModel()),
-              ChangeNotifierProvider(create: (context) => LocationModel()),
-            ],
-            child: DeliveryApp(
-              locale: locale,
-              localizedValues: localizedValues,
-            ),
-          ),
-        );
-        return Future.value(null);
-        // ignore: deprecated_member_use
-      }, onError: (error, stackTrace) {});
+void initializeLanguage({bool isTest}) async {
+  if (isTest != null && !isTest) {
+    oneSignalTimer = Timer.periodic(Duration(seconds: 4), (timer) {
+      initPlatformPlayerState();
     });
-  });
+    initPlatformPlayerState();
+  }
 }
 
 void initPlatformPlayerState() async {
@@ -88,7 +71,8 @@ void initPlatformPlayerState() async {
   if (playerId != null) {
     await Common.setPlayerID(playerId);
     setPlayerId();
-    if (onesignlTimer != null && onesignlTimer.isActive) onesignlTimer.cancel();
+    if (oneSignalTimer != null && oneSignalTimer.isActive)
+      oneSignalTimer.cancel();
   }
 }
 
@@ -106,15 +90,6 @@ void setPlayerId() async {
 }
 
 class DeliveryApp extends StatefulWidget {
-  final String locale;
-  final Map localizedValues;
-
-  DeliveryApp({
-    Key key,
-    this.locale,
-    this.localizedValues,
-  });
-
   @override
   _DeliveryAppState createState() => _DeliveryAppState();
 }
@@ -122,11 +97,38 @@ class DeliveryApp extends StatefulWidget {
 class _DeliveryAppState extends State<DeliveryApp> {
   bool isLoggedIn = false, checkDeliveyDisOrNot = false;
   SocketService socket = SocketService();
-
+  Map localizedValues;
+  String locale;
+  bool isGetJsonLoading = false;
   @override
   void initState() {
+    getJson();
     checkAUthentication();
     super.initState();
+  }
+
+  getJson() async {
+    setState(() {
+      isGetJsonLoading = true;
+    });
+    await Common.getSelectedLanguage().then((selectedLocale) async {
+      String defaultLocale = '';
+      locale = selectedLocale ?? defaultLocale;
+      await APIService.getLanguageJson(locale).then((value) async {
+        setState(() {
+          isGetJsonLoading = false;
+        });
+        localizedValues = value['response_data']['json'];
+        locale = value['response_data']['languageCode'];
+        Common.setNoConnection({
+          "NO_INTERNET": value['response_data']['json'][locale]["NO_INTERNET"],
+          "ONLINE_MSG": value['response_data']['json'][locale]["ONLINE_MSG"],
+          "NO_INTERNET_MSG": value['response_data']['json'][locale]
+              ["NO_INTERNET_MSG"]
+        });
+        await Common.setSelectedLanguage(locale);
+      });
+    });
   }
 
   void checkAUthentication() async {
@@ -162,31 +164,30 @@ class _DeliveryAppState extends State<DeliveryApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: Locale(widget.locale),
-      localizationsDelegates: [
-        MyLocalizationsDelegate(widget.localizedValues, [widget.locale]),
-        GlobalWidgetsLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        DefaultCupertinoLocalizations.delegate
-      ],
-      supportedLocales: [Locale(widget.locale)],
-      debugShowCheckedModeBanner: false,
-      title: Constants.appName,
-      theme: ThemeData(primaryColor: primary, accentColor: primary),
-      home: checkDeliveyDisOrNot
-          ? AnimatedScreen()
-          : isLoggedIn == false
-              ? LOGIN(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues,
-                )
-              : Tabs(
-                  locale: widget.locale,
-                  localizedValues: widget.localizedValues,
-                ),
-    );
+    return isGetJsonLoading || checkDeliveyDisOrNot
+        ? MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: Constants.appName,
+            theme: ThemeData(primaryColor: primary, accentColor: primary),
+            darkTheme: ThemeData(brightness: Brightness.dark),
+            home: AnimatedScreen())
+        : MaterialApp(
+            locale: Locale(locale),
+            localizationsDelegates: [
+              MyLocalizationsDelegate(localizedValues, [locale]),
+              GlobalWidgetsLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              DefaultCupertinoLocalizations.delegate
+            ],
+            supportedLocales: [Locale(locale)],
+            debugShowCheckedModeBanner: false,
+            title: Constants.appName,
+            theme: ThemeData(primaryColor: primary, accentColor: primary),
+            home: isLoggedIn == false
+                ? LOGIN(locale: locale, localizedValues: localizedValues)
+                : Tabs(locale: locale, localizedValues: localizedValues),
+          );
   }
 }
 
@@ -198,12 +199,10 @@ class AnimatedScreen extends StatelessWidget {
         color: Colors.white,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        child: Image.asset(
-          'lib/assets/splash.png',
-          fit: BoxFit.cover,
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-        ),
+        child: Image.asset('lib/assets/splash.png',
+            fit: BoxFit.cover,
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width),
       ),
     );
   }
