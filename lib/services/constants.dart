@@ -18,4 +18,8 @@ class Constants {
 
   // PREDEFINED
   static String predefined = DotEnv().env['PREDEFINED'] ?? "false";
+
+  //email validation
+  static String emailValidation =
+      r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
-import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
@@ -9,15 +8,14 @@ import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/button.dart';
 
 class ResetPassword extends StatefulWidget {
-  final String verificationToken, locale, email;
+  final String locale, mobileNumber, token;
   final Map localizedValues;
-
   ResetPassword(
       {Key key,
-      this.verificationToken,
+      this.token,
       this.localizedValues,
       this.locale,
-      this.email})
+      this.mobileNumber})
       : super(key: key);
 
   @override
@@ -29,7 +27,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   final TextEditingController _passwordTextController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String password1;
+  String newpassword;
   String password2;
   bool success = false, passwordVisible = true, passwordVisible1 = true;
 
@@ -45,9 +43,9 @@ class _ResetPasswordState extends State<ResetPassword> {
         });
       }
       Map<String, dynamic> body = {
-        "newPassword": password1,
-        "email": widget.email,
-        "verificationToken": widget.verificationToken
+        "newPassword": newpassword,
+        "mobileNumber": widget.mobileNumber,
+        "verificationToken": widget.token
       };
       await AuthService.resetPassword(body).then((onValue) {
         try {
@@ -79,15 +77,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                         style: textbarlowRegularaPrimary(),
                       ),
                       onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) => LOGIN(
-                                locale: widget.locale,
-                                localizedValues: widget.localizedValues,
-                              ),
-                            ),
-                            (Route<dynamic> route) => false);
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                       },
                     ),
                   ],
@@ -198,7 +190,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     },
                     controller: _passwordTextController,
                     onSaved: (String value) {
-                      password1 = value;
+                      newpassword = value;
                     },
                     obscureText: passwordVisible1,
                   ),
@@ -289,13 +281,5 @@ class _ResetPasswordState extends State<ResetPassword> {
         ),
       ),
     );
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }
