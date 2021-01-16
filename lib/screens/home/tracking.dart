@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
@@ -228,13 +229,15 @@ class _TrackingState extends State<Tracking> {
   void _initCall(number) async {
     await canLaunch('tel:$number')
         ? launch('tel:$number')
-        : Common.showSnackbar(_scaffoldKey, '$number dialing failed');
+        : AlertService()
+            .showSnackbar('$number dialing failed', context, _scaffoldKey);
   }
 
   void _launchURL(url) async {
     await canLaunch(url)
         ? launch(url)
-        : Common.showSnackbar(_scaffoldKey, '$url lauch failed');
+        : AlertService()
+            .showSnackbar('$url lauch failed', context, _scaffoldKey);
   }
 
   void _launchMap(LatLng location) async {
@@ -578,16 +581,7 @@ class _TrackingState extends State<Tracking> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                orderSummary(
-                    context,
-                    "PAYMENT",
-                    order['order']['paymentType'] == 'COD'
-                        ? MyLocalizations.of(context)
-                            .getLocalizations("CASH_ON_DELIVERY")
-                        : order['order']['paymentType'] == 'STRIPE'
-                            ? MyLocalizations.of(context)
-                                .getLocalizations("PAYBYCARD")
-                            : order['order']['paymentType']),
+                orderSummary(context, "PAYMENT", order['order']['paymentType']),
                 orderSummary(context, "SUB_TOTAL",
                     "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
                 order['cart']['tax'] == 0

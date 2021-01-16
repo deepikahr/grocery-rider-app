@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/localizations.dart';
@@ -36,66 +37,48 @@ class _ChangePasswordState extends State<ChangePassword> {
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
-      if (newPassword == oldPassword) {
-        showSnackbar(MyLocalizations.of(context)
-            .getLocalizations("DO_NOT_ENTER_SAME_PASS"));
-      } else {
-        if (mounted) {
-          setState(() {
-            isChangePasswordLoading = true;
-          });
-        }
-        Map<String, dynamic> body = {
-          "currentPassword": oldPassword,
-          "newPassword": newPassword,
-          "confirmPassword": confirmPassword
-        };
-        await AuthService.changePassword(body).then((onValue) {
-          try {
-            if (mounted) {
-              setState(() {
-                isChangePasswordLoading = false;
-              });
-            }
-            showSnackbar(onValue['response_data']);
-            Common.getSelectedLanguage().then((selectedLocale) async {
-              Map body = {"language": selectedLocale, "playerId": null};
-              AuthService.updateUserInfo(body).then((value) async {
-                await Common.setToken(null);
-                await Common.setAccountID(null);
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => LOGIN(
-                        locale: widget.locale,
-                        localizedValues: widget.localizedValues,
-                      ),
-                    ),
-                    (Route<dynamic> route) => false);
-              });
-            });
-          } catch (error) {
-            if (mounted) {
-              setState(() {
-                isChangePasswordLoading = false;
-              });
-            }
-          }
-        }).catchError((error) {
-          if (mounted) {
-            setState(() {
-              isChangePasswordLoading = false;
-            });
-          }
-        });
-      }
-    } else {
+
       if (mounted) {
         setState(() {
-          isChangePasswordLoading = false;
+          isChangePasswordLoading = true;
         });
       }
-      return;
+      Map<String, dynamic> body = {
+        "currentPassword": oldPassword,
+        "newPassword": newPassword,
+        "confirmPassword": confirmPassword
+      };
+      await AuthService.changePassword(body).then((onValue) {
+        if (mounted) {
+          setState(() {
+            isChangePasswordLoading = false;
+          });
+        }
+        AlertService()
+            .showSnackbar(onValue['response_data'], context, _scaffoldKey);
+        Common.getSelectedLanguage().then((selectedLocale) async {
+          Map body = {"language": selectedLocale, "playerId": null};
+          AuthService.updateUserInfo(body).then((value) async {
+            await Common.setToken(null);
+            await Common.setAccountID(null);
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => LOGIN(
+                    locale: widget.locale,
+                    localizedValues: widget.localizedValues,
+                  ),
+                ),
+                (Route<dynamic> route) => false);
+          });
+        });
+      }).catchError((error) {
+        if (mounted) {
+          setState(() {
+            isChangePasswordLoading = false;
+          });
+        }
+      });
     }
   }
 
@@ -340,13 +323,5 @@ class _ChangePasswordState extends State<ChangePassword> {
         ),
       ),
     );
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }
