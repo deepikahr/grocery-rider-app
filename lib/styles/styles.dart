@@ -7,6 +7,14 @@ final greyB = const Color(0xFFC2C0C0);
 final red = const Color(0xFFDF1616);
 final green = const Color(0xFF20C978);
 
+double screenHeight(context) {
+  return MediaQuery.of(context).size.height;
+}
+
+double screenWidth(context) {
+  return MediaQuery.of(context).size.width;
+}
+
 //..................................poppins semi bold....................................
 
 TextStyle titleWPS() {
@@ -400,5 +408,23 @@ TextStyle hintSfboldBig() {
     fontSize: 16.0,
     color: Colors.black,
     fontFamily: 'SfUiDBold',
+  );
+}
+
+TextStyle textAddressLocation() {
+  return TextStyle(
+    fontSize: 20.0,
+    fontWeight: FontWeight.bold,
+    fontFamily: 'BarlowSemiBold',
+    color: Colors.black,
+  );
+}
+
+TextStyle textAddressLocationLow() {
+  return TextStyle(
+    fontSize: 20.0,
+    fontFamily: 'BarlowRegular',
+    fontWeight: FontWeight.w400,
+    color: Colors.black.withOpacity(0.6),
   );
 }

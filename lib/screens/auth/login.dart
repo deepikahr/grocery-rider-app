@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/forgotpassword.dart';
+import 'package:grocerydelivery/screens/auth/otp.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
@@ -26,7 +28,7 @@ class _LOGINState extends State<LOGIN> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String email, password;
+  String userName, password;
   bool isLoading = false;
 
   void loginMethod() async {
@@ -36,15 +38,14 @@ class _LOGINState extends State<LOGIN> {
       });
       _formKey.currentState.save();
       Common.getPlayerId().then((palyerId) {
-        Map<String, dynamic> body = {
-          'email': email,
+        Map body = {
+          'userName': userName,
           'password': password,
           "playerId": palyerId ?? 'no id found'
         };
         AuthService.login(body).then((onValue) {
-          print(onValue);
           if (onValue['response_code'] == 205) {
-            showAlert(onValue['response_data'], email.toLowerCase());
+            showAlert(onValue['response_data'], userName);
           } else if (onValue['response_data'] != null &&
               onValue['response_data']['token'] != null) {
             if (onValue['response_data']['role'] == 'DELIVERY_BOY') {
@@ -63,12 +64,13 @@ class _LOGINState extends State<LOGIN> {
                 }
               });
             } else {
-              Common.showSnackbar(_scaffoldKey,
-                  '$email ${MyLocalizations.of(context).getLocalizations("AUTHORICATION_ERROR")}');
+              AlertService().showSnackbar(
+                  '$userName ${MyLocalizations.of(context).getLocalizations("AUTHORICATION_ERROR")}',
+                  context,
+                  _scaffoldKey);
             }
           } else {
-            Common.showSnackbar(_scaffoldKey,
-                MyLocalizations.of(context).getLocalizations("WRONG_FORMAT"));
+            AlertService().showSnackbar("WRONG_FORMAT", context, _scaffoldKey);
           }
           setState(() {
             isLoading = false;
@@ -82,7 +84,7 @@ class _LOGINState extends State<LOGIN> {
     }
   }
 
-  showAlert(message, email) {
+  showAlert(message, mobileNumber) {
     return showDialog<Null>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -104,13 +106,25 @@ class _LOGINState extends State<LOGIN> {
             ),
             new FlatButton(
               child: new Text(
-                MyLocalizations.of(context).getLocalizations("VERI_LINK"),
+                MyLocalizations.of(context).getLocalizations("SEND_OTP"),
                 style: textbarlowRegularaPrimary(),
               ),
               onPressed: () {
-                AuthService.verificationMailSendApi(email).then((response) {
-                  Navigator.of(context).pop();
-                  showSnackbar(response['response_data']);
+                AuthService.forgetPassword(mobileNumber).then((response) {
+                  AlertService().showSnackbar(
+                      response['response_data'], context, _scaffoldKey);
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => Otp(
+                          locale: widget.locale,
+                          localizedValues: widget.localizedValues,
+                          loginTime: true,
+                          mobileNumber: mobileNumber,
+                          sId: response['sId']),
+                    ),
+                  );
                 });
               },
             ),
@@ -118,14 +132,6 @@ class _LOGINState extends State<LOGIN> {
         );
       },
     );
-  }
-
-  void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
-    );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
   @override
@@ -150,18 +156,17 @@ class _LOGINState extends State<LOGIN> {
                       children: <Widget>[
                         SizedBox(height: 50),
                         Center(
-                          child: GFAvatar(
-                            backgroundImage: AssetImage('lib/assets/logo.png'),
-                            radius: 60,
-                          ),
-                        ),
+                            child: GFAvatar(
+                                backgroundImage:
+                                    AssetImage('lib/assets/logo.png'),
+                                radius: 60)),
                         SizedBox(height: 30),
                         Text(
-                            MyLocalizations.of(context)
-                                .getLocalizations("EMAIL", true),
+                            MyLocalizations.of(context).getLocalizations(
+                                "EMAIL_OR_MOBILE_NUMBER", true),
                             style: titleSmallBPR()),
                         SizedBox(height: 10),
-                        buildEmailTextFormField(),
+                        buildEmailOrMobileNumberTextFormField(),
                         SizedBox(height: 25),
                         Text(
                             MyLocalizations.of(context)
@@ -219,7 +224,7 @@ class _LOGINState extends State<LOGIN> {
     );
   }
 
-  Widget buildEmailTextFormField() {
+  Widget buildEmailOrMobileNumberTextFormField() {
     return TextFormField(
       initialValue: Constants.predefined == "true"
           ? "delivery1@ionicfirebaseapp.com"
@@ -230,25 +235,23 @@ class _LOGINState extends State<LOGIN> {
         fillColor: greyA,
         contentPadding: EdgeInsets.all(15),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: greyA, width: 1.0),
-        ),
+            borderSide: BorderSide(color: greyA, width: 1.0)),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: greyA, width: 1.0),
-        ),
+            borderSide: BorderSide(color: greyA, width: 1.0)),
         focusedErrorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: greyA, width: 1.0),
-        ),
+            borderSide: BorderSide(color: greyA, width: 1.0)),
         errorStyle: titleVerySamllPPB(),
       ),
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
-        if (value.isEmpty || !RegExp(Common.emailPattern).hasMatch(value)) {
-          return MyLocalizations.of(context).getLocalizations("ERROR_MAIL");
+        if (value.isEmpty) {
+          return MyLocalizations.of(context)
+              .getLocalizations("ENTER_EMAIL_OR_MOBILE_NUMBER");
         } else
           return null;
       },
       onSaved: (String value) {
-        email = value;
+        userName = value;
       },
     );
   }

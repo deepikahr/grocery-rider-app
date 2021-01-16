@@ -1,9 +1,6 @@
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/common.dart';
-import 'package:grocerydelivery/styles/styles.dart';
 import 'package:http_interceptor/http_interceptor.dart';
 
 class ApiInterceptor implements InterceptorContract {
@@ -32,16 +29,13 @@ class ApiInterceptor implements InterceptorContract {
     if (data.statusCode == 400) {
       var msg = '';
       for (int i = 0, l = errorData['errors'].length; i < l; i++) {
-        msg += errorData['errors'][i] + '\n';
+        if (l != i + 1) {
+          msg += errorData['errors'][i] + "\n";
+        } else {
+          msg += errorData['errors'][i];
+        }
       }
-      Fluttertoast.showToast(
-          msg: msg,
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: primary,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      AlertService().showToast(msg);
       return Future.error('Unexpected error :cry:');
     } else if (data.statusCode == 401) {
       await Common.setToken(null);

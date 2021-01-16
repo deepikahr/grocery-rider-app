@@ -11,19 +11,19 @@ Client client =
 
 class AuthService {
   //login
-  static Future<Map<String, dynamic>> login(body) async {
+  static Future login(body) async {
     return client
-        .post(Constants.apiURL + '/users/login', body: json.encode(body))
+        .post(Constants.apiURL + '/users/login-phone', body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
     });
   }
 
   // forgetPassword
-  static Future<Map<String, dynamic>> forgetPassword(email) async {
-    Map body = {"email": email};
+  static Future forgetPassword(mobileNumber) async {
+    Map body = {"mobileNumber": mobileNumber.toString()};
     return client
-        .post(Constants.apiURL + "/users/forgot-password",
+        .post(Constants.apiURL + "/users/send-otp-phone",
             body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
@@ -31,18 +31,19 @@ class AuthService {
   }
 
   // verify otp
-  static Future<Map<String, dynamic>> verifyOtp(otp, email) async {
+  static Future verifyOtp(body) async {
     return client
-        .get(Constants.apiURL + "/users/verify-otp?email=$email&otp=$otp")
+        .post(Constants.apiURL + "/users/verify-otp/number",
+            body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
     });
   }
 
   // reset password
-  static Future<Map<String, dynamic>> resetPassword(body) async {
+  static Future resetPassword(body) async {
     return client
-        .post(Constants.apiURL + "/users/reset-password",
+        .post(Constants.apiURL + "/users/reset-password-number",
             body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
@@ -50,7 +51,7 @@ class AuthService {
   }
 
   // change password
-  static Future<Map<String, dynamic>> changePassword(body) async {
+  static Future changePassword(body) async {
     return client
         .post(Constants.apiURL + "/users/change-password",
             body: json.encode(body))
@@ -60,14 +61,14 @@ class AuthService {
   }
 
   //get user info
-  static Future<Map<String, dynamic>> getUserInfo() async {
+  static Future getUserInfo() async {
     return client.get(Constants.apiURL + '/users/me').then((response) {
       return json.decode(response.body);
     });
   }
 
 // user data update
-  static Future<Map<String, dynamic>> updateUserInfo(body) async {
+  static Future updateUserInfo(body) async {
     return client
         .put(Constants.apiURL + "/users/update/profile",
             body: json.encode(body))
@@ -86,7 +87,7 @@ class AuthService {
   }
 
   // verify mail send api
-  static Future<dynamic> verificationMailSendApi(email) async {
+  static Future verificationMailSendApi(email) async {
     return client
         .get(Constants.apiURL + '/users/resend-verify-email?email=$email')
         .then((response) {
