@@ -56,6 +56,8 @@ workflows:
           - ujjwal.2518@gmail.com
           - montyvipul@gmail.com
           - nitish.k@pietechsolution.com
+          - nidhiacharya2995@gmail.com
+          - sarth@pietechsolution.com
       app_store_connect:
         app_id: "1506770041"
         apple_id: pietechsolution@gmail.com
@@ -106,3 +108,5 @@ workflows:
           - montyvipul@gmail.com
           - nitish.k@pietechsolution.com
           - nidhi@pietechsolution.com
+          - sarth@pietechsolution.com
+          - nidhiacharya2995@gmail.com
