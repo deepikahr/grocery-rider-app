@@ -15,10 +15,10 @@ import '../../styles/styles.dart';
 import '../home/tabs.dart';
 
 class LOGIN extends StatefulWidget {
-  final Map localizedValues;
-  final String locale;
+  final Map? localizedValues;
+  final String? locale;
 
-  LOGIN({Key key, this.localizedValues, this.locale}) : super(key: key);
+  LOGIN({Key? key, this.localizedValues, this.locale}) : super(key: key);
 
   @override
   _LOGINState createState() => _LOGINState();
@@ -28,15 +28,15 @@ class _LOGINState extends State<LOGIN> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String userName, password;
+  String? userName, password;
   bool isLoading = false;
 
   void loginMethod() async {
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
-      _formKey.currentState.save();
+      _formKey.currentState!.save();
       Common.getPlayerId().then((palyerId) {
         Map body = {
           'userName': userName,
@@ -65,7 +65,7 @@ class _LOGINState extends State<LOGIN> {
               });
             } else {
               AlertService().showSnackbar(
-                  '$userName ${MyLocalizations.of(context).getLocalizations("AUTHORICATION_ERROR")}',
+                  '$userName ${MyLocalizations.of(context)!.getLocalizations("AUTHORICATION_ERROR")}',
                   context,
                   _scaffoldKey);
             }
@@ -97,7 +97,7 @@ class _LOGINState extends State<LOGIN> {
           actions: <Widget>[
             new FlatButton(
               child: new Text(
-                MyLocalizations.of(context).getLocalizations("CANCEL"),
+                MyLocalizations.of(context)!.getLocalizations("CANCEL"),
                 style: textbarlowRegularaPrimary(),
               ),
               onPressed: () {
@@ -106,7 +106,7 @@ class _LOGINState extends State<LOGIN> {
             ),
             new FlatButton(
               child: new Text(
-                MyLocalizations.of(context).getLocalizations("SEND_OTP"),
+                MyLocalizations.of(context)!.getLocalizations("SEND_OTP"),
                 style: textbarlowRegularaPrimary(),
               ),
               onPressed: () {
@@ -138,7 +138,7 @@ class _LOGINState extends State<LOGIN> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBarPrimary(context, "LOGIN"),
+      appBar: appBarPrimary(context, "LOGIN") as PreferredSizeWidget?,
       backgroundColor: Colors.white,
       body: ListView(
         children: <Widget>[
@@ -162,14 +162,14 @@ class _LOGINState extends State<LOGIN> {
                                 radius: 60)),
                         SizedBox(height: 30),
                         Text(
-                            MyLocalizations.of(context).getLocalizations(
+                            MyLocalizations.of(context)!.getLocalizations(
                                 "EMAIL_OR_MOBILE_NUMBER", true),
                             style: titleSmallBPR()),
                         SizedBox(height: 10),
                         buildEmailOrMobileNumberTextFormField(),
                         SizedBox(height: 25),
                         Text(
-                            MyLocalizations.of(context)
+                            MyLocalizations.of(context)!
                                 .getLocalizations("PASSWORD", true),
                             style: titleSmallBPR()),
                         SizedBox(height: 10),
@@ -209,7 +209,7 @@ class _LOGINState extends State<LOGIN> {
           text: TextSpan(
             children: <TextSpan>[
               TextSpan(
-                  text: MyLocalizations.of(context)
+                  text: MyLocalizations.of(context)!
                           .getLocalizations("FORGET_PASSWORD") +
                       "?",
                   style: titleSmallBPR()),
@@ -243,14 +243,14 @@ class _LOGINState extends State<LOGIN> {
         errorStyle: titleVerySamllPPB(),
       ),
       keyboardType: TextInputType.emailAddress,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return MyLocalizations.of(context)
+      validator: (String? value) {
+        if (value!.isEmpty) {
+          return MyLocalizations.of(context)!
               .getLocalizations("ENTER_EMAIL_OR_MOBILE_NUMBER");
         } else
           return null;
       },
-      onSaved: (String value) {
+      onSaved: (String? value) {
         userName = value;
       },
     );
@@ -277,13 +277,13 @@ class _LOGINState extends State<LOGIN> {
       ),
       keyboardType: TextInputType.text,
       obscureText: true,
-      validator: (String value) {
-        if (value.isEmpty || value.length < 6) {
-          return MyLocalizations.of(context).getLocalizations("ERROR_PASSWORD");
+      validator: (String? value) {
+        if (value!.isEmpty || value.length < 6) {
+          return MyLocalizations.of(context)!.getLocalizations("ERROR_PASSWORD");
         } else
           return null;
       },
-      onSaved: (String value) {
+      onSaved: (String? value) {
         password = value;
       },
     );

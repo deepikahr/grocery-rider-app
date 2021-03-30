@@ -11,15 +11,15 @@ Client client =
 
 class APIService {
   // get location info
-  static Future<Map<String, dynamic>> getLocationformation() async {
-    final response = await client.get(Constants.apiURL + '/settings/details');
+  static Future<Map<String, dynamic>?> getLocationformation() async {
+    final response = await client.get(Uri.parse(Constants.apiURL! + '/settings/details'));
     return json.decode(response.body);
   }
 
   // get json data
   static Future<Map<String, dynamic>> getLanguageJson(languageCode) async {
     return client
-        .get(Constants.apiURL + "/languages/delivery?code=$languageCode")
+        .get(Uri.parse(Constants.apiURL! + "/languages/delivery?code=$languageCode"))
         .then((response) {
       return json.decode(response.body);
     });
@@ -27,7 +27,7 @@ class APIService {
 
   // get languages list
   static Future<dynamic> getLanguagesList() async {
-    return client.get(Constants.apiURL + "/languages/list").then((response) {
+    return client.get(Uri.parse(Constants.apiURL! + "/languages/list")).then((response) {
       return json.decode(response.body);
     });
   }
@@ -35,7 +35,7 @@ class APIService {
   //notification list
   static Future<Map<String, dynamic>> getOrderHistory(orderId) async {
     return client
-        .get(Constants.apiURL + "/orders/delivery-boy/detail/$orderId")
+        .get(Uri.parse(Constants.apiURL! + "/orders/delivery-boy/detail/$orderId"))
         .then((response) {
       return json.decode(response.body);
     });
@@ -43,7 +43,7 @@ class APIService {
 
   static Future<dynamic> orderStausChange(body, orderId) async {
     return client
-        .put(Constants.apiURL + "/orders/delivery-boy/status-update/$orderId",
+        .put(Uri.parse(Constants.apiURL! + "/orders/delivery-boy/status-update/$orderId"),
             body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
@@ -53,8 +53,8 @@ class APIService {
   // get delivered order list
   static Future<dynamic> getDeliverdOrder(limit, index) async {
     return client
-        .get(Constants.apiURL +
-            "/orders/delivery-boy/delivered/list?limit=$limit&page=$index")
+        .get(Uri.parse(Constants.apiURL! +
+        "/orders/delivery-boy/delivered/list?limit=$limit&page=$index"))
         .then((response) {
       return json.decode(response.body);
     });
@@ -63,8 +63,8 @@ class APIService {
   // get assigned order list
   static Future<dynamic> getAssignedOrder(limit, index) async {
     return client
-        .get(Constants.apiURL +
-            "/orders/delivery-boy/assigned/list?limit=$limit&page=$index")
+        .get(Uri.parse(Constants.apiURL! +
+        "/orders/delivery-boy/assigned/list?limit=$limit&page=$index"))
         .then((response) {
       return json.decode(response.body);
     });
@@ -73,7 +73,7 @@ class APIService {
   // get order Accept api order
   static Future<Map<String, dynamic>> orderAcceptApi(orderId) async {
     return client
-        .put(Constants.apiURL + "/orders/delivery-boy/accept/$orderId")
+        .put(Uri.parse(Constants.apiURL! + "/orders/delivery-boy/accept/$orderId"))
         .then((response) {
       return json.decode(response.body);
     });
@@ -82,7 +82,7 @@ class APIService {
   // get RejectApi order
   static Future<Map<String, dynamic>> orderRejectApi(orderId) async {
     return client
-        .put(Constants.apiURL + "/orders/delivery-boy/reject/$orderId")
+        .put(Uri.parse(Constants.apiURL! + "/orders/delivery-boy/reject/$orderId"))
         .then((response) {
       return json.decode(response.body);
     });

@@ -11,7 +11,7 @@ class Common {
   /// retrive token from storage
   static Future<String> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return Future(() => prefs.getString('token'));
+    return Future(() => prefs.getString('token')!);
   }
 
   /// save currency on storage
@@ -23,7 +23,7 @@ class Common {
   /// retrive currency from storage
   static Future<String> getCurrency() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return Future(() => prefs.getString('currency'));
+    return Future(() => prefs.getString('currency')!);
   }
 
   /// save account id on storage
@@ -35,7 +35,7 @@ class Common {
   /// retrive account id from storage
   static Future<String> getAccountID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return Future(() => prefs.getString('accountID'));
+    return Future(() => prefs.getString('accountID')!);
   }
 
   // save playerId on storage
@@ -47,7 +47,7 @@ class Common {
   // retrive playerId from storage
   static Future<String> getPlayerId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return Future(() => prefs.getString('playerId'));
+    return Future(() => prefs.getString('playerId')!);
   }
 
   static Future<bool> setSelectedLanguage(String lang) async {
@@ -57,7 +57,7 @@ class Common {
 
   static Future<String> getSelectedLanguage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return Future(() => prefs.getString('selectedLanguage'));
+    return Future(() => prefs.getString('selectedLanguage')!);
   }
 
   static Future<bool> setNoConnection(Map data) async {
@@ -65,11 +65,11 @@ class Common {
     return prefs.setString('connection', json.encode(data));
   }
 
-  static Future<Map> getNoConnection() async {
+  static Future<Map?> getNoConnection() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String info = prefs.getString('connection');
+    String info = prefs.getString('connection')!;
     try {
-      return json.decode(info) as Map;
+      return json.decode(info) as Map?;
     } catch (err) {
       return Future(() => null);
     }

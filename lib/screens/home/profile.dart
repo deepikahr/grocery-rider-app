@@ -18,10 +18,10 @@ import '../../services/socket.dart';
 import '../../styles/styles.dart';
 
 class Profile extends StatefulWidget {
-  final Map localizedValues;
-  final String locale;
+  final Map? localizedValues;
+  final String? locale;
 
-  Profile({Key key, this.localizedValues, this.locale}) : super(key: key);
+  Profile({Key? key, this.localizedValues, this.locale}) : super(key: key);
 
   @override
   _ProfileState createState() => _ProfileState();
@@ -29,13 +29,13 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  Map<String, dynamic> profileInfo;
+  Map<String, dynamic>? profileInfo;
   TextEditingController nameController = TextEditingController();
   TextEditingController numberController = TextEditingController();
   TextEditingController countController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  SocketService socket;
-  List languagesList;
+  SocketService? socket;
+  List? languagesList;
   bool languagesListLoading = false, isProfileLoading = false;
   var selectedLanguages;
   @override
@@ -58,9 +58,9 @@ class _ProfileState extends State<Profile> {
           if (mounted) {
             setState(() {
               languagesList = value['response_data'];
-              for (int i = 0; i < languagesList.length; i++) {
-                if (languagesList[i]['languageCode'] == widget.locale) {
-                  selectedLanguages = languagesList[i]['languageName'];
+              for (int i = 0; i < languagesList!.length; i++) {
+                if (languagesList![i]['languageCode'] == widget.locale) {
+                  selectedLanguages = languagesList![i]['languageName'];
                 }
               }
               languagesListLoading = false;
@@ -96,15 +96,15 @@ class _ProfileState extends State<Profile> {
         setState(() {
           profileInfo = value['response_data'];
           nameController.text =
-              '${profileInfo['firstName']} ${profileInfo['lastName']}';
-          if (profileInfo['orderDelivered'] == null) {
+              '${profileInfo!['firstName']} ${profileInfo!['lastName']}';
+          if (profileInfo!['orderDelivered'] == null) {
             countController.text = "0";
           } else {
-            countController.text = profileInfo['orderDelivered'].toString();
+            countController.text = profileInfo!['orderDelivered'].toString();
           }
           numberController.text =
-              "${profileInfo['countryCode'] ?? ""} ${profileInfo['mobileNumber'] ?? ""}";
-          emailController.text = profileInfo['email'].toString() ?? '';
+              "${profileInfo!['countryCode'] ?? ""} ${profileInfo!['mobileNumber'] ?? ""}";
+          emailController.text = profileInfo!['email'].toString() ?? '';
           isProfileLoading = false;
         });
       }
@@ -137,18 +137,18 @@ class _ProfileState extends State<Profile> {
                       padding: EdgeInsets.only(bottom: 25),
                       physics: ScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: languagesList.length == null
+                      itemCount: languagesList!.length == null
                           ? 0
-                          : languagesList.length,
+                          : languagesList!.length,
                       itemBuilder: (BuildContext context, int i) {
                         return GFButton(
                             onPressed: () async {
                               setState(() {
                                 selectedLanguages =
-                                    languagesList[i]['languageName'];
+                                    languagesList![i]['languageName'];
                               });
                               await Common.setSelectedLanguage(
-                                  languagesList[i]['languageCode']);
+                                  languagesList![i]['languageCode']);
                               Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
@@ -158,7 +158,7 @@ class _ProfileState extends State<Profile> {
                             },
                             type: GFButtonType.transparent,
                             child: alertText(context,
-                                languagesList[i]['languageName'], null));
+                                languagesList![i]['languageName'], null));
                       }),
                 ],
               ),
@@ -171,7 +171,7 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBar(context, "PROFILE"),
+      appBar: appBar(context, "PROFILE") as PreferredSizeWidget?,
       backgroundColor: Colors.white,
       body: languagesListLoading || isProfileLoading
           ? Center(
@@ -189,36 +189,36 @@ class _ProfileState extends State<Profile> {
                             SizedBox(height: 30),
                             Center(
                               child: GFAvatar(
-                                backgroundImage: profileInfo['imageUrl'] == null
+                                backgroundImage: (profileInfo!['imageUrl'] == null
                                     ? AssetImage('lib/assets/logo.png')
-                                    : NetworkImage(profileInfo['imageUrl']),
+                                    : NetworkImage(profileInfo!['imageUrl'])) as ImageProvider<Object>?,
                                 radius: 60,
                               ),
                             ),
                             SizedBox(height: 30),
                             Text(
-                                MyLocalizations.of(context)
+                                MyLocalizations.of(context)!
                                     .getLocalizations("USER_NAME", true),
                                 style: titleSmallBPR()),
                             SizedBox(height: 10),
                             buildTextField(context, nameController),
                             SizedBox(height: 25),
                             Text(
-                                MyLocalizations.of(context)
+                                MyLocalizations.of(context)!
                                     .getLocalizations("EMAIL_ID", true),
                                 style: titleSmallBPR()),
                             SizedBox(height: 10),
                             buildTextField(context, emailController),
                             SizedBox(height: 25),
                             Text(
-                                MyLocalizations.of(context)
+                                MyLocalizations.of(context)!
                                     .getLocalizations("MOBILE_NUMBER", true),
                                 style: titleSmallBPR()),
                             SizedBox(height: 10),
                             buildTextField(context, numberController),
                             SizedBox(height: 25),
                             Text(
-                                MyLocalizations.of(context)
+                                MyLocalizations.of(context)!
                                     .getLocalizations("ORDER_COMPLETED", true),
                                 style: titleSmallBPR()),
                             SizedBox(height: 10),
@@ -249,7 +249,7 @@ class _ProfileState extends State<Profile> {
                                 child: buildContainerField(
                                     context, "EDIT_PROFILE")),
                             SizedBox(height: 20),
-                            languagesList.length > 0
+                            languagesList!.length > 0
                                 ? InkWell(
                                     onTap: selectLanguagesMethod,
                                     child: buildContainerFieldRow(
@@ -292,8 +292,8 @@ class _ProfileState extends State<Profile> {
               AlertService()
                   .showSnackbar("LOGOUT_SUCCESSFULL", context, _scaffoldKey);
               Future.delayed(Duration(milliseconds: 1500), () async {
-                await Common.setToken(null);
-                await Common.setAccountID(null);
+                await Common.setToken('');
+                await Common.setAccountID('');
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(

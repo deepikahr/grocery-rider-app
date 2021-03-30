@@ -9,23 +9,23 @@ import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/button.dart';
 
 class ForgotPassword extends StatefulWidget {
-  ForgotPassword({Key key, this.title, this.locale, this.localizedValues})
+  ForgotPassword({Key? key, this.title, this.locale, this.localizedValues})
       : super(key: key);
-  final String title, locale;
-  final Map localizedValues;
+  final String? title, locale;
+  final Map? localizedValues;
 
   @override
   _ForgotPasswordState createState() => _ForgotPasswordState();
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
-  String mobileNumber;
+  String? mobileNumber;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool isVerfyEmailLoading = false;
 
   verifyEmail() async {
-    final form = _formKey.currentState;
+    final form = _formKey.currentState!;
     if (form.validate()) {
       form.save();
       if (mounted) {
@@ -57,7 +57,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   actions: <Widget>[
                     new FlatButton(
                       child: new Text(
-                        MyLocalizations.of(context).getLocalizations("OK"),
+                        MyLocalizations.of(context)!.getLocalizations("OK"),
                         style: textbarlowRegularaPrimary(),
                       ),
                       onPressed: () {
@@ -108,7 +108,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBarPrimary(context, "FORGET_PASSWORD"),
+      appBar: appBarPrimary(context, "FORGET_PASSWORD") as PreferredSizeWidget?,
       body: Form(
         key: _formKey,
         child: Container(
@@ -118,7 +118,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 padding: const EdgeInsets.only(
                     top: 40.0, left: 18.0, bottom: 8.0, right: 20.0),
                 child: Text(
-                  MyLocalizations.of(context)
+                  MyLocalizations.of(context)!
                       .getLocalizations("PASSWORD_RESET"),
                   style: textbarlowMediumBlack(),
                 ),
@@ -127,7 +127,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 padding: const EdgeInsets.only(
                     left: 18.0, bottom: 25.0, right: 20.0),
                 child: Text(
-                  MyLocalizations.of(context)
+                  MyLocalizations.of(context)!
                       .getLocalizations("FORET_PASS_OTP_MSG"),
                   style: textbarlowRegularBlack(),
                 ),
@@ -137,11 +137,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     const EdgeInsets.only(left: 20.0, bottom: 5.0, right: 20.0),
                 child: GFTypography(
                   showDivider: false,
+                  text: '',
                   child: RichText(
                     text: TextSpan(
                       children: <TextSpan>[
                         TextSpan(
-                            text: MyLocalizations.of(context)
+                            text: MyLocalizations.of(context)!
                                 .getLocalizations("MOBILE_NUMBER"),
                             style: textbarlowRegularBlack()),
                         TextSpan(
@@ -158,12 +159,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     top: 5.0, bottom: 10.0, left: 20.0, right: 20.0),
                 child: Container(
                   child: TextFormField(
-                    onSaved: (String value) {
+                    onSaved: (String? value) {
                       mobileNumber = value;
                     },
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return MyLocalizations.of(context)
+                    validator: (String? value) {
+                      if (value!.isEmpty) {
+                        return MyLocalizations.of(context)!
                             .getLocalizations("ENTER_MOBILE_NUMBER");
                       } else
                         return null;

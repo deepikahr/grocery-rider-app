@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart' as DotEnv;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/screens/home/tabs.dart';
@@ -12,7 +12,7 @@ import 'package:grocerydelivery/services/auth.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/socket.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
+// import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'models/location.dart';
 import 'models/socket.dart';
@@ -20,14 +20,14 @@ import 'services/constants.dart';
 import 'services/localizations.dart';
 import 'styles/styles.dart';
 
-Timer oneSignalTimer, connectivityTimer;
+Timer? oneSignalTimer, connectivityTimer;
 
 void main() {
   initializeMain(isTest: false);
 }
 
-void initializeMain({bool isTest}) async {
-  await DotEnv().load('.env');
+void initializeMain({bool? isTest}) async {
+  await DotEnv.load();
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarBrightness: Brightness.dark,
@@ -40,41 +40,41 @@ void initializeMain({bool isTest}) async {
     ], child: DeliveryApp()));
     return Future.value(null);
   }, onError: (error, stackTrace) {});
-  initializeLanguage(isTest: isTest);
+  // initializeLanguage(isTest: isTest);
 }
 
-void initializeLanguage({bool isTest}) async {
-  if (isTest != null && !isTest) {
-    oneSignalTimer = Timer.periodic(Duration(seconds: 4), (timer) {
-      initPlatformPlayerState();
-    });
-    initPlatformPlayerState();
-  }
-}
-
-void initPlatformPlayerState() async {
-  var settings = {
-    OSiOSSettings.autoPrompt: true,
-    OSiOSSettings.promptBeforeOpeningPushUrl: true
-  };
-  OneSignal.shared
-      .setNotificationReceivedHandler((OSNotification notification) {});
-  OneSignal.shared
-      .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
-  await OneSignal.shared.init(Constants.oneSignalKey, iOSSettings: settings);
-  OneSignal.shared
-      .promptUserForPushNotificationPermission(fallbackToSettings: true);
-  OneSignal.shared
-      .setInFocusDisplayType(OSNotificationDisplayType.notification);
-  var status = await OneSignal.shared.getPermissionSubscriptionState();
-  String playerId = status.subscriptionStatus.userId;
-  if (playerId != null) {
-    await Common.setPlayerID(playerId);
-    setPlayerId();
-    if (oneSignalTimer != null && oneSignalTimer.isActive)
-      oneSignalTimer.cancel();
-  }
-}
+// void initializeLanguage({bool isTest}) async {
+//   if (isTest != null && !isTest) {
+//     oneSignalTimer = Timer.periodic(Duration(seconds: 4), (timer) {
+//       initPlatformPlayerState();
+//     });
+//     initPlatformPlayerState();
+//   }
+// }
+//
+// void initPlatformPlayerState() async {
+//   var settings = {
+//     OSiOSSettings.autoPrompt: true,
+//     OSiOSSettings.promptBeforeOpeningPushUrl: true
+//   };
+//   OneSignal.shared
+//       .setNotificationReceivedHandler((OSNotification notification) {});
+//   OneSignal.shared
+//       .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
+//   await OneSignal.shared.init(Constants.oneSignalKey, iOSSettings: settings);
+//   OneSignal.shared
+//       .promptUserForPushNotificationPermission(fallbackToSettings: true);
+//   OneSignal.shared
+//       .setInFocusDisplayType(OSNotificationDisplayType.notification);
+//   var status = await OneSignal.shared.getPermissionSubscriptionState();
+//   String playerId = status.subscriptionStatus.userId;
+//   if (playerId != null) {
+//     await Common.setPlayerID(playerId);
+//     setPlayerId();
+//     if (oneSignalTimer != null && oneSignalTimer.isActive)
+//       oneSignalTimer.cancel();
+//   }
+// }
 
 void setPlayerId() async {
   await Common.getToken().then((token) async {
@@ -97,8 +97,8 @@ class DeliveryApp extends StatefulWidget {
 class _DeliveryAppState extends State<DeliveryApp> {
   bool isLoggedIn = false, checkDeliveyDisOrNot = false;
   SocketService socket = SocketService();
-  Map localizedValues;
-  String locale;
+  Map? localizedValues;
+  String? locale;
   bool isGetJsonLoading = false;
   @override
   void initState() {
@@ -126,7 +126,7 @@ class _DeliveryAppState extends State<DeliveryApp> {
           "NO_INTERNET_MSG": value['response_data']['json'][locale]
               ["NO_INTERNET_MSG"]
         });
-        await Common.setSelectedLanguage(locale);
+        await Common.setSelectedLanguage(locale!);
       });
     });
   }
@@ -172,7 +172,7 @@ class _DeliveryAppState extends State<DeliveryApp> {
             darkTheme: ThemeData(brightness: Brightness.dark),
             home: AnimatedScreen())
         : MaterialApp(
-            locale: Locale(locale),
+            locale: Locale(locale!),
             localizationsDelegates: [
               MyLocalizationsDelegate(localizedValues, [locale]),
               GlobalWidgetsLocalizations.delegate,
@@ -180,7 +180,7 @@ class _DeliveryAppState extends State<DeliveryApp> {
               GlobalCupertinoLocalizations.delegate,
               DefaultCupertinoLocalizations.delegate
             ],
-            supportedLocales: [Locale(locale)],
+            supportedLocales: [Locale(locale!)],
             debugShowCheckedModeBanner: false,
             title: Constants.appName,
             theme: ThemeData(primaryColor: primary, accentColor: primary),

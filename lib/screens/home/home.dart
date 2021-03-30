@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:getwidget/getwidget.dart';
@@ -10,8 +12,8 @@ import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:grocerydelivery/widgets/normalText.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../models/location.dart';
 import '../../models/socket.dart';
@@ -19,10 +21,10 @@ import '../../styles/styles.dart';
 import 'tracking.dart';
 
 class Home extends StatefulWidget {
-  final Map localizedValues;
-  final String locale;
+  final Map? localizedValues;
+  final String? locale;
 
-  Home({Key key, this.localizedValues, this.locale}) : super(key: key);
+  Home({Key? key, this.localizedValues, this.locale}) : super(key: key);
 
   @override
   _HomeState createState() => _HomeState();
@@ -37,13 +39,13 @@ class _HomeState extends State<Home> {
       isNewOrderAccept = false,
       isNewOrderReject = false;
   List assignedOrdersList = [];
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  int productLimt = 10, productIndex = 0, totalProduct = 1, orderIndex;
+  final GlobalKey<LiquidPullToRefreshState> _refreshIndicatorKey =
+  GlobalKey<LiquidPullToRefreshState>();
+  int? productLimt = 10, productIndex = 0, totalProduct = 1, orderIndex;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var adminData;
   SocketService socket = SocketService();
-  Map newOrder;
+  Map? newOrder;
   @override
   void initState() {
     if (mounted) {
@@ -60,7 +62,7 @@ class _HomeState extends State<Home> {
   intSocket() {
     Common.getAccountID().then((id) {
       if (id != null) {
-        socket.getSocket().on('new-order-delivery-boy-$id', (data) {
+        socket.getSocket()!.on('new-order-delivery-boy-$id', (data) {
           if (data != null && mounted) {
             setState(() {
               newOrder = data;
@@ -109,7 +111,8 @@ class _HomeState extends State<Home> {
 
   Future<void> getAssignedOrders(productIndex) async {
     await APIService.getAssignedOrder(productLimt, productIndex).then((value) {
-      _refreshController.refreshCompleted();
+      // _refreshController.refreshCompleted();
+      _handleRefresh();
       if (mounted) {
         setState(() {
           assignedOrderLoading = false;
@@ -122,7 +125,7 @@ class _HomeState extends State<Home> {
           int index = assignedOrdersList.length;
           if (lastApiCall == true) {
             productIndex++;
-            if (index < totalProduct) {
+            if (index < totalProduct!) {
               getAssignedOrders(productIndex);
             } else {
               if (index == totalProduct) {
@@ -303,21 +306,36 @@ class _HomeState extends State<Home> {
     });
   }
 
+  Future<void> _handleRefresh() async {
+    final Completer<void> completer = Completer<void>();
+    Timer(const Duration(seconds: 3), () {
+      completer.complete();
+    });
+    setState(() {
+      productLimt = 10;
+      productIndex = 0;
+      totalProduct = 1;
+      assignedOrdersList = [];
+      getAssignedOrders(productIndex);
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     Provider.of<LocationModel>(context, listen: false).requestLocation();
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBar(context, "HOME"),
+      appBar: appBar(context, "HOME") as PreferredSizeWidget?,
       body: GFFloatingWidget(
-        showblurness: newOrder == null ? false : true,
+        showBlurness: newOrder == null ? false : true,
         verticalPosition: 50,
         child: newOrder == null
             ? Container()
             : GFAlert(
-                title: MyLocalizations.of(context)
+                title: MyLocalizations.of(context)!
                         .getLocalizations("ORDER_ID", true) +
-                    ' #${newOrder['orderID']}',
+                    ' #${newOrder!['orderID']}',
                 contentChild: buildNewOrderCard(newOrder),
                 bottombar: Row(
                   children: <Widget>[
@@ -328,19 +346,23 @@ class _HomeState extends State<Home> {
                     buildNeworderAcceptButton(newOrder),
                   ],
                 )),
-        body: SmartRefresher(
-          enablePullDown: true,
-          enablePullUp: false,
-          controller: _refreshController,
-          onRefresh: () {
-            setState(() {
-              productLimt = 10;
-              productIndex = 0;
-              totalProduct = 1;
-              assignedOrdersList = [];
-              getAssignedOrders(productIndex);
-            });
-          },
+        body: LiquidPullToRefresh(
+        key: _refreshIndicatorKey,
+        onRefresh: _handleRefresh,
+        showChildOpacityTransition: false,
+    // SmartRefresher(
+    //       enablePullDown: true,
+    //       enablePullUp: false,
+    //       controller: _refreshController,
+    //       onRefresh: () {
+    //         setState(() {
+    //           productLimt = 10;
+    //           productIndex = 0;
+    //           totalProduct = 1;
+    //           assignedOrdersList = [];
+    //           getAssignedOrders(productIndex);
+    //         });
+    //       },
           child: assignedOrderLoading == true || locationLoading == true
               ? SquareLoader()
               : ListView(
@@ -349,7 +371,7 @@ class _HomeState extends State<Home> {
                       padding:
                           const EdgeInsets.only(top: 20, left: 16, right: 16),
                       child: Text(
-                        MyLocalizations.of(context)
+                        MyLocalizations.of(context)!
                             .getLocalizations("ACTIVE_REQUESTS"),
                         style: titleBPS(),
                       ),
@@ -373,7 +395,7 @@ class _HomeState extends State<Home> {
                                   color: greyB,
                                 ),
                                 Text(
-                                    MyLocalizations.of(context)
+                                    MyLocalizations.of(context)!
                                         .getLocalizations("NO_ACTIVE_REQUESTS"),
                                     style: pageHeader()),
                               ],
@@ -387,7 +409,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget buildNewOrderCard(order) {
-    String fullName = '', firstName = '', lastName = '', deliveryAddress = '';
+    String? fullName = '', firstName = '', lastName = '', deliveryAddress = '';
     if (order['user'] != null && order['user']['firstName'] != null) {
       firstName = order['user']['firstName'];
     }
@@ -448,7 +470,7 @@ class _HomeState extends State<Home> {
                       ),
                       padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
                       child: Text(
-                          MyLocalizations.of(context).getLocalizations(
+                          MyLocalizations.of(context)!.getLocalizations(
                               order['address']['addressType'] ?? ""),
                           style: TextStyle(
                               color: greyA,
@@ -495,7 +517,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget buildOrderCard(order, index, context) {
-    String fullName = '', firstName = '', lastName = '', deliveryAddress = '';
+    String? fullName = '', firstName = '', lastName = '', deliveryAddress = '';
     if (order['user'] != null && order['user']['firstName'] != null) {
       firstName = order['user']['firstName'];
     }
@@ -556,7 +578,7 @@ class _HomeState extends State<Home> {
                       ),
                       padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
                       child: Text(
-                          MyLocalizations.of(context).getLocalizations(
+                          MyLocalizations.of(context)!.getLocalizations(
                               order['address']['addressType'] ?? ""),
                           style: TextStyle(
                               color: greyA,
