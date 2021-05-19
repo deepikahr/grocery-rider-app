@@ -165,7 +165,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                       "$currency${order['cart']['walletAmount'].toDouble().toStringAsFixed(2)}"),
               Divider(),
               orderSummary(context, "NOTE",
-                  "$currency${order['cart']['note']}"),
+                  "${order['order']['deliveryInstruction']}"),
               Divider(),
               orderSummary(context, "TOTAL",
                   "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
