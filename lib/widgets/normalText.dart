@@ -81,14 +81,12 @@ Widget orderSummary(BuildContext context, title, value) {
       Text(MyLocalizations.of(context).getLocalizations(title, true),
           style: keyText()),
       Expanded(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(MyLocalizations.of(context).getLocalizations(value ?? ""),
-                style: titleLargeBPM()),
-          ],
-        ),
-      )
+        child: Container(
+          alignment: AlignmentDirectional.centerEnd,
+          child: Text(MyLocalizations.of(context).getLocalizations(value ?? ""),
+              style: titleLargeBPM(),  textAlign: TextAlign.right),
+        )
+      ),
     ],
   );
 }
