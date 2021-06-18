@@ -8,13 +8,13 @@ class MyLocalizations {
 
   final Locale locale;
 
-  static MyLocalizations of(BuildContext context) {
+  static MyLocalizations? of(BuildContext context) {
     return Localizations.of<MyLocalizations>(context, MyLocalizations);
   }
 
   getLocalizations(keyName, [bool isKeyValue = false]) {
     String keyValue = localizedValues[locale.languageCode][keyName];
-    keyValue ??= keyName;
+    keyValue = keyName;
 
     if (isKeyValue) keyValue = keyValue + " : ";
     return keyValue;

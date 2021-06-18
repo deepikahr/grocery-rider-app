@@ -6,14 +6,13 @@ import 'package:http_interceptor/http_interceptor.dart';
 
 import 'constants.dart';
 
-Client client =
-    HttpClientWithInterceptor.build(interceptors: [ApiInterceptor()]);
+Client client = InterceptedHttp.build(interceptors: [ApiInterceptor()]) as Client;
 
 class AuthService {
   //login
   static Future login(body) async {
     return client
-        .post(Constants.apiURL + '/users/login-phone', body: json.encode(body))
+        .post(Uri.parse(Constants.apiURL + '/users/login-phone'), body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
     });
@@ -23,7 +22,7 @@ class AuthService {
   static Future forgetPassword(mobileNumber) async {
     Map body = {"mobileNumber": mobileNumber.toString()};
     return client
-        .post(Constants.apiURL + "/users/send-otp-phone",
+        .post(Uri.parse(Constants.apiURL + "/users/send-otp-phone"),
             body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
@@ -33,7 +32,7 @@ class AuthService {
   // verify otp
   static Future verifyOtp(body) async {
     return client
-        .post(Constants.apiURL + "/users/verify-otp/number",
+        .post(Uri.parse(Constants.apiURL + "/users/verify-otp/number"),
             body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
@@ -43,7 +42,7 @@ class AuthService {
   // reset password
   static Future resetPassword(body) async {
     return client
-        .post(Constants.apiURL + "/users/reset-password-number",
+        .post(Uri.parse(Constants.apiURL + "/users/reset-password-number"),
             body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
@@ -53,7 +52,7 @@ class AuthService {
   // change password
   static Future changePassword(body) async {
     return client
-        .post(Constants.apiURL + "/users/change-password",
+        .post(Uri.parse(Constants.apiURL + "/users/change-password"),
             body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
@@ -62,7 +61,7 @@ class AuthService {
 
   //get user info
   static Future getUserInfo() async {
-    return client.get(Constants.apiURL + '/users/me').then((response) {
+    return client.get(Uri.parse(Constants.apiURL + '/users/me')).then((response) {
       return json.decode(response.body);
     });
   }
@@ -70,7 +69,7 @@ class AuthService {
 // user data update
   static Future updateUserInfo(body) async {
     return client
-        .put(Constants.apiURL + "/users/update/profile",
+        .put(Uri.parse(Constants.apiURL + "/users/update/profile"),
             body: json.encode(body))
         .then((response) {
       return json.decode(response.body);
@@ -80,7 +79,7 @@ class AuthService {
   // image delete
   static Future imagedelete() async {
     return client
-        .delete(Constants.apiURL + "/users/delete/image")
+        .delete(Uri.parse(Constants.apiURL + "/users/delete/image"))
         .then((response) {
       return json.decode(response.body);
     });
@@ -89,7 +88,7 @@ class AuthService {
   // verify mail send api
   static Future verificationMailSendApi(email) async {
     return client
-        .get(Constants.apiURL + '/users/resend-verify-email?email=$email')
+        .get(Uri.parse(Constants.apiURL + '/users/resend-verify-email?email=$email'))
         .then((response) {
       return json.decode(response.body);
     });

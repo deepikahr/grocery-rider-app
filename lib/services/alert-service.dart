@@ -8,15 +8,15 @@ import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 
 class AlertService {
-  Timer checkConnectionTimer;
+  Timer? checkConnectionTimer;
   bool isFirstTime = false;
-  AppLifecycleState state;
+  AppLifecycleState? state;
   checkConnectionMethod() async {
-    if (checkConnectionTimer != null && checkConnectionTimer.isActive)
-      checkConnectionTimer.cancel();
+    if (checkConnectionTimer != null && checkConnectionTimer!.isActive)
+      checkConnectionTimer!.cancel();
     checkConnectionTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
       var connectivityResult = await (Connectivity().checkConnectivity());
-      state = WidgetsBinding.instance.lifecycleState;
+      state = WidgetsBinding.instance!.lifecycleState!;
       if (state != AppLifecycleState.paused) {
         Common.getNoConnection().then((value) {
           String noInternet = (value == null || value['NO_INTERNET'] == null
@@ -59,7 +59,7 @@ class AlertService {
     final snackBar = SnackBar(
         backgroundColor: primary,
         content:
-            Text(MyLocalizations.of(context).getLocalizations(message ?? "")),
+            Text(MyLocalizations.of(context)!.getLocalizations(message ?? "")),
         duration: Duration(milliseconds: 3000));
     _scaffoldKey.currentState.showSnackBar(snackBar);
   }

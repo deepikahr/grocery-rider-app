@@ -20,14 +20,14 @@ import 'services/constants.dart';
 import 'services/localizations.dart';
 import 'styles/styles.dart';
 
-Timer oneSignalTimer, connectivityTimer;
+// Timer oneSignalTimer, connectivityTimer;
 
 void main() {
   initializeMain(isTest: false);
 }
 
-void initializeMain({bool isTest}) async {
-  await DotEnv().load('.env');
+void initializeMain({bool? isTest}) async {
+  await DotEnv().load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarBrightness: Brightness.dark,
@@ -43,36 +43,51 @@ void initializeMain({bool isTest}) async {
   initializeLanguage(isTest: isTest);
 }
 
-void initializeLanguage({bool isTest}) async {
+void initializeLanguage({bool? isTest}) async {
   if (isTest != null && !isTest) {
-    oneSignalTimer = Timer.periodic(Duration(seconds: 4), (timer) {
-      initPlatformPlayerState();
-    });
+    // oneSignalTimer = Timer.periodic(Duration(seconds: 4), (timer) {
+    //   initPlatformPlayerState();
+    // });
     initPlatformPlayerState();
   }
 }
 
-void initPlatformPlayerState() async {
-  var settings = {
-    OSiOSSettings.autoPrompt: true,
-    OSiOSSettings.promptBeforeOpeningPushUrl: true
-  };
-  OneSignal.shared
-      .setNotificationReceivedHandler((OSNotification notification) {});
-  OneSignal.shared
-      .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
-  await OneSignal.shared.init(Constants.oneSignalKey, iOSSettings: settings);
-  OneSignal.shared
+// void initPlatformPlayerState() async {
+//   var settings = {
+//     OSiOSSettings.autoPrompt: true,
+//     OSiOSSettings.promptBeforeOpeningPushUrl: true
+//   };
+//   OneSignal.shared
+//       .setNotificationReceivedHandler((OSNotification notification) {});
+//   OneSignal.shared
+//       .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
+//   await OneSignal.shared.init(Constants.oneSignalKey, iOSSettings: settings);
+//   OneSignal.shared
+//       .promptUserForPushNotificationPermission(fallbackToSettings: true);
+//   OneSignal.shared
+//       .setInFocusDisplayType(OSNotificationDisplayType.notification);
+//   var status = await OneSignal.shared.getPermissionSubscriptionState();
+//   String playerId = status.subscriptionStatus.userId;
+//   if (playerId != null) {
+//     await Common.setPlayerID(playerId);
+//     setPlayerId();
+//     if (oneSignalTimer != null && oneSignalTimer.isActive)
+//       oneSignalTimer.cancel();
+//   }
+// }
+
+Future<void> initPlatformPlayerState() async {
+  await OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+  await OneSignal.shared.setAppId(Constants.oneSignalKey);
+  final allowed = await OneSignal.shared
       .promptUserForPushNotificationPermission(fallbackToSettings: true);
-  OneSignal.shared
-      .setInFocusDisplayType(OSNotificationDisplayType.notification);
-  var status = await OneSignal.shared.getPermissionSubscriptionState();
-  String playerId = status.subscriptionStatus.userId;
-  if (playerId != null) {
-    await Common.setPlayerID(playerId);
-    setPlayerId();
-    if (oneSignalTimer != null && oneSignalTimer.isActive)
-      oneSignalTimer.cancel();
+  if (allowed) {
+    var status =
+    await (OneSignal.shared.getDeviceState() as FutureOr<OSDeviceState>);
+    var playerId = status.userId;
+    if (playerId != null) {
+      await Common.setPlayerID(playerId);
+    }
   }
 }
 
@@ -97,8 +112,8 @@ class DeliveryApp extends StatefulWidget {
 class _DeliveryAppState extends State<DeliveryApp> {
   bool isLoggedIn = false, checkDeliveyDisOrNot = false;
   SocketService socket = SocketService();
-  Map localizedValues;
-  String locale;
+  Map? localizedValues;
+  String? locale;
   bool isGetJsonLoading = false;
   @override
   void initState() {
@@ -126,7 +141,7 @@ class _DeliveryAppState extends State<DeliveryApp> {
           "NO_INTERNET_MSG": value['response_data']['json'][locale]
               ["NO_INTERNET_MSG"]
         });
-        await Common.setSelectedLanguage(locale);
+        await Common.setSelectedLanguage(locale!);
       });
     });
   }
@@ -172,15 +187,15 @@ class _DeliveryAppState extends State<DeliveryApp> {
             darkTheme: ThemeData(brightness: Brightness.dark),
             home: AnimatedScreen())
         : MaterialApp(
-            locale: Locale(locale),
+            locale: Locale(locale!),
             localizationsDelegates: [
-              MyLocalizationsDelegate(localizedValues, [locale]),
+              MyLocalizationsDelegate(localizedValues!, [locale]),
               GlobalWidgetsLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
               DefaultCupertinoLocalizations.delegate
             ],
-            supportedLocales: [Locale(locale)],
+            supportedLocales: [Locale(locale!)],
             debugShowCheckedModeBanner: false,
             title: Constants.appName,
             theme: ThemeData(primaryColor: primary, accentColor: primary),

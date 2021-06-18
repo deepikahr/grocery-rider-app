@@ -21,7 +21,7 @@ Widget buttonPrimary(BuildContext context, title, bool isloading) {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+              Text(MyLocalizations.of(context)!.getLocalizations(title ?? ""),
                   style: titleXLargeWPB()),
               SizedBox(height: 10),
               isloading ? GFLoader(type: GFLoaderType.ios) : Text("")
@@ -49,7 +49,7 @@ Widget buttonSecondry(BuildContext context, title, bool isloading) {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+              Text(MyLocalizations.of(context)!.getLocalizations(title ?? ""),
                   style: titleXLargeWPB()),
               SizedBox(height: 10),
               isloading ? GFLoader(type: GFLoaderType.ios) : Text("")
@@ -69,7 +69,7 @@ Widget loginButton(BuildContext context, title, bool isLoading) {
         size: GFSize.LARGE,
         child: isLoading
             ? GFLoader(type: GFLoaderType.ios)
-            : Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+            : Text(MyLocalizations.of(context)!.getLocalizations(title ?? ""),
                 style: titleXLargeWPB()),
         color: secondary,
         blockButton: true),
@@ -82,7 +82,7 @@ Widget logoutButton(BuildContext context, title) {
     child: GFButton(
         onPressed: null,
         size: GFSize.LARGE,
-        child: Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+        child: Text(MyLocalizations.of(context)!.getLocalizations(title ?? ""),
             style: titleGPBSec()),
         type: GFButtonType.outline2x,
         color: secondary,
@@ -93,7 +93,7 @@ Widget logoutButton(BuildContext context, title) {
 Widget tostoreCustomerButton(BuildContext context, title) {
   return GFButton(
     onPressed: null,
-    text: MyLocalizations.of(context).getLocalizations(title ?? ""),
+    text: MyLocalizations.of(context)!.getLocalizations(title ?? ""),
     textStyle: titleRPM(red),
     icon: Icon(Icons.directions, color: Colors.red),
     color: Colors.white,
@@ -112,7 +112,7 @@ Widget acceptRejectButton(
       size: GFSize.LARGE,
       child: isloading && orderIndex == index
           ? SquareLoader()
-          : Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+          : Text(MyLocalizations.of(context)!.getLocalizations(title ?? ""),
               style: titleGPBB()),
       color: greyB,
       type: GFButtonType.outline2x,
@@ -128,7 +128,7 @@ Widget alartAcceptRejectButton(BuildContext context, title, bool isloading) {
       size: GFSize.LARGE,
       child: isloading
           ? SquareLoader()
-          : Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+          : Text(MyLocalizations.of(context)!.getLocalizations(title ?? ""),
               style: titleGPBB()),
       color: greyB,
       type: GFButtonType.outline2x,
@@ -146,7 +146,7 @@ Widget deliveredButton(
         size: GFSize.LARGE,
         child: isOrderStatusDeliveredLoading
             ? SquareLoader()
-            : Text(MyLocalizations.of(context).getLocalizations(title)),
+            : Text(MyLocalizations.of(context)!.getLocalizations(title)),
         textStyle: titleXLargeWPB(),
         color: secondary,
         blockButton: true),
@@ -159,7 +159,7 @@ Widget trackButton(BuildContext context, title) {
     child: GFButton(
         onPressed: null,
         size: GFSize.LARGE,
-        child: Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+        child: Text(MyLocalizations.of(context)!.getLocalizations(title ?? ""),
             style: titleGPBB()),
         textStyle: titleGPBB(),
         type: GFButtonType.outline2x,
@@ -177,7 +177,7 @@ Widget mapButton(BuildContext context, title) {
       ),
       child: GFButton(
         onPressed: null,
-        text: MyLocalizations.of(context).getLocalizations(title ?? ""),
+        text: MyLocalizations.of(context)!.getLocalizations(title ?? ""),
         textStyle: titleRPM(red),
         icon: Icon(Icons.directions, color: red),
         color: Colors.white,
@@ -199,8 +199,8 @@ Widget startAndStartedButton(BuildContext context, String startButtonText,
       onPressed: null,
       child: isOrderStatusOutForDeliveryLoading
           ? GFLoader(type: GFLoaderType.ios)
-          : Text(MyLocalizations.of(context)
-              .getLocalizations(startButtonText ?? "")),
+          : Text(MyLocalizations.of(context)!
+              .getLocalizations(startButtonText)),
       textStyle: titleRPM(startButtonText == 'START' ? red : primary),
       icon: Icon(
         startButtonText == 'START' ? Icons.play_arrow : Icons.check,
