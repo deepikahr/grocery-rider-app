@@ -8,10 +8,10 @@ import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/button.dart';
 
 class ResetPassword extends StatefulWidget {
-  final String locale, mobileNumber, token;
-  final Map localizedValues;
+  final String? locale, mobileNumber, token;
+  final Map? localizedValues;
   ResetPassword(
-      {Key key,
+      {Key? key,
       this.token,
       this.localizedValues,
       this.locale,
@@ -27,14 +27,14 @@ class _ResetPasswordState extends State<ResetPassword> {
   final TextEditingController _passwordTextController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String newpassword;
-  String password2;
+  String? newpassword;
+  String? password2;
   bool success = false, passwordVisible = true, passwordVisible1 = true;
 
   bool isResetPasswordLoading = false;
 
   resetPassword() async {
-    final form = _formKey.currentState;
+    final form = _formKey.currentState!;
     if (form.validate()) {
       form.save();
       if (mounted) {
@@ -71,9 +71,10 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                   ),
                   actions: <Widget>[
-                    new FlatButton(
+                    GFButton(
+                      color: Colors.transparent,
                       child: new Text(
-                        MyLocalizations.of(context).getLocalizations("OK"),
+                        MyLocalizations.of(context)!.getLocalizations("OK"),
                         style: textbarlowRegularaPrimary(),
                       ),
                       onPressed: () {
@@ -115,7 +116,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBarPrimary(context, "PASSWORD_RESET"),
+      appBar: appBarPrimary(context, "PASSWORD_RESET") as PreferredSizeWidget?,
       body: Form(
         key: _formKey,
         child: Container(
@@ -132,7 +133,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                       text: TextSpan(
                         children: <TextSpan>[
                           TextSpan(
-                              text: MyLocalizations.of(context)
+                              text: MyLocalizations.of(context)!
                                   .getLocalizations("ENTER_NEW_PASSWORD", true),
                               style: textBarlowRegularBlack()),
                           TextSpan(
@@ -178,18 +179,18 @@ class _ResetPasswordState extends State<ResetPassword> {
                         borderSide: BorderSide(color: primary),
                       ),
                     ),
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return MyLocalizations.of(context)
+                    validator: (String? value) {
+                      if (value!.isEmpty) {
+                        return MyLocalizations.of(context)!
                             .getLocalizations("ENTER_NEW_PASSWORD");
                       } else if (value.length < 6) {
-                        return MyLocalizations.of(context)
+                        return MyLocalizations.of(context)!
                             .getLocalizations("ERROR_PASS");
                       } else
                         return null;
                     },
                     controller: _passwordTextController,
-                    onSaved: (String value) {
+                    onSaved: (String? value) {
                       newpassword = value;
                     },
                     obscureText: passwordVisible1,
@@ -205,7 +206,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     text: TextSpan(
                       children: <TextSpan>[
                         TextSpan(
-                            text: MyLocalizations.of(context)
+                            text: MyLocalizations.of(context)!
                                 .getLocalizations("RE_ENTER_NEW_PASSWORD"),
                             style: textBarlowRegularBlack()),
                         TextSpan(
@@ -252,20 +253,20 @@ class _ResetPasswordState extends State<ResetPassword> {
                         borderSide: BorderSide(color: primary),
                       ),
                     ),
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return MyLocalizations.of(context)
+                    validator: (String? value) {
+                      if (value!.isEmpty) {
+                        return MyLocalizations.of(context)!
                             .getLocalizations("RE_ENTER_NEW_PASSWORD");
                       } else if (value.length < 6) {
-                        return MyLocalizations.of(context)
+                        return MyLocalizations.of(context)!
                             .getLocalizations("ERROR_PASS");
                       } else if (_passwordTextController.text != value) {
-                        return MyLocalizations.of(context)
+                        return MyLocalizations.of(context)!
                             .getLocalizations("PASS_NOT_MATCH");
                       } else
                         return null;
                     },
-                    onSaved: (String value) {
+                    onSaved: (String? value) {
                       password2 = value;
                     },
                     obscureText: passwordVisible,

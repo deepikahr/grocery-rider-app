@@ -14,20 +14,6 @@ ANDROID_GOOGLE_MAP_API_KEY=
 IOS_GOOGLE_MAP_API_KEY=
 PREDEFINED=
 ```
-
-### before doing flutter run. run this command once.
-
-if you close terminal you need to run this command again.
-```
-source .env; export ANDROID_GOOGLE_MAP_API_KEY=$ANDROID_GOOGLE_MAP_API_KEY;
-```
-
-for windows user need to set environment variables separately. using
-```
-set ANDROID_GOOGLE_MAP_API_KEY=
-```
-
-
 ### to generate new icons & splash for android and ios.
 
 replace new images on lib/assets/logo.png (1024px*1024px) & lib/assets/splash.png (375px*812px) and run following commands.
