@@ -59,7 +59,7 @@ workflows:
           - nidhiacharya2995@gmail.com
           - sarth@pietechsolution.com
       app_store_connect:
-        app_id: "1506770041"
+        # app_id: "1506770041"
         apple_id: pietechsolution@gmail.com
         password: Encrypted(Z0FBQUFBQmZKX1p3WU1obl9mTjBSa0tBOWpqSlRoNzBvVk53Vzl4eFpGRm5OVVdsVW5zbnFETThEaTBoNEhQdGJZb2Itc2I5SmlmTnVuRktxRWdmWEo4dFdWOXRVd2xrdXJHY1NlZHg3ZzBjZ21WbldlaF9QZTQ9)
       google_play:
