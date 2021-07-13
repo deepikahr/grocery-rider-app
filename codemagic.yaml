@@ -13,7 +13,7 @@ workflows:
         APP_STORE_CONNECT_KEY_IDENTIFIER: Encrypted(Z0FBQUFBQmZKX1htU3AzUXRYSDRxckJQOW5SbXBkb1VRSHFSY0pKZ0RzY1ZZSVdEU1U1X0NiTFV1UEphWW5vRWdtclBiN2JheVYyVGE2Y19sb3NyOXNaUjlScmtLbVMya1E9PQ==)
         APP_STORE_CONNECT_PRIVATE_KEY: Encrypted(Z0FBQUFBQmZKX1htQzllaFhRMG1LZGEwSXM0WkE4ZVZoZ1NLZkM3S0t4MXNlcW5tMnBPN2hGWi1pSVNia25wR25JM3ZEZWVIZlQ3a2swV2tWVm5OWVdXWDc3YjJDcEt2Z2tYZHFFQU9iRktwZy1HQ2RPZkpWenVMOEljQXU0NGY2aGJYdlVKMUhrRWE0OG5mUEdIVmN2RVlOZFFYLVFSdnNXYmRnTE9Pd1VkeXpzNy03NGMyUFBnNjNFY0R2RzhFTlBsTU8wRkhFU1JUX0pmcDZzWTlib3VQRmg1RDZ4SVcxY19ZaFZyTFBYODl1aGlTdi1vQ2dZZzhTdjhxSlUzWXFzeDVSeWljUTJzUkhkMUhUUkN1ck9PMFFEbTlMckprT290X21RYV9pTXhaVnI1MGhLUHp2WG0xQUp2d29ncEJMQkJMbWNCdmk1R2hFcVpLQllaNHZ1eWtWRFdPQ1QtMF8wZl9mWXJhTXZTdzR0NERsbHJJZjZxMkFkemJJUXQ4TFhiTUg0WThRRTVaQ2paZVEwdGlmYzNHUTROaHVRa0tiZ1prUWhoTUZlTWFIbW5UTHRRTEpsND0=)
         SH_FILE_VAR: Y2F0IDw8RU9UID4+IC5lbnYKQVBJX1VSTD0ke0FQSV9VUkx9Ck9ORV9TSUdOQUxfS0VZPSR7T05FX1NJR05BTF9LRVl9CkFORFJPSURfR09PR0xFX01BUF9BUElfS0VZPSR7QU5EUk9JRF9HT09HTEVfTUFQX0FQSV9LRVl9CklPU19HT09HTEVfTUFQX0FQSV9LRVk9JHtJT1NfR09PR0xFX01BUF9BUElfS0VZfQpQUkVERUZJTkVEPXRydWUKRU9U
-      flutter: 1.22.4
+      flutter: stable
       xcode: latest
       cocoapods: default
     cache:
@@ -26,7 +26,7 @@ workflows:
           include: true
           source: true
     scripts:
-      # - flutter upgrade
+      - flutter upgrade
       - export LC_CTYPE=C; export LANG=C;
       - find ios/Runner/AppDelegate.swift -type f -exec sed -i '' "s|IOS_GOOGLE_MAP_API_KEY|$IOS_GOOGLE_MAP_API_KEY|g" {} \;
       - echo $SH_FILE_VAR | base64 --decode > temp
@@ -70,7 +70,7 @@ workflows:
     name: Send Test Apk to given mails
     max_build_duration: 60
     environment:
-      flutter: 1.22.4
+      flutter: stable
       xcode: latest
       cocoapods: default
       vars:
@@ -88,7 +88,7 @@ workflows:
           include: true
           source: true
     scripts:
-      # - flutter upgrade
+      - flutter upgrade
       - export LC_CTYPE=C; export LANG=C;
       - echo $SH_FILE_VAR | base64 --decode > temp
       - sh temp
