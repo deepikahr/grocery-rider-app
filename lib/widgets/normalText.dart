@@ -33,7 +33,8 @@ Widget buildContainerField(BuildContext context, title) {
         Padding(
           padding: const EdgeInsets.only(
               top: 10.0, bottom: 10.0, left: 20.0, right: 20.0),
-          child: Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+          child: Text(
+              MyLocalizations.of(context)!.getLocalizations(title ?? ""),
               style: titleSmallBPR()),
         ),
       ],
@@ -53,9 +54,9 @@ Widget buildContainerFieldRow(BuildContext context, title, subTitle) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+          Text(MyLocalizations.of(context)!.getLocalizations(title ?? ""),
               style: titleSmallBPR()),
-          Text(MyLocalizations.of(context).getLocalizations(subTitle ?? ""),
+          Text(MyLocalizations.of(context)!.getLocalizations(subTitle ?? ""),
               style: titleSmallBPR()),
         ],
       ),
@@ -63,11 +64,11 @@ Widget buildContainerFieldRow(BuildContext context, title, subTitle) {
   );
 }
 
-Widget alertText(BuildContext context, title, Icon icon) {
+Widget alertText(BuildContext context, title, Icon? icon) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: <Widget>[
-      Text(MyLocalizations.of(context).getLocalizations(title ?? ""),
+      Text(MyLocalizations.of(context)!.getLocalizations(title ?? ""),
           style: hintSfboldBig()),
       icon != null ? icon : Container()
     ],
@@ -78,15 +79,17 @@ Widget orderSummary(BuildContext context, title, value) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: <Widget>[
-      Text(MyLocalizations.of(context).getLocalizations(title, true),
+      Text(MyLocalizations.of(context)!.getLocalizations(title, true),
           style: keyText()),
       Expanded(
-        child: Container(
-          alignment: AlignmentDirectional.centerEnd,
-          child: Text(MyLocalizations.of(context).getLocalizations(value ?? ""),
-              style: titleLargeBPM(),  textAlign: TextAlign.right),
-        )
-      ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(MyLocalizations.of(context)!.getLocalizations(value ?? ""),
+                style: titleLargeBPM()),
+          ],
+        ),
+      )
     ],
   );
 }
@@ -94,15 +97,15 @@ Widget orderSummary(BuildContext context, title, value) {
 Widget buildOrder(
     BuildContext context, Widget icon, title, value, bool container) {
   return Row(
-    children: <Widget>[
+    children: [
       icon,
-      Text(MyLocalizations.of(context).getLocalizations(title, true),
+      Text(MyLocalizations.of(context)!.getLocalizations(title, true),
           style: keyText()),
       container
           ? value
           : Expanded(
               child: Text(
-                  MyLocalizations.of(context).getLocalizations(value ?? ""),
+                  MyLocalizations.of(context)!.getLocalizations(value ?? ""),
                   style: keyValue()),
             )
     ],

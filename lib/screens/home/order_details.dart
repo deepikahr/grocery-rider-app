@@ -7,15 +7,14 @@ import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:grocerydelivery/widgets/normalText.dart';
-
 import '../../styles/styles.dart';
 
 class OrderDetails extends StatefulWidget {
-  final String orderID;
-  final Map localizedValues;
-  final String locale;
+  final String? orderID;
+  final Map? localizedValues;
+  final String? locale;
 
-  OrderDetails({Key key, this.localizedValues, this.locale, this.orderID})
+  OrderDetails({Key? key, this.localizedValues, this.locale, this.orderID})
       : super(key: key);
 
   @override
@@ -23,8 +22,8 @@ class OrderDetails extends StatefulWidget {
 }
 
 class _OrderDetailsState extends State<OrderDetails> {
-  Map order;
-  String currency, mobileNumber;
+  Map? order;
+  String? currency, mobileNumber;
   bool orderDataLoading = false;
   var fullName, deliveryAddress;
 
@@ -50,19 +49,18 @@ class _OrderDetailsState extends State<OrderDetails> {
             setState(() {
               order = value['response_data'];
 
-              String firstName = '', lastName = '';
-              if (order['order']['user'] != null &&
-                  order['order']['user']['firstName'] != null)
-                firstName = order['order']['user']['firstName'];
-              if (order['order']['user'] != null &&
-                  order['order']['user']['lastName'] != null)
-                lastName = order['order']['user']['lastName'];
-              mobileNumber =
-                  order['order']['user']['mobileNumber'].toString() ?? "";
+              String? firstName = '', lastName = '';
+              if (order!['order']['user'] != null &&
+                  order!['order']['user']['firstName'] != null)
+                firstName = order!['order']['user']['firstName'];
+              if (order!['order']['user'] != null &&
+                  order!['order']['user']['lastName'] != null)
+                lastName = order!['order']['user']['lastName'];
+              mobileNumber = '${order!['order']['user']['mobileNumber'] ?? ""}';
               fullName = '$firstName $lastName';
-              if (order['order']['address'] != null) {
+              if (order!['order']['address'] != null) {
                 deliveryAddress =
-                    '${order['order']['address']['flatNo']}, ${order['order']['address']['apartmentName']}, ${order['order']['address']['address']}';
+                    '${order!['order']['address']['flatNo']}, ${order!['order']['address']['apartmentName']}, ${order!['order']['address']['address']}';
               }
               orderDataLoading = false;
             });
@@ -87,7 +85,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarPrimary(context, "ORDER_DETAILS"),
+      appBar: appBarPrimary(context, "ORDER_DETAILS") as PreferredSizeWidget?,
       backgroundColor: greyA,
       body: orderDataLoading
           ? SquareLoader()
@@ -108,18 +106,18 @@ class _OrderDetailsState extends State<OrderDetails> {
         children: <Widget>[
           Text(fullName, style: titleXLargeBPSB()),
           SizedBox(height: 20),
-          Text(MyLocalizations.of(context).getLocalizations("ADDRESS", true),
+          Text(MyLocalizations.of(context)!.getLocalizations("ADDRESS", true),
               style: keyText()),
           Text(deliveryAddress, style: titleLargeBPM()),
           SizedBox(height: 20),
-          Text(MyLocalizations.of(context).getLocalizations("ITEMS", true),
+          Text(MyLocalizations.of(context)!.getLocalizations("ITEMS", true),
               style: keyText()),
           ListView.builder(
               physics: ScrollPhysics(),
               shrinkWrap: true,
-              itemCount: order['cart']['products'].length,
+              itemCount: order!['cart']['products'].length,
               itemBuilder: (BuildContext context, int index) {
-                List products = order['cart']['products'];
+                List products = order!['cart']['products'];
                 return Text(
                   "${products[index]['productName']} (${products[index]['unit']}) X ${products[index]['quantity']}",
                   style: titleLargeBPM(),
@@ -139,36 +137,36 @@ class _OrderDetailsState extends State<OrderDetails> {
           child: Column(
             children: [
               orderSummary(context, "ORDER_ID",
-                  "#${order['order']['orderID'].toString()}"),
-              orderSummary(context, "DATE", order['order']['deliveryDate']),
-              orderSummary(context, "TIME", order['order']['deliveryTime']),
-              orderSummary(context, "PAYMENT", order['order']['paymentType']),
+                  "#${order!['order']['orderID'].toString()}"),
+              orderSummary(context, "DATE", order!['order']['deliveryDate']),
+              orderSummary(context, "TIME", order!['order']['deliveryTime']),
+              orderSummary(context, "PAYMENT", order!['order']['paymentType']),
               orderSummary(
-                  context, "PAYMENT_STATUS", order['order']['paymentStatus']),
+                  context, "PAYMENT_STATUS", order!['order']['paymentStatus']),
               orderSummary(context, "SUB_TOTAL",
-                  "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
-              order['cart']['tax'] == 0
+                  "$currency${order!['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
+              order!['cart']['tax'] == 0
                   ? Container()
                   : orderSummary(context, "TAX",
-                      "$currency${order['cart']['tax'].toDouble().toStringAsFixed(2)}"),
-              order['cart']['deliveryCharges'] == 0
+                      "$currency${order!['cart']['tax'].toDouble().toStringAsFixed(2)}"),
+              order!['cart']['deliveryCharges'] == 0
                   ? Container()
                   : orderSummary(context, "DELIVERY_CHARGES",
-                      "$currency${order['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}"),
-              order['cart']['couponAmount'] == 0
+                      "$currency${order!['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}"),
+              order!['cart']['couponAmount'] == 0
                   ? Container()
                   : orderSummary(context, "DISCOUNT",
-                      "$currency${order['cart']['couponAmount'].toDouble().toStringAsFixed(2)}"),
-              order['cart']['walletAmount'] == 0
+                      "$currency${order!['cart']['couponAmount'].toDouble().toStringAsFixed(2)}"),
+              order!['cart']['walletAmount'] == 0
                   ? Container()
                   : orderSummary(context, "WALLET",
-                      "$currency${order['cart']['walletAmount'].toDouble().toStringAsFixed(2)}"),
+                      "$currency${order!['cart']['walletAmount'].toDouble().toStringAsFixed(2)}"),
               Divider(),
               orderSummary(context, "NOTE",
                   "${order['order']['deliveryInstruction']}"),
               Divider(),
               orderSummary(context, "TOTAL",
-                  "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
+                  "$currency${order!['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
               Divider(),
             ],
           ),

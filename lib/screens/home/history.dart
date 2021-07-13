@@ -11,10 +11,10 @@ import '../../styles/styles.dart';
 import 'order_details.dart';
 
 class History extends StatefulWidget {
-  final Map localizedValues;
-  final String locale;
+  final Map? localizedValues;
+  final String? locale;
 
-  History({Key key, this.localizedValues, this.locale}) : super(key: key);
+  History({Key? key, this.localizedValues, this.locale}) : super(key: key);
 
   @override
   _HistoryState createState() => _HistoryState();
@@ -23,7 +23,7 @@ class History extends StatefulWidget {
 class _HistoryState extends State<History> {
   bool deliverdOrderLoading = false, lastApiCall = false;
   List deliverdOrdersList = [];
-  int productLimt = 10, productIndex = 0, totalProduct = 1;
+  int? productLimt = 10, productIndex = 0, totalProduct = 1;
 
   @override
   void initState() {
@@ -50,7 +50,7 @@ class _HistoryState extends State<History> {
           int index = deliverdOrdersList.length;
           if (lastApiCall == true) {
             productIndex++;
-            if (index < totalProduct) {
+            if (index < totalProduct!) {
               getDeliverdInfo(productIndex);
             } else {
               if (index == totalProduct) {
@@ -82,7 +82,7 @@ class _HistoryState extends State<History> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarPrimary(context, "HISTORY"),
+      appBar: appBarPrimary(context, "HISTORY") as PreferredSizeWidget?,
       body: deliverdOrderLoading == true
           ? SquareLoader()
           : ListView(
@@ -90,7 +90,7 @@ class _HistoryState extends State<History> {
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
                   child: Text(
-                    MyLocalizations.of(context)
+                    MyLocalizations.of(context)!
                         .getLocalizations("COMPLETED_REQUESTS"),
                     style: titleBPS(),
                   ),
@@ -114,7 +114,7 @@ class _HistoryState extends State<History> {
                               color: greyB,
                             ),
                             Text(
-                              MyLocalizations.of(context)
+                              MyLocalizations.of(context)!
                                   .getLocalizations("NO_DELIVERED_ORDERS"),
                               style: titleBPS(),
                             ),

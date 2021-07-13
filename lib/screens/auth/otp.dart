@@ -9,20 +9,21 @@ import 'package:grocerydelivery/styles/styles.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
-import 'package:pin_entry_text_field/pin_entry_text_field.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import '../../styles/styles.dart';
 
 class Otp extends StatefulWidget {
   Otp(
-      {Key key,
+      {Key? key,
       this.locale,
       this.localizedValues,
       this.loginTime,
       this.mobileNumber,
       this.sId})
       : super(key: key);
-  final String mobileNumber, locale, sId;
-  final Map localizedValues;
-  final bool loginTime;
+  final String? mobileNumber, locale, sId;
+  final Map? localizedValues;
+  final bool? loginTime;
 
   @override
   _OtpState createState() => _OtpState();
@@ -33,7 +34,7 @@ class _OtpState extends State<Otp> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String enteredOtp, sid;
+  String? enteredOtp, sid;
   bool isOtpVerifyLoading = false,
       isEmailLoading = false,
       isResentOtpLoading = false;
@@ -45,7 +46,7 @@ class _OtpState extends State<Otp> {
 
   verifyOTP() async {
     if (enteredOtp != null) {
-      final form = _formKey.currentState;
+      final form = _formKey.currentState!;
       if (form.validate()) {
         form.save();
         if (mounted) {
@@ -82,9 +83,10 @@ class _OtpState extends State<Otp> {
                     ),
                   ),
                   actions: <Widget>[
-                    new FlatButton(
+                    GFButton(
+                      color: Colors.transparent,
                       child: new Text(
-                          MyLocalizations.of(context).getLocalizations("OK"),
+                          MyLocalizations.of(context)!.getLocalizations("OK"),
                           style: TextStyle(color: green)),
                       onPressed: () {
                         if (widget.loginTime == true) {
@@ -132,7 +134,7 @@ class _OtpState extends State<Otp> {
       builder: (BuildContext context) {
         return new AlertDialog(
           title: new Text(
-            MyLocalizations.of(context).getLocalizations("ERROR"),
+            MyLocalizations.of(context)!.getLocalizations("ERROR"),
             style: hintSfMediumredsmall(),
           ),
           content: new SingleChildScrollView(
@@ -146,9 +148,10 @@ class _OtpState extends State<Otp> {
             ),
           ),
           actions: <Widget>[
-            new FlatButton(
+            GFButton(
+              color: Colors.transparent,
               child: new Text(
-                MyLocalizations.of(context).getLocalizations("OK"),
+                MyLocalizations.of(context)!.getLocalizations("OK"),
                 style: textbarlowRegularaPrimary(),
               ),
               onPressed: () {
@@ -190,13 +193,13 @@ class _OtpState extends State<Otp> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBarPrimary(context, "WELCOME"),
+      appBar: appBarPrimary(context, "WELCOME") as PreferredSizeWidget?,
       body: ListView(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(top: 40.0, left: 15.0, right: 20.0),
             child: Text(
-              MyLocalizations.of(context).getLocalizations("VERIFY_OTP"),
+              MyLocalizations.of(context)!.getLocalizations("VERIFY_OTP"),
               style: textbarlowMediumBlack(),
             ),
           ),
@@ -206,7 +209,7 @@ class _OtpState extends State<Otp> {
               text: TextSpan(
                 children: <TextSpan>[
                   TextSpan(
-                      text: MyLocalizations.of(context)
+                      text: MyLocalizations.of(context)!
                           .getLocalizations("OTP_CODE_MSG"),
                       style: textBarlowRegularBlack()),
                   TextSpan(text: '', style: textBarlowMediumGreen()),
@@ -222,7 +225,7 @@ class _OtpState extends State<Otp> {
                   padding:
                       const EdgeInsets.only(left: 20.0, top: 10.0, right: 20.0),
                   child: Text(
-                      MyLocalizations.of(context)
+                      MyLocalizations.of(context)!
                           .getLocalizations("RESENT_OTP"),
                       style: textBarlowRegularBlack()),
                 ),
@@ -240,7 +243,7 @@ class _OtpState extends State<Otp> {
             child: GFTypography(
               showDivider: false,
               child: Text(
-                MyLocalizations.of(context)
+                MyLocalizations.of(context)!
                     .getLocalizations("ENTER_VERIFICATION_CODE", true),
                 style: textBarlowRegularBlack(),
               ),
@@ -248,16 +251,51 @@ class _OtpState extends State<Otp> {
           ),
           Form(
             key: _formKey,
-            child: Container(
-              width: 800,
-              child: PinEntryTextField(
-                showFieldAsBox: true,
-                fields: 6,
-                fieldWidth: 40.0,
-                onSubmit: (String pin) {
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+              child: PinCodeTextField(
+                appContext: context,
+                length: 6,
+                obscureText: true,
+                obscuringCharacter: '*',
+                blinkWhenObscuring: true,
+                animationType: AnimationType.fade,
+                validator: (v) {
+                  if (v!.length < 6) {
+                    return MyLocalizations.of(context)!
+                        .getLocalizations('ENTER_OTP_ERROR');
+                  } else {
+                    return null;
+                  }
+                },
+                pinTheme: PinTheme(
+                  borderWidth: 2,
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(5),
+                  fieldHeight: 50,
+                  fieldWidth: 40,
+                  activeColor: Colors.white,
+                  activeFillColor: Colors.white,
+                  selectedColor: Colors.white,
+                  selectedFillColor: Colors.white,
+                  inactiveColor: Colors.white,
+                  inactiveFillColor: Colors.white,
+                ),
+                cursorColor: Colors.black,
+                animationDuration: Duration(milliseconds: 300),
+                enableActiveFill: true,
+                keyboardType: TextInputType.number,
+                onCompleted: (String pin) {
                   if (mounted) {
                     setState(() {
                       enteredOtp = pin;
+                    });
+                  }
+                },
+                onChanged: (String value) {
+                  if (mounted) {
+                    setState(() {
+                      enteredOtp = value;
                     });
                   }
                 },
