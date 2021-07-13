@@ -3,7 +3,7 @@ import 'package:location/location.dart';
 
 class LocationModel extends ChangeNotifier {
   Location location = new Location();
-  LocationData _locationData;
+  LocationData? _locationData;
 
   void requestLocation() async {
     PermissionStatus _permissionGranted = await location.hasPermission();
@@ -29,5 +29,5 @@ class LocationModel extends ChangeNotifier {
     });
   }
 
-  LocationData get getLocation => _locationData;
+  LocationData? get getLocation => _locationData;
 }
