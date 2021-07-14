@@ -77,9 +77,9 @@ class Common {
 
   static Future<Map?> getNoConnection() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String info = prefs.getString('connection')!;
+    String? info = prefs.getString('connection');
     try {
-      return json.decode(info) as Map?;
+      return json.decode(info!) as Map?;
     } catch (err) {
       return Future(() => null);
     }
