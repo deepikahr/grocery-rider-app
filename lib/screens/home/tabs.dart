@@ -13,10 +13,10 @@ import 'home.dart';
 import 'profile.dart';
 
 class Tabs extends StatefulWidget {
-  final Map localizedValues;
-  final String locale;
+  final Map? localizedValues;
+  final String? locale;
 
-  Tabs({Key key, this.localizedValues, this.locale}) : super(key: key);
+  Tabs({Key? key, this.localizedValues, this.locale}) : super(key: key);
 
   @override
   _TabsState createState() => _TabsState();
@@ -25,8 +25,8 @@ class Tabs extends StatefulWidget {
 class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   SocketService socket = SocketService();
-  TabController tabController;
-  Map newOrder;
+  TabController? tabController;
+  Map? newOrder;
   bool isOrderAccept = false, isOrderReject = false;
   @override
   void initState() {
@@ -37,13 +37,13 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    if (tabController != null) tabController.dispose();
+    if (tabController != null) tabController!.dispose();
     super.dispose();
   }
 
   void getData() async {
     APIService.getLocationformation().then((onValue) async {
-      if (onValue['response_data'] != null &&
+      if (onValue!['response_data'] != null &&
           onValue['response_data']['currencySymbol'] != null) {
         Common.setCurrency(onValue['response_data']['currencySymbol']);
       } else {
@@ -153,7 +153,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               color: primary,
               height: 20,
             ),
-            text: MyLocalizations.of(context).getLocalizations("HOME"),
+            text: MyLocalizations.of(context)!.getLocalizations("HOME"),
           ),
           Tab(
             icon: SvgPicture.asset(
@@ -161,7 +161,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               color: primary,
               height: 20,
             ),
-            text: MyLocalizations.of(context).getLocalizations("PROFILE"),
+            text: MyLocalizations.of(context)!.getLocalizations("PROFILE"),
           ),
           Tab(
             icon: SvgPicture.asset(
@@ -169,7 +169,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
               color: primary,
               height: 20,
             ),
-            text: MyLocalizations.of(context).getLocalizations("HISTORY"),
+            text: MyLocalizations.of(context)!.getLocalizations("HISTORY"),
           ),
         ],
       ),
