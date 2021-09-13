@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:grocerydelivery/screens/auth/login.dart';
-import 'package:grocerydelivery/screens/home/tabs.dart';
+import 'package:grocerydelivery/screens/location_permission.dart';
 import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/auth.dart';
@@ -168,9 +167,11 @@ class _DeliveryAppState extends State<DeliveryApp> {
             debugShowCheckedModeBanner: false,
             title: Constants.appName,
             theme: ThemeData(primaryColor: primary, accentColor: primary),
-            home: isLoggedIn == false
-                ? LOGIN(locale: locale, localizedValues: localizedValues)
-                : Tabs(locale: locale, localizedValues: localizedValues),
+            home: LocationPermissionCheck(
+              isLoggedIn: isLoggedIn,
+              locale: locale,
+              localizedValues: localizedValues,
+            ),
           );
   }
 }

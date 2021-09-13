@@ -44,7 +44,7 @@ file('../../.env').readLines().each() {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -56,7 +56,7 @@ android {
     defaultConfig {
         applicationId "com.ionicfirebaseapp.grocerydelivery"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
