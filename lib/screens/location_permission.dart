@@ -3,9 +3,9 @@ import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
 import 'package:grocerydelivery/screens/home/tabs.dart';
 import 'package:grocerydelivery/services/localizations.dart';
+import 'package:grocerydelivery/services/locationService.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 import 'package:grocerydelivery/widgets/button.dart';
-import 'package:location/location.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:permission_handler/permission_handler.dart' as permission;
 
@@ -24,9 +24,6 @@ class LocationPermissionCheck extends StatefulWidget {
 
 class _LocationPermissionCheckState extends State<LocationPermissionCheck> {
   var message;
-  PermissionStatus? _permissionGranted;
-  Location _location = Location();
-  LocationData? currentLocation;
   bool isChecking = false;
   @override
   void initState() {
@@ -39,25 +36,14 @@ class _LocationPermissionCheckState extends State<LocationPermissionCheck> {
       isChecking = true;
       message = 'PLEASE_WAIT';
     });
-    _permissionGranted = await _location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await _location.requestPermission();
-      if (_permissionGranted == PermissionStatus.granted) {
-        goToPage();
-        return;
-      } else {
-        setState(() {
-          if (_permissionGranted == PermissionStatus.deniedForever) {
-            message = 'LOCATION_ALLOW_ERROR_MSG_PERMANTLY';
-          } else {
-            message = 'LOCATION_ALLOW_ERROR_MSG';
-          }
-          isChecking = false;
-        });
-      }
-    }
-    currentLocation = await _location.getLocation();
-    if (currentLocation != null) {
+    String permission = await LocationUtils().locationPermission();
+    print(permission);
+    if (permission != 'ALLOW') {
+      setState(() {
+        message = permission;
+        isChecking = false;
+      });
+    } else {
       goToPage();
     }
   }

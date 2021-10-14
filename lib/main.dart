@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_config/flutter_config.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:grocerydelivery/screens/location_permission.dart';
 import 'package:grocerydelivery/services/alert-service.dart';
@@ -24,8 +24,8 @@ void main() {
 }
 
 void initializeMain({bool? isTest}) async {
-  await dotenv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterConfig.loadEnvVariables();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarBrightness: Brightness.dark,
       statusBarIconBrightness: Brightness.dark));

@@ -305,6 +305,6 @@ class _ProfileState extends State<Profile> {
             });
           });
         },
-        child: logoutButton(context, "LOGOUT"));
+        child: Center(child: logoutButton(context, "LOGOUT")));
   }
 }

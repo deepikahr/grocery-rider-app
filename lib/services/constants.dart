@@ -1,23 +1,24 @@
 import 'dart:io';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'package:flutter_config/flutter_config.dart';
 
 class Constants {
   // app name
   static String appName = 'Readymade Grocery App';
 
   // Base url
-  static String? apiURL = dotenv.env['API_URL'];
+  static String? apiURL = FlutterConfig.get('API_URL');
 
   // One signal key
-  static String? oneSignalKey = dotenv.env['ONE_SIGNAL_KEY'];
+  static String? oneSignalKey = FlutterConfig.get('ONE_SIGNAL_KEY');
 
   // Google API key
   static String? googleMapApiKey = Platform.isIOS
-      ? dotenv.env['IOS_GOOGLE_MAP_API_KEY']
-      : dotenv.env['ANDROID_GOOGLE_MAP_API_KEY'];
+      ? FlutterConfig.get('IOS_GOOGLE_MAP_API_KEY')
+      : FlutterConfig.get('ANDROID_GOOGLE_MAP_API_KEY');
 
   // PREDEFINED
-  static String predefined = dotenv.env['PREDEFINED'] ?? "false";
+  static String predefined = FlutterConfig.get('PREDEFINED') ?? "false";
 
   //email validation
   static String emailValidation =
