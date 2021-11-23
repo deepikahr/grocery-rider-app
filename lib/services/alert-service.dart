@@ -8,21 +8,27 @@ import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 
 class AlertService {
-  Timer checkConnectionTimer;
+  Timer? checkConnectionTimer;
   bool isFirstTime = false;
-  AppLifecycleState state;
+  AppLifecycleState? state;
   checkConnectionMethod() async {
-    if (checkConnectionTimer != null && checkConnectionTimer.isActive)
-      checkConnectionTimer.cancel();
+    if (checkConnectionTimer != null && checkConnectionTimer!.isActive)
+      checkConnectionTimer!.cancel();
     checkConnectionTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
       var connectivityResult = await (Connectivity().checkConnectivity());
-      state = WidgetsBinding.instance.lifecycleState;
+      state = WidgetsBinding.instance!.lifecycleState;
       if (state != AppLifecycleState.paused) {
         Common.getNoConnection().then((value) {
-          String noInternet = value['NO_INTERNET'] ?? "No Internet connection";
-          String onlineMsg = value['ONLINE_MSG'] ?? "Now you are online.";
-          String noInternetMsg = value["NO_INTERNET_MSG"] ??
-              "requires an internet connection. Chcek you connection then try again.";
+          String? noInternet = (value == null || value['NO_INTERNET'] == null
+              ? "No Internet connection"
+              : value['NO_INTERNET']);
+          String? onlineMsg = (value == null || value['ONLINE_MSG'] == null
+              ? "Now you are online."
+              : value['ONLINE_MSG']);
+          String? noInternetMsg = (value == null ||
+                  value["NO_INTERNET_MSG"] == null
+              ? "requires an internet connection. Chcek you connection then try again."
+              : value["NO_INTERNET_MSG"]);
           if (connectivityResult == ConnectivityResult.none) {
             isFirstTime = true;
             String msg = "$noInternet\n ${Constants.appName} $noInternetMsg";
@@ -53,7 +59,7 @@ class AlertService {
     final snackBar = SnackBar(
         backgroundColor: primary,
         content:
-            Text(MyLocalizations.of(context).getLocalizations(message ?? "")),
+            Text(MyLocalizations.of(context)!.getLocalizations(message ?? "")),
         duration: Duration(milliseconds: 3000));
     _scaffoldKey.currentState.showSnackBar(snackBar);
   }

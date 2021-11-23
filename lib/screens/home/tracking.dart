@@ -1,8 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
@@ -11,7 +11,6 @@ import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:grocerydelivery/widgets/normalText.dart';
-import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,10 +21,10 @@ import '../../services/socket.dart';
 import '../../styles/styles.dart';
 
 class Tracking extends StatefulWidget {
-  final String orderID;
+  final String? orderID;
   final adminData, customerInfo;
 
-  Tracking({Key key, this.orderID, this.adminData, this.customerInfo})
+  Tracking({Key? key, this.orderID, this.adminData, this.customerInfo})
       : super(key: key);
 
   @override
@@ -35,21 +34,21 @@ class Tracking extends StatefulWidget {
 class _TrackingState extends State<Tracking> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  static BitmapDescriptor agentIcon, customerIcon, storeIcon;
+  static BitmapDescriptor? agentIcon, customerIcon, storeIcon;
   static const double CAMERA_ZOOM = 12;
   static const double CAMERA_TILT = 0;
   static const double CAMERA_BEARING = 30;
-  static LatLng agentLocation, customerLocation, storeLocation;
-  static Map order;
+  static LatLng? agentLocation, customerLocation, storeLocation;
+  static Map? order;
   final PolylinePoints polylinePoints = PolylinePoints();
   final Completer<GoogleMapController> _controller = Completer();
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
   final List<LatLng> polylineCoordinatesForAgentToStore = [];
   final List<LatLng> polylineCoordinatesForStoreToCustomer = [];
-  LocationData location;
-  String fullName = '', deliveryAddress = '', currency, mobileNumber;
-  SocketService socket;
+  Position? location;
+  String? fullName = '', deliveryAddress = '', currency, mobileNumber;
+  SocketService? socket;
   String startButtonText = 'START';
 
   SolidController _soldController = SolidController();
@@ -63,15 +62,19 @@ class _TrackingState extends State<Tracking> {
   void initState() {
     getOrderDetails();
     Common.getCurrency().then((value) {
-      currency = value;
+      setState(() {
+        currency = value;
+      });
     });
 
     location = Provider.of<LocationModel>(context, listen: false).getLocation;
-    if (location != null) {
-      agentLocation = LatLng(location.latitude, location.longitude);
-    } else {
-      agentLocation = LatLng(12.8718, 77.6022);
-    }
+    setState(() {
+      if (location != null) {
+        agentLocation = LatLng(location!.latitude, location!.longitude);
+      } else {
+        agentLocation = LatLng(12.8718, 77.6022);
+      }
+    });
     super.initState();
   }
 
@@ -88,22 +91,21 @@ class _TrackingState extends State<Tracking> {
           if (mounted) {
             setState(() {
               order = value['response_data'];
-              if (order['order']['orderStatus'] == 'OUT_FOR_DELIVERY')
+              if (order!['order']['orderStatus'] == 'OUT_FOR_DELIVERY')
                 startButtonText = 'STARTED';
 
-              String firstName = '', lastName = '';
-              if (order['order']['user'] != null &&
-                  order['order']['user']['firstName'] != null)
-                firstName = order['order']['user']['firstName'];
-              if (order['order']['user'] != null &&
-                  order['order']['user']['lastName'] != null)
-                lastName = order['order']['user']['lastName'];
-              mobileNumber =
-                  order['order']['user']['mobileNumber'].toString() ?? "";
+              String? firstName = '', lastName = '';
+              if (order!['order']['user'] != null &&
+                  order!['order']['user']['firstName'] != null)
+                firstName = order!['order']['user']['firstName'];
+              if (order!['order']['user'] != null &&
+                  order!['order']['user']['lastName'] != null)
+                lastName = order!['order']['user']['lastName'];
+              mobileNumber = '${order!['order']['user']['mobileNumber'] ?? ""}';
               fullName = '$firstName $lastName';
-              if (order['order']['address'] != null) {
+              if (order!['order']['address'] != null) {
                 deliveryAddress =
-                    '${order['order']['address']['flatNo']}, ${order['order']['address']['apartmentName']}, ${order['order']['address']['address']}';
+                    '${order!['order']['address']['flatNo']}, ${order!['order']['address']['apartmentName']}, ${order!['order']['address']['address']}';
               }
               orderDataLoading = false;
             });
@@ -157,18 +159,18 @@ class _TrackingState extends State<Tracking> {
       setState(() {
         _markers.add(Marker(
           markerId: MarkerId('agentPin'),
-          position: agentLocation,
-          icon: agentIcon,
+          position: agentLocation!,
+          icon: agentIcon!,
         ));
         _markers.add(Marker(
           markerId: MarkerId('customerPin'),
-          position: customerLocation,
-          icon: customerIcon,
+          position: customerLocation!,
+          icon: customerIcon!,
         ));
         _markers.add(Marker(
           markerId: MarkerId('storePin'),
-          position: storeLocation,
-          icon: storeIcon,
+          position: storeLocation!,
+          icon: storeIcon!,
         ));
       });
     }
@@ -176,30 +178,24 @@ class _TrackingState extends State<Tracking> {
   }
 
   void setPolylines() async {
-    List<PointLatLng> agentToStore =
-        await polylinePoints?.getRouteBetweenCoordinates(
-      Constants.googleMapApiKey,
-      agentLocation.latitude,
-      agentLocation.longitude,
-      storeLocation.latitude,
-      storeLocation.longitude,
+    var agentToStore = await polylinePoints.getRouteBetweenCoordinates(
+      Constants.googleMapApiKey!,
+      PointLatLng(agentLocation!.latitude, agentLocation!.longitude),
+      PointLatLng(storeLocation!.latitude, storeLocation!.longitude),
     );
-    if (agentToStore.isNotEmpty) {
-      agentToStore.forEach((PointLatLng point) {
+
+    if (agentToStore.points.isNotEmpty) {
+      agentToStore.points.forEach((PointLatLng point) {
         polylineCoordinatesForAgentToStore
             .add(LatLng(point.latitude, point.longitude));
       });
     }
-    List<PointLatLng> storeToCustomer =
-        await polylinePoints?.getRouteBetweenCoordinates(
-      Constants.googleMapApiKey,
-      storeLocation.latitude,
-      storeLocation.longitude,
-      customerLocation.latitude,
-      customerLocation.longitude,
-    );
-    if (storeToCustomer.isNotEmpty) {
-      storeToCustomer.forEach((PointLatLng point) {
+    var storeToCustomer = await polylinePoints.getRouteBetweenCoordinates(
+        Constants.googleMapApiKey!,
+        PointLatLng(storeLocation!.latitude, storeLocation!.longitude),
+        PointLatLng(customerLocation!.latitude, customerLocation!.longitude));
+    if (storeToCustomer.points.isNotEmpty) {
+      storeToCustomer.points.forEach((PointLatLng point) {
         polylineCoordinatesForStoreToCustomer
             .add(LatLng(point.latitude, point.longitude));
       });
@@ -253,7 +249,7 @@ class _TrackingState extends State<Tracking> {
 
   orderStatusChange(status) {
     Map body = {"status": status};
-    APIService.orderStausChange(body, order['order']['_id'].toString())
+    APIService.orderStausChange(body, order!['order']['_id'].toString())
         .then((value) {
       showSnackbar(value['response_data']);
       if (value['response_data'] != null && mounted) {
@@ -262,7 +258,7 @@ class _TrackingState extends State<Tracking> {
             Navigator.of(context).pop(true);
           } else {
             startButtonText = 'STARTED';
-            order['order']['orderStatus'] = "OUT_FOR_DELIVERY";
+            order!['order']['orderStatus'] = "OUT_FOR_DELIVERY";
           }
           isOrderStatusDeliveredLoading = false;
           isOrderStatusOutForDeliveryLoading = false;
@@ -286,11 +282,12 @@ class _TrackingState extends State<Tracking> {
   }
 
   void showSnackbar(message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(milliseconds: 3000),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(milliseconds: 3000),
+      ),
     );
-    _scaffoldKey.currentState.showSnackBar(snackBar);
   }
 
   @override
@@ -300,24 +297,47 @@ class _TrackingState extends State<Tracking> {
       key: _scaffoldKey,
       body: orderDataLoading
           ? SquareLoader()
-          : Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: GoogleMap(
-                onMapCreated: _onMapCreated,
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-                padding: EdgeInsets.all(0),
-                markers: _markers,
-                polylines: _polylines,
-                mapType: MapType.normal,
-                initialCameraPosition: CameraPosition(
-                  zoom: CAMERA_ZOOM,
-                  bearing: CAMERA_BEARING,
-                  tilt: CAMERA_TILT,
-                  target: agentLocation ?? LatLng(12.8718, 77.6022),
+          : Stack(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: GoogleMap(
+                    onMapCreated: _onMapCreated,
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    padding: EdgeInsets.all(0),
+                    markers: _markers,
+                    polylines: _polylines,
+                    mapType: MapType.normal,
+                    initialCameraPosition: CameraPosition(
+                      zoom: CAMERA_ZOOM,
+                      bearing: CAMERA_BEARING,
+                      tilt: CAMERA_TILT,
+                      target: agentLocation ?? LatLng(12.8718, 77.6022),
+                    ),
+                  ),
                 ),
-              ),
+                Positioned(
+                  top: 45,
+                  left: 20,
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        color: Colors.black26,
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
       bottomSheet: orderDataLoading
           ? SquareLoader()
@@ -369,18 +389,18 @@ class _TrackingState extends State<Tracking> {
                 children: <Widget>[
                   Row(children: <Widget>[
                     Text(
-                        MyLocalizations.of(context)
+                        MyLocalizations.of(context)!
                             .getLocalizations("DATE", true),
                         style: keyTextWhite()),
-                    Text(' ${order['order']['deliveryDate']}',
+                    Text(' ${order!['order']['deliveryDate']}',
                         style: titleWPM()),
                   ]),
                   Row(children: <Widget>[
                     Text(
-                        MyLocalizations.of(context)
+                        MyLocalizations.of(context)!
                             .getLocalizations("TIME", true),
                         style: keyTextWhite()),
-                    Text(' ${order['order']['deliveryTime']}',
+                    Text(' ${order!['order']['deliveryTime']}',
                         style: titleWPM()),
                   ]),
                 ])),
@@ -389,7 +409,7 @@ class _TrackingState extends State<Tracking> {
               padding: const EdgeInsets.only(left: 15.0, right: 15.0),
               child: InkWell(
                 onTap: () {
-                  if (order['order']['orderStatus'] == "CONFIRMED") {
+                  if (order!['order']['orderStatus'] == "CONFIRMED") {
                     if (mounted) {
                       setState(() {
                         isOrderStatusOutForDeliveryLoading = true;
@@ -414,7 +434,7 @@ class _TrackingState extends State<Tracking> {
           Padding(
             padding: EdgeInsets.only(left: 20, right: 15),
             child: Text(
-                MyLocalizations.of(context)
+                MyLocalizations.of(context)!
                     .getLocalizations("DIRECTIONS", true),
                 style: keyTextWhite()),
           ),
@@ -426,7 +446,7 @@ class _TrackingState extends State<Tracking> {
                     padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                     child: InkWell(
                       onTap: () {
-                        _launchMap(storeLocation);
+                        _launchMap(storeLocation!);
                       },
                       child: mapButton(context, "TO_STORE"),
                     ),
@@ -437,7 +457,7 @@ class _TrackingState extends State<Tracking> {
                     padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                     child: InkWell(
                       onTap: () {
-                        _launchMap(customerLocation);
+                        _launchMap(customerLocation!);
                       },
                       child: mapButton(context, "TO_CUSTOMER"),
                     ),
@@ -465,10 +485,10 @@ class _TrackingState extends State<Tracking> {
             padding: const EdgeInsets.only(left: 20, bottom: 5, right: 10),
             child: Row(children: <Widget>[
               Text(
-                  MyLocalizations.of(context)
+                  MyLocalizations.of(context)!
                       .getLocalizations("ORDER_ID", true),
                   style: keyText()),
-              Text('#${order['order']['orderID']}', style: keyValue()),
+              Text('#${order!['order']['orderID']}', style: keyValue()),
             ]),
           ),
           Container(
@@ -488,7 +508,7 @@ class _TrackingState extends State<Tracking> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(fullName, style: keyText()),
+                      Text(fullName!, style: keyText()),
                       Text(mobileNumber.toString(), style: titleSmallBPR())
                     ],
                   ),
@@ -525,7 +545,7 @@ class _TrackingState extends State<Tracking> {
         Padding(
           padding: const EdgeInsets.only(left: 20, bottom: 5, right: 15),
           child: Text(
-              MyLocalizations.of(context).getLocalizations("ADDRESS", true),
+              MyLocalizations.of(context)!.getLocalizations("ADDRESS", true),
               style: keyText()),
         ),
         Padding(
@@ -549,7 +569,7 @@ class _TrackingState extends State<Tracking> {
         Padding(
           padding: const EdgeInsets.only(left: 20, bottom: 5, right: 15),
           child: Text(
-              MyLocalizations.of(context).getLocalizations("ITEMS", true),
+              MyLocalizations.of(context)!.getLocalizations("ITEMS", true),
               style: keyText()),
         ),
         Container(
@@ -560,9 +580,9 @@ class _TrackingState extends State<Tracking> {
             child: ListView.builder(
                 physics: ScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: order['cart']['products'].length,
+                itemCount: order!['cart']['products'].length,
                 itemBuilder: (BuildContext context, int index) {
-                  List products = order['cart']['products'];
+                  List products = order!['cart']['products'];
                   return Text(
                       "${products[index]['productName']} (${products[index]['unit']}) X ${products[index]['quantity']}",
                       style: keyValue());
@@ -581,28 +601,29 @@ class _TrackingState extends State<Tracking> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                orderSummary(context, "PAYMENT", order['order']['paymentType']),
+                orderSummary(
+                    context, "PAYMENT", order!['order']['paymentType']),
                 orderSummary(context, "SUB_TOTAL",
-                    "$currency${order['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
-                order['cart']['tax'] == 0
+                    "$currency${order!['cart']['subTotal'].toDouble().toStringAsFixed(2)}"),
+                order!['cart']['tax'] == 0
                     ? Container()
                     : orderSummary(context, "TAX",
-                        "$currency${order['cart']['tax'].toDouble().toStringAsFixed(2)}"),
-                order['cart']['deliveryCharges'] == 0
+                        "$currency${order!['cart']['tax'].toDouble().toStringAsFixed(2)}"),
+                order!['cart']['deliveryCharges'] == 0
                     ? Container()
                     : orderSummary(context, "DELIVERY_CHARGES",
-                        "$currency${order['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}"),
-                order['cart']['couponAmount'] == 0
+                        "$currency${order!['cart']['deliveryCharges'].toDouble().toStringAsFixed(2)}"),
+                order!['cart']['couponAmount'] == 0
                     ? Container()
                     : orderSummary(context, "DISCOUNT",
-                        "$currency${order['cart']['couponAmount'].toDouble().toStringAsFixed(2)}"),
-                order['cart']['walletAmount'] == 0
+                        "$currency${order!['cart']['couponAmount'].toDouble().toStringAsFixed(2)}"),
+                order!['cart']['walletAmount'] == 0
                     ? Container()
                     : orderSummary(context, "WALLET",
-                        "$currency${order['cart']['walletAmount'].toDouble().toStringAsFixed(2)}"),
+                        "$currency${order!['cart']['walletAmount'].toDouble().toStringAsFixed(2)}"),
                 Divider(),
                 orderSummary(context, "TOTAL",
-                    "$currency${order['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
+                    "$currency${order!['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),
                 Divider(),
               ],
             ),
@@ -613,10 +634,10 @@ class _TrackingState extends State<Tracking> {
   }
 
   Widget buildDeliveredButton() {
-    return order['order']['orderStatus'] == 'OUT_FOR_DELIVERY'
+    return order!['order']['orderStatus'] == 'OUT_FOR_DELIVERY'
         ? InkWell(
             onTap: () async {
-              if (order['order']['orderStatus'] == "OUT_FOR_DELIVERY") {
+              if (order!['order']['orderStatus'] == "OUT_FOR_DELIVERY") {
                 if (mounted) {
                   setState(() {
                     isOrderStatusDeliveredLoading = true;
