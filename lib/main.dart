@@ -2,10 +2,9 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_config/flutter_config.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:grocerydelivery/screens/auth/login.dart';
-import 'package:grocerydelivery/screens/home/tabs.dart';
+import 'package:grocerydelivery/screens/location_permission.dart';
 import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/auth.dart';
@@ -25,8 +24,8 @@ void main() {
 }
 
 void initializeMain({bool? isTest}) async {
-  await dotenv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterConfig.loadEnvVariables();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarBrightness: Brightness.dark,
       statusBarIconBrightness: Brightness.dark));
@@ -50,10 +49,9 @@ void initializeLanguage({bool? isTest}) async {
 void initPlatformPlayerState() async {
   await OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
   await OneSignal.shared.setAppId(Constants.oneSignalKey!);
-  await OneSignal.shared
-      .promptUserForPushNotificationPermission(fallbackToSettings: true);
-  var status = await (OneSignal.shared.getDeviceState());
-  var playerId = status?.userId;
+  await OneSignal.shared.promptUserForPushNotificationPermission();
+  var playerId = (await OneSignal.shared.getDeviceState())?.userId;
+  print('playerId-- $playerId');
   if (playerId != null) {
     await Common.setPlayerID(playerId);
     setPlayerId();
@@ -168,9 +166,11 @@ class _DeliveryAppState extends State<DeliveryApp> {
             debugShowCheckedModeBanner: false,
             title: Constants.appName,
             theme: ThemeData(primaryColor: primary, accentColor: primary),
-            home: isLoggedIn == false
-                ? LOGIN(locale: locale, localizedValues: localizedValues)
-                : Tabs(locale: locale, localizedValues: localizedValues),
+            home: LocationPermissionCheck(
+              isLoggedIn: isLoggedIn,
+              locale: locale,
+              localizedValues: localizedValues,
+            ),
           );
   }
 }

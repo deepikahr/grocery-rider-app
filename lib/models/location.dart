@@ -1,33 +1,20 @@
 import 'package:flutter/foundation.dart';
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:grocerydelivery/services/locationService.dart';
 
 class LocationModel extends ChangeNotifier {
-  Location location = new Location();
-  LocationData? _locationData;
+  Position? _locationData;
 
   void requestLocation() async {
-    PermissionStatus _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-    bool _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-    }
-    _locationData = await location.getLocation();
+    _locationData = await LocationUtils().currentLocation();
     onLocationChange();
     notifyListeners();
   }
 
-  void onLocationChange() {
-    location.onLocationChanged.listen((LocationData currentLocation) {
-      _locationData = currentLocation;
-      notifyListeners();
-    });
+  Future<void> onLocationChange() async {
+    _locationData = await LocationUtils().currentLocation();
+    notifyListeners();
   }
 
-  LocationData? get getLocation => _locationData;
+  Position? get getLocation => _locationData;
 }

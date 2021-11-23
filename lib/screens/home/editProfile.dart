@@ -283,7 +283,7 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: appBar(context, "EDIT_PROFILE") as PreferredSizeWidget?,
+      appBar: appBarPrimary(context, "EDIT_PROFILE") as PreferredSizeWidget?,
       body: isLoading
           ? SquareLoader()
           : Form(
