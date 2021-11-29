@@ -61,11 +61,7 @@ class _TrackingState extends State<Tracking> {
   @override
   void initState() {
     getOrderDetails();
-    Common.getCurrency().then((value) {
-      setState(() {
-        currency = value;
-      });
-    });
+    Common.getCurrency().then((value) => setState(() => currency = value));
 
     location = Provider.of<LocationModel>(context, listen: false).getLocation;
     setState(() {
@@ -251,7 +247,8 @@ class _TrackingState extends State<Tracking> {
     Map body = {"status": status};
     APIService.orderStausChange(body, order!['order']['_id'].toString())
         .then((value) {
-      showSnackbar(value['response_data']);
+      AlertService()
+          .showSnackbar(value['response_data'], context, _scaffoldKey);
       if (value['response_data'] != null && mounted) {
         setState(() {
           if (status == "DELIVERED") {
@@ -279,15 +276,6 @@ class _TrackingState extends State<Tracking> {
         });
       }
     });
-  }
-
-  void showSnackbar(message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: Duration(milliseconds: 3000),
-      ),
-    );
   }
 
   @override

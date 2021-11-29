@@ -276,7 +276,8 @@ class _LOGINState extends State<LOGIN> {
             borderSide: BorderSide(color: greyA, width: 1.0)),
         errorStyle: titleVerySamllPPB(),
       ),
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
       validator: (String? value) {
         if (value!.isEmpty) {
           return MyLocalizations.of(context)!
@@ -310,6 +311,7 @@ class _LOGINState extends State<LOGIN> {
         errorStyle: titleVerySamllPPB(),
       ),
       keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.done,
       obscureText: true,
       validator: (String? value) {
         if (value!.isEmpty || value.length < 6) {
