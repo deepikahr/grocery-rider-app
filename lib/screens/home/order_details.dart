@@ -30,9 +30,8 @@ class _OrderDetailsState extends State<OrderDetails> {
   @override
   void initState() {
     getOrderDetails();
-    Common.getCurrency().then((value) {
-      currency = value;
-    });
+    Common.getCurrency().then((value) => setState(() => currency = value));
+
     super.initState();
   }
 

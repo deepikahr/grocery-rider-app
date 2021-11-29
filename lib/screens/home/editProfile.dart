@@ -385,6 +385,7 @@ class _EditProfileState extends State<EditProfile> {
                       initialValue: userInfo!['firstName'] ?? "",
                       style: textBarlowRegularBlack(),
                       keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         errorBorder: OutlineInputBorder(
                             borderSide:
@@ -434,6 +435,7 @@ class _EditProfileState extends State<EditProfile> {
                       initialValue: userInfo!['lastName'] ?? "",
                       style: textBarlowRegularBlack(),
                       keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         errorBorder: OutlineInputBorder(
                             borderSide:
@@ -482,7 +484,8 @@ class _EditProfileState extends State<EditProfile> {
                     child: TextFormField(
                       initialValue: userInfo!['email'] ?? "",
                       style: textBarlowRegularBlack(),
-                      keyboardType: TextInputType.text,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
                         errorBorder: OutlineInputBorder(
                             borderSide:
@@ -519,24 +522,27 @@ class _EditProfileState extends State<EditProfile> {
                 ],
               ),
             ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-        child: Container(
-          height: 51,
-          child: GFButton(
-              onPressed: () {
-                if (!isLoading) updateUserInformation();
-              },
-              size: GFSize.LARGE,
-              child: profileEdit
-                  ? GFLoader(type: GFLoaderType.ios)
-                  : Text(
-                      MyLocalizations.of(context)!.getLocalizations("SUBMIT"),
-                      style: titleXLargeWPB()),
-              color: secondary,
-              blockButton: true),
-        ),
-      ),
+      bottomNavigationBar: isLoading
+          ? Container(height: 1)
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+              child: Container(
+                height: 51,
+                child: GFButton(
+                    onPressed: () {
+                      if (!isLoading) updateUserInformation();
+                    },
+                    size: GFSize.LARGE,
+                    child: profileEdit
+                        ? GFLoader(type: GFLoaderType.ios)
+                        : Text(
+                            MyLocalizations.of(context)!
+                                .getLocalizations("SUBMIT"),
+                            style: titleXLargeWPB()),
+                    color: secondary,
+                    blockButton: true),
+              ),
+            ),
     );
   }
 }

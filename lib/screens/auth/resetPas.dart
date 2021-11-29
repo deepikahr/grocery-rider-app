@@ -151,7 +151,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                   padding: const EdgeInsets.only(
                       left: 20.0, right: 20.0, bottom: 20.0),
                   child: TextFormField(
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                       errorBorder: OutlineInputBorder(
                           borderSide:
@@ -222,7 +223,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                   child: TextFormField(
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
