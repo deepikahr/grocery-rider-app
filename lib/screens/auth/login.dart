@@ -8,7 +8,8 @@ import 'package:grocerydelivery/services/constants.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/appBar.dart';
 import 'package:grocerydelivery/widgets/button.dart';
-
+import 'package:grocerydelivery/widgets/loader.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../../services/auth.dart';
 import '../../services/common.dart';
 import '../../styles/styles.dart';
@@ -28,8 +29,25 @@ class _LOGINState extends State<LOGIN> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String? userName, password;
+  String? userName, password, playerIdTemp;
   bool isLoading = false;
+  @override
+  void initState() {
+    configLocalNotification();
+    super.initState();
+  }
+
+  Future<void> configLocalNotification() async {
+    var playerId = (await (OneSignal.shared.getDeviceState()))?.userId;
+    if (playerId != null) {
+      setState(() {
+        playerIdTemp = playerId;
+      });
+      await Common.setPlayerID(playerId);
+    } else {
+      configLocalNotification();
+    }
+  }
 
   void loginMethod() async {
     if (_formKey.currentState!.validate()) {
@@ -37,51 +55,63 @@ class _LOGINState extends State<LOGIN> {
         isLoading = true;
       });
       _formKey.currentState!.save();
-      Common.getPlayerId().then((palyerId) {
-        Map body = {
-          'userName': userName,
-          'password': password,
-          "playerId": palyerId ?? 'no id found'
-        };
-        AuthService.login(body).then((onValue) {
-          if (onValue['response_code'] == 205) {
-            showAlert(onValue['response_data'], userName);
-          } else if (onValue['response_data'] != null &&
-              onValue['response_data']['token'] != null) {
-            if (onValue['response_data']['role'] == 'DELIVERY_BOY') {
-              Common.setToken(onValue['response_data']['token'])
-                  .then((_) async {
-                Common.setAccountID(onValue['response_data']['id']);
-                if (mounted) {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => Tabs(
-                            locale: widget.locale,
-                            localizedValues: widget.localizedValues),
-                      ),
-                      (Route<dynamic> route) => false);
-                }
-              });
-            } else {
-              AlertService().showSnackbar(
-                  '$userName ${MyLocalizations.of(context)!.getLocalizations("AUTHORICATION_ERROR")}',
-                  context,
-                  _scaffoldKey);
-            }
-          } else {
-            AlertService().showSnackbar("WRONG_FORMAT", context, _scaffoldKey);
-          }
+      Common.getPlayerId().then((playerId) async {
+        Map body = {'userName': userName, 'password': password};
+        if (playerId == null) {
+          var playerIdData = (await OneSignal.shared.getDeviceState())?.userId;
+          await Common.setPlayerID(playerIdData!);
+          print('playerIdData-- $playerIdData');
           setState(() {
-            isLoading = false;
+            body['playerId'] = playerIdData;
+            loginMethodNew(body);
           });
-        }).catchError((onError) {
+        } else {
           setState(() {
-            isLoading = false;
+            body['playerId'] = playerId;
+            loginMethodNew(body);
           });
-        });
+        }
       });
     }
+  }
+
+  loginMethodNew(body) {
+    AuthService.login(body).then((onValue) {
+      if (onValue['response_code'] == 205) {
+        showAlert(onValue['response_data'], userName);
+      } else if (onValue['response_data'] != null &&
+          onValue['response_data']['token'] != null) {
+        if (onValue['response_data']['role'] == 'DELIVERY_BOY') {
+          Common.setToken(onValue['response_data']['token']).then((_) async {
+            Common.setAccountID(onValue['response_data']['id']);
+            if (mounted) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => Tabs(
+                        locale: widget.locale,
+                        localizedValues: widget.localizedValues),
+                  ),
+                  (Route<dynamic> route) => false);
+            }
+          });
+        } else {
+          AlertService().showSnackbar(
+              '$userName ${MyLocalizations.of(context)!.getLocalizations("AUTHORICATION_ERROR")}',
+              context,
+              _scaffoldKey);
+        }
+      } else {
+        AlertService().showSnackbar("WRONG_FORMAT", context, _scaffoldKey);
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }).catchError((onError) {
+      setState(() {
+        isLoading = false;
+      });
+    });
   }
 
   showAlert(message, mobileNumber) {
@@ -142,53 +172,55 @@ class _LOGINState extends State<LOGIN> {
       key: _scaffoldKey,
       appBar: appBarPrimary(context, "LOGIN") as PreferredSizeWidget?,
       backgroundColor: Colors.white,
-      body: ListView(
-        children: <Widget>[
-          Container(
-            height: MediaQuery.of(context).size.height * 0.85,
-            child: Stack(
-              alignment: AlignmentDirectional.center,
+      body: playerIdTemp == null
+          ? SquareLoader()
+          : ListView(
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(height: 50),
-                        Center(
-                            child: GFAvatar(
-                                backgroundImage:
-                                    AssetImage('lib/assets/logo.png'),
-                                radius: 60)),
-                        SizedBox(height: 30),
-                        Text(
-                            MyLocalizations.of(context)!.getLocalizations(
-                                "EMAIL_OR_MOBILE_NUMBER", true),
-                            style: titleSmallBPR()),
-                        SizedBox(height: 10),
-                        buildEmailOrMobileNumberTextFormField(),
-                        SizedBox(height: 25),
-                        Text(
-                            MyLocalizations.of(context)!
-                                .getLocalizations("PASSWORD", true),
-                            style: titleSmallBPR()),
-                        SizedBox(height: 10),
-                        buildPasswordextFormField(),
-                        SizedBox(height: 10),
-                        buildForgotPasswordLink(),
-                        SizedBox(height: 10),
-                      ],
-                    ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.85,
+                  child: Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              SizedBox(height: 50),
+                              Center(
+                                  child: GFAvatar(
+                                      backgroundImage:
+                                          AssetImage('lib/assets/logo.png'),
+                                      radius: 60)),
+                              SizedBox(height: 30),
+                              Text(
+                                  MyLocalizations.of(context)!.getLocalizations(
+                                      "EMAIL_OR_MOBILE_NUMBER", true),
+                                  style: titleSmallBPR()),
+                              SizedBox(height: 10),
+                              buildEmailOrMobileNumberTextFormField(),
+                              SizedBox(height: 25),
+                              Text(
+                                  MyLocalizations.of(context)!
+                                      .getLocalizations("PASSWORD", true),
+                                  style: titleSmallBPR()),
+                              SizedBox(height: 10),
+                              buildPasswordextFormField(),
+                              SizedBox(height: 10),
+                              buildForgotPasswordLink(),
+                              SizedBox(height: 10),
+                            ],
+                          ),
+                        ),
+                      ),
+                      buildlOGINButton()
+                    ],
                   ),
                 ),
-                buildlOGINButton()
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -244,7 +276,8 @@ class _LOGINState extends State<LOGIN> {
             borderSide: BorderSide(color: greyA, width: 1.0)),
         errorStyle: titleVerySamllPPB(),
       ),
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.next,
       validator: (String? value) {
         if (value!.isEmpty) {
           return MyLocalizations.of(context)!
@@ -278,6 +311,7 @@ class _LOGINState extends State<LOGIN> {
         errorStyle: titleVerySamllPPB(),
       ),
       keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.done,
       obscureText: true,
       validator: (String? value) {
         if (value!.isEmpty || value.length < 6) {

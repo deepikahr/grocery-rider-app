@@ -30,9 +30,8 @@ class _OrderDetailsState extends State<OrderDetails> {
   @override
   void initState() {
     getOrderDetails();
-    Common.getCurrency().then((value) {
-      currency = value;
-    });
+    Common.getCurrency().then((value) => setState(() => currency = value));
+
     super.initState();
   }
 
@@ -161,9 +160,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                   ? Container()
                   : orderSummary(context, "WALLET",
                       "$currency${order!['cart']['walletAmount'].toDouble().toStringAsFixed(2)}"),
-              // Divider(),
-              // orderSummary(
-              //     context, "NOTE", "${order!['order']['deliveryInstruction']}"),
+              Divider(),
+              orderSummary(
+                  context, "NOTE", "${order!['order']['deliveryInstruction']}"),
               Divider(),
               orderSummary(context, "TOTAL",
                   "$currency${order!['cart']['grandTotal'].toDouble().toStringAsFixed(2)}"),

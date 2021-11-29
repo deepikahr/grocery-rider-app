@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
@@ -10,7 +11,6 @@ import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/widgets/button.dart';
 import 'package:grocerydelivery/widgets/loader.dart';
 import 'package:grocerydelivery/widgets/normalText.dart';
-import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -46,7 +46,7 @@ class _TrackingState extends State<Tracking> {
   final Set<Polyline> _polylines = {};
   final List<LatLng> polylineCoordinatesForAgentToStore = [];
   final List<LatLng> polylineCoordinatesForStoreToCustomer = [];
-  LocationData? location;
+  Position? location;
   String? fullName = '', deliveryAddress = '', currency, mobileNumber;
   SocketService? socket;
   String startButtonText = 'START';
@@ -61,16 +61,16 @@ class _TrackingState extends State<Tracking> {
   @override
   void initState() {
     getOrderDetails();
-    Common.getCurrency().then((value) {
-      currency = value;
-    });
+    Common.getCurrency().then((value) => setState(() => currency = value));
 
     location = Provider.of<LocationModel>(context, listen: false).getLocation;
-    if (location != null) {
-      agentLocation = LatLng(location!.latitude!, location!.longitude!);
-    } else {
-      agentLocation = LatLng(12.8718, 77.6022);
-    }
+    setState(() {
+      if (location != null) {
+        agentLocation = LatLng(location!.latitude, location!.longitude);
+      } else {
+        agentLocation = LatLng(12.8718, 77.6022);
+      }
+    });
     super.initState();
   }
 
@@ -247,7 +247,8 @@ class _TrackingState extends State<Tracking> {
     Map body = {"status": status};
     APIService.orderStausChange(body, order!['order']['_id'].toString())
         .then((value) {
-      showSnackbar(value['response_data']);
+      AlertService()
+          .showSnackbar(value['response_data'], context, _scaffoldKey);
       if (value['response_data'] != null && mounted) {
         setState(() {
           if (status == "DELIVERED") {
@@ -277,15 +278,6 @@ class _TrackingState extends State<Tracking> {
     });
   }
 
-  void showSnackbar(message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: Duration(milliseconds: 3000),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     socket = Provider.of<SocketModel>(context, listen: false).getSocketInstance;
@@ -293,24 +285,47 @@ class _TrackingState extends State<Tracking> {
       key: _scaffoldKey,
       body: orderDataLoading
           ? SquareLoader()
-          : Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: GoogleMap(
-                onMapCreated: _onMapCreated,
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-                padding: EdgeInsets.all(0),
-                markers: _markers,
-                polylines: _polylines,
-                mapType: MapType.normal,
-                initialCameraPosition: CameraPosition(
-                  zoom: CAMERA_ZOOM,
-                  bearing: CAMERA_BEARING,
-                  tilt: CAMERA_TILT,
-                  target: agentLocation ?? LatLng(12.8718, 77.6022),
+          : Stack(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: GoogleMap(
+                    onMapCreated: _onMapCreated,
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    padding: EdgeInsets.all(0),
+                    markers: _markers,
+                    polylines: _polylines,
+                    mapType: MapType.normal,
+                    initialCameraPosition: CameraPosition(
+                      zoom: CAMERA_ZOOM,
+                      bearing: CAMERA_BEARING,
+                      tilt: CAMERA_TILT,
+                      target: agentLocation ?? LatLng(12.8718, 77.6022),
+                    ),
+                  ),
                 ),
-              ),
+                Positioned(
+                  top: 45,
+                  left: 20,
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        color: Colors.black26,
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
       bottomSheet: orderDataLoading
           ? SquareLoader()

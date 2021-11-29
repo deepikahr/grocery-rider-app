@@ -24,6 +24,7 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+apply from: project(':flutter_config').projectDir.getPath() + "/dotenv.gradle"
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
@@ -31,20 +32,8 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-def googleMapApiKey = "";
-file('../../.env').readLines().each() {
-    if (!it.isEmpty() && !it.startsWith("#")) {
-        def pos = it.indexOf("=")
-        def key = it.substring(0, pos)
-        def value = it.substring(pos + 1)
-        if (key == "ANDROID_GOOGLE_MAP_API_KEY") {
-            googleMapApiKey = value
-        }
-    }
-}
-
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -56,13 +45,11 @@ android {
     defaultConfig {
         applicationId "com.ionicfirebaseapp.grocerydelivery"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-        manifestPlaceholders = [googleMapApiKey: googleMapApiKey]
-
     }
 
     signingConfigs {

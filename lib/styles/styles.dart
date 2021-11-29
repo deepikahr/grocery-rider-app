@@ -428,3 +428,12 @@ TextStyle textAddressLocationLow() {
     color: Colors.black.withOpacity(0.6),
   );
 }
+
+TextStyle textmediumblack() {
+  return TextStyle(
+    fontWeight: FontWeight.w600,
+    fontSize: 16.0,
+    color: Colors.black,
+    fontFamily: 'MontserratMedium',
+  );
+}

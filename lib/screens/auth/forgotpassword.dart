@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/otp.dart';
 import 'package:grocerydelivery/services/auth.dart';
@@ -170,7 +171,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         return null;
                     },
                     style: textBarlowRegularBlack(),
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.numberWithOptions(
+                        signed: true, decimal: false),
+                    textInputAction: TextInputAction.done,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                         errorBorder: OutlineInputBorder(
                             borderSide:
