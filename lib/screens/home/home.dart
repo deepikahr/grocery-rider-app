@@ -175,11 +175,15 @@ class _HomeState extends State<Home> {
           );
           result.then((value) {
             if (value != null) {
-              productLimt = 10;
-              productIndex = 0;
-              totalProduct = 1;
-              assignedOrdersList = [];
-
+              if (mounted) {
+                setState(() {
+                  assignedOrderLoading = true;
+                  productLimt = 10;
+                  productIndex = 0;
+                  totalProduct = 1;
+                  assignedOrdersList = [];
+                });
+              }
               getAssignedOrders(productIndex);
               getAdminInfo();
             }
@@ -247,12 +251,17 @@ class _HomeState extends State<Home> {
         setState(() {
           isNewOrderAccept = false;
           setState(() {
-            productLimt = 10;
-            productIndex = 0;
-            totalProduct = 1;
-            assignedOrdersList = [];
+            if (mounted) {
+              setState(() {
+                assignedOrderLoading = true;
+                productLimt = 10;
+                productIndex = 0;
+                totalProduct = 1;
+                assignedOrdersList = [];
+                newOrder = null;
+              });
+            }
             getAssignedOrders(productIndex);
-            newOrder = null;
           });
         });
       } else {
