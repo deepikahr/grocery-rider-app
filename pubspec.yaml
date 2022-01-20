@@ -15,9 +15,9 @@ dependencies:
     git:
       url: https://github.com/ionicfirebaseapp/getwidget.git
   http: ^0.13.3
-  google_maps_flutter: ^2.0.6
+  google_maps_flutter: ^2.1.1
   flutter_polyline_points: ^1.0.0
-  geolocator: ^7.7.0
+  geolocator: ^8.0.3
   solid_bottom_sheet: ^0.1.10
   shared_preferences: ^2.0.6
   socket_io_client: ^1.0.1
