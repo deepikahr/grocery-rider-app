@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
@@ -46,7 +44,7 @@ class _TrackingState extends State<Tracking> {
   final Set<Polyline> _polylines = {};
   final List<LatLng> polylineCoordinatesForAgentToStore = [];
   final List<LatLng> polylineCoordinatesForStoreToCustomer = [];
-  Position? location;
+  LatLng? location;
   String? fullName = '', deliveryAddress = '', currency, mobileNumber;
   SocketService? socket;
   String startButtonText = 'START';
@@ -128,15 +126,15 @@ class _TrackingState extends State<Tracking> {
   }
 
   void setSourceAndDestinationIcons() async {
-    agentIcon = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2.5),
-        'lib/assets/icons/agentpin.png');
-    storeIcon = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2.5),
-        'lib/assets/icons/storepin.png');
-    customerIcon = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2.5),
-        'lib/assets/icons/homepin.png');
+    agentIcon = BitmapDescriptor.fromBytes(
+      await getBytesFromAsset('lib/assets/icons/agentpin.png', 50),
+    );
+    storeIcon = BitmapDescriptor.fromBytes(
+      await getBytesFromAsset('lib/assets/icons/storepin.png', 50),
+    );
+    customerIcon = BitmapDescriptor.fromBytes(
+      await getBytesFromAsset('lib/assets/icons/homepin.png', 50),
+    );
     setLatLng();
   }
 

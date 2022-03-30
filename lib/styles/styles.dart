@@ -82,15 +82,6 @@ TextStyle titleXLargeWPB() {
   );
 }
 
-TextStyle titleXLargeGPB() {
-  return new TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 20.0,
-    color: green,
-    fontFamily: 'PoppinsBold',
-  );
-}
-
 TextStyle titleSPB() {
   return new TextStyle(
     fontWeight: FontWeight.w500,
@@ -433,6 +424,15 @@ TextStyle textmediumblack() {
   return TextStyle(
     fontWeight: FontWeight.w600,
     fontSize: 16.0,
+    color: Colors.black,
+    fontFamily: 'MontserratMedium',
+  );
+}
+
+TextStyle hintSmallSfMediumblack(context) {
+  return TextStyle(
+    fontWeight: FontWeight.w100,
+    fontSize: 13.0,
     color: Colors.black,
     fontFamily: 'MontserratMedium',
   );

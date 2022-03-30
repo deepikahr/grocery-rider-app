@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:ui' as ui;
+import 'package:flutter/services.dart';
 
 class Common {
   /// save token on storage
@@ -84,4 +87,29 @@ class Common {
       return Future(() => null);
     }
   }
+
+  static Future<bool> setLocation(Map data) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString('location', json.encode(data));
+  }
+
+  static Future<Map?> getLocation() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? info = prefs.getString('location');
+    try {
+      return json.decode(info!) as Map?;
+    } catch (err) {
+      return Future(() => null);
+    }
+  }
+}
+
+Future<Uint8List> getBytesFromAsset(String path, int width) async {
+  var data = await rootBundle.load(path);
+  var codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+      targetWidth: width);
+  var fi = await codec.getNextFrame();
+  return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+      .buffer
+      .asUint8List();
 }
