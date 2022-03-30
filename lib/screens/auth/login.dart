@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/forgotpassword.dart';
@@ -15,17 +14,17 @@ import '../../services/common.dart';
 import '../../styles/styles.dart';
 import '../home/tabs.dart';
 
-class LOGIN extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   final Map? localizedValues;
   final String? locale;
 
-  LOGIN({Key? key, this.localizedValues, this.locale}) : super(key: key);
+  LoginPage({Key? key, this.localizedValues, this.locale}) : super(key: key);
 
   @override
-  _LOGINState createState() => _LOGINState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LOGINState extends State<LOGIN> {
+class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 

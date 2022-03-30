@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/login.dart';
@@ -64,7 +63,7 @@ class _ChangePasswordState extends State<ChangePassword> {
             Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => LOGIN(
+                  builder: (BuildContext context) => LoginPage(
                     locale: widget.locale,
                     localizedValues: widget.localizedValues,
                   ),

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:grocerydelivery/screens/location_permission.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/api_service.dart';
 import 'package:grocerydelivery/services/auth.dart';
@@ -15,8 +16,12 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'models/location.dart';
 import 'models/socket.dart';
+import 'screens/address_pick.dart';
+import 'screens/auth/login.dart';
+import 'screens/home/tabs.dart';
 import 'services/constants.dart';
 import 'services/localizations.dart';
+import 'services/locationService.dart';
 import 'styles/styles.dart';
 
 void main() {
@@ -81,11 +86,13 @@ class _DeliveryAppState extends State<DeliveryApp> {
   SocketService socket = SocketService();
   Map? localizedValues;
   String? locale;
-  bool isGetJsonLoading = false;
+  bool isGetJsonLoading = false, isPermissionChecking = false;
+  LatLng? latLng;
   @override
   void initState() {
     getJson();
     checkAUthentication();
+    checkPermission();
     super.initState();
   }
 
@@ -144,13 +151,47 @@ class _DeliveryAppState extends State<DeliveryApp> {
     });
   }
 
+  checkPermission() async {
+    if (mounted) {
+      setState(() {
+        isPermissionChecking = true;
+      });
+    }
+    String permission = await LocationUtils().locationPermission();
+    if (permission != 'ALLOW') {
+      if (mounted) {
+        setState(() {
+          isPermissionChecking = false;
+        });
+      }
+    } else {
+      Position? position = await LocationUtils().currentLocation();
+      if (mounted) {
+        setState(() {
+          latLng = LatLng(position.latitude, position.longitude);
+          isPermissionChecking = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return isGetJsonLoading || checkDeliveyDisOrNot
+    return isGetJsonLoading || checkDeliveyDisOrNot || isPermissionChecking
         ? MaterialApp(
             debugShowCheckedModeBanner: false,
             title: Constants.appName,
-            theme: ThemeData(primaryColor: primary, accentColor: primary),
+            theme: ThemeData(
+              textSelectionTheme: TextSelectionThemeData(
+                selectionColor: Colors.transparent,
+                selectionHandleColor: Colors.transparent,
+                cursorColor: primary,
+              ),
+              primaryColor: primary,
+              colorScheme: ThemeData().colorScheme.copyWith(
+                    secondary: primary,
+                  ),
+            ),
             darkTheme: ThemeData(brightness: Brightness.dark),
             home: AnimatedScreen())
         : MaterialApp(
@@ -165,12 +206,32 @@ class _DeliveryAppState extends State<DeliveryApp> {
             supportedLocales: [Locale(locale!)],
             debugShowCheckedModeBanner: false,
             title: Constants.appName,
-            theme: ThemeData(primaryColor: primary, accentColor: primary),
-            home: LocationPermissionCheck(
-              isLoggedIn: isLoggedIn,
-              locale: locale,
-              localizedValues: localizedValues,
+            theme: ThemeData(
+              textSelectionTheme: TextSelectionThemeData(
+                selectionColor: Colors.transparent,
+                selectionHandleColor: Colors.transparent,
+                cursorColor: primary,
+              ),
+              primaryColor: primary,
+              colorScheme: ThemeData().colorScheme.copyWith(
+                    secondary: primary,
+                  ),
             ),
+            home: latLng != null
+                ? isLoggedIn
+                    ? Tabs(
+                        locale: locale,
+                        localizedValues: localizedValues,
+                      )
+                    : LoginPage(
+                        locale: locale,
+                        localizedValues: localizedValues,
+                      )
+                : AddressPickPage(
+                    locale: locale,
+                    localizedValues: localizedValues,
+                    initialLocation: latLng,
+                  ),
           );
   }
 }

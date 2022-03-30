@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/localizations.dart';
 import 'package:grocerydelivery/styles/styles.dart';
 
@@ -108,6 +109,44 @@ Widget buildOrder(
                   MyLocalizations.of(context)!.getLocalizations(value ?? ""),
                   style: keyValue()),
             )
+    ],
+  );
+}
+
+Widget buildGFTypography(BuildContext context, title, isStar, isColon) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 5.0),
+    child: GFTypography(
+      showDivider: false,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20.0, bottom: 2.0),
+        child: RichText(
+          text: TextSpan(
+            children: <TextSpan>[
+              TextSpan(
+                  text: MyLocalizations.of(context)!
+                      .getLocalizations(title, isColon),
+                  style: textBarlowRegularBlack()),
+              TextSpan(
+                text: isStar ? " * " : ' ',
+                style: TextStyle(color: red),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget locationTile(BuildContext context, String address) {
+  return Column(
+    children: [
+      ListTile(
+        title: Text(address, style: hintSmallSfMediumblack(context)),
+        trailing: Icon(Icons.arrow_forward_ios),
+      ),
+      Divider(color: Colors.black)
     ],
   );
 }
