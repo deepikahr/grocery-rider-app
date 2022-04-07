@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/screens/auth/resetPas.dart';
@@ -86,8 +85,11 @@ class _OtpState extends State<Otp> {
                     GFButton(
                       color: Colors.transparent,
                       child: new Text(
-                          MyLocalizations.of(context)!.getLocalizations("OK"),
-                          style: TextStyle(color: green)),
+                        MyLocalizations.of(context)!.getLocalizations("OK"),
+                        style: TextStyle(
+                          color: green,
+                        ),
+                      ),
                       onPressed: () {
                         if (widget.loginTime == true) {
                           Navigator.of(context).pop();

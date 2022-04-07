@@ -9,12 +9,27 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+    <queries>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="https" />
+    </intent>
+    <intent>
+        <action android:name="android.intent.action.DIAL" />
+        <data android:scheme="tel" />
+    </intent>
+    <intent>
+        <action android:name="android.intent.action.SEND" />
+        <data android:mimeType="*/*" />
+    </intent>
+    </queries>
     <application
-        android:name="io.flutter.app.FlutterApplication"
         android:label="Readymade Grocery Delivery App"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/ANDROID_GOOGLE_MAP_API_KEY"/>
         <activity
+            android:exported="true"
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"

@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:grocerydelivery/services/alert-service.dart';
@@ -17,7 +15,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
-import 'dart:ui';
 
 class EditProfile extends StatefulWidget {
   final Map<String, dynamic>? userInfo;
@@ -36,7 +33,7 @@ class _EditProfileState extends State<EditProfile> {
   bool isLoading = false, isPicUploading = false, profileEdit = false;
   String? firstName, lastName, email;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  PickedFile? image;
+  XFile? image;
   final ImagePicker _picker = ImagePicker();
   @override
   void initState() {
@@ -133,7 +130,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   selectGallary() async {
-    image = await _picker.getImage(
+    image = await _picker.pickImage(
         source: ImageSource.gallery, maxHeight: 800, maxWidth: 800);
     if (mounted) {
       setState(() {
@@ -144,7 +141,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   selectCamera() async {
-    image = await _picker.getImage(
+    image = await _picker.pickImage(
         source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
     if (mounted) {
       setState(() {
@@ -154,7 +151,7 @@ class _EditProfileState extends State<EditProfile> {
     imageUpload(image);
   }
 
-  imageUpload(PickedFile? _imageFile) async {
+  imageUpload(XFile? _imageFile) async {
     Navigator.pop(context);
     var stream =
         // ignore: deprecated_member_use

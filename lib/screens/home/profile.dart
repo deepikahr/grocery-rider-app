@@ -133,31 +133,43 @@ class _ProfileState extends State<Profile> {
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: ListView(
                 children: <Widget>[
+                  Center(
+                    child: Text(
+                      MyLocalizations.of(context)!
+                          .getLocalizations('CHANGE_LANGUAGE'),
+                      style: hintSfboldBig(),
+                    ),
+                  ),
+                  Divider(),
                   ListView.builder(
-                      padding: EdgeInsets.only(bottom: 25),
+                      padding: EdgeInsets.only(bottom: 10, top: 10),
                       physics: ScrollPhysics(),
                       shrinkWrap: true,
                       itemCount:
-                          languagesList!.isNotEmpty ? 0 : languagesList!.length,
+                          languagesList!.isEmpty ? 0 : languagesList?.length,
                       itemBuilder: (BuildContext context, int i) {
                         return GFButton(
-                            onPressed: () async {
-                              setState(() {
-                                selectedLanguages =
-                                    languagesList![i]['languageName'];
-                              });
-                              await Common.setSelectedLanguage(
-                                  languagesList![i]['languageCode']);
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          DeliveryApp()),
-                                  (Route<dynamic> route) => false);
-                            },
-                            type: GFButtonType.transparent,
-                            child: alertText(context,
-                                languagesList![i]['languageName'], null));
+                          onPressed: () async {
+                            setState(() {
+                              selectedLanguages =
+                                  languagesList![i]['languageName'];
+                            });
+                            await Common.setSelectedLanguage(
+                                languagesList![i]['languageCode']);
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        DeliveryApp()),
+                                (Route<dynamic> route) => false);
+                          },
+                          type: GFButtonType.transparent,
+                          child: alertText(
+                            context,
+                            languagesList?[i]['languageName'],
+                            null,
+                          ),
+                        );
                       }),
                 ],
               ),
