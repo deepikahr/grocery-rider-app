@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:grocerydelivery/services/alert-service.dart';
 import 'package:grocerydelivery/services/common.dart';
 import 'package:http_interceptor/http_interceptor.dart';
@@ -17,13 +18,13 @@ class ApiInterceptor implements InterceptorContract {
       data.headers['Content-Type'] = 'application/json';
       data.headers['language'] = languageCode!;
       data.headers['Authorization'] = 'bearer $token';
-      print('\n🎇🎇🎇 REQUEST 🎇🎇🎇');
-      print('🎇🎇🎇 baseUrl: ${data.baseUrl}');
-      print('🎇🎇🎇 url: ${data.url}');
-      print('🎇🎇🎇 headers: ${data.headers}');
-      printWrapped('🎇🎇🎇 body: ${data.body}');
-      print('🎇🎇🎇 method: ${data.method}');
-      print('🎇🎇🎇 queryParameters: ${data.params}');
+      log('\n🎇🎇🎇 REQUEST 🎇🎇🎇');
+      log('🎇🎇🎇 baseUrl: ${data.baseUrl}');
+      log('🎇🎇🎇 url: ${data.url}');
+      log('🎇🎇🎇 headers: ${data.headers}');
+      log('🎇🎇🎇 body: ${data.body}');
+      log('🎇🎇🎇 method: ${data.method}');
+      log('🎇🎇🎇 queryParameters: ${data.params}');
     } catch (e) {}
     return data;
   }
@@ -31,10 +32,10 @@ class ApiInterceptor implements InterceptorContract {
   @override
   Future<ResponseData> interceptResponse({required ResponseData data}) async {
     var errorData = json.decode(data.body!);
-    print('\n🎇🎇🎇 RESPONSE 🎇🎇🎇');
-    print('🎇🎇🎇 url: ${data.url}');
-    print('🎇🎇🎇 status code: ${data.statusCode}');
-    printWrapped('🎇🎇🎇 response: ${data.body}');
+    log('\n🎇🎇🎇 RESPONSE 🎇🎇🎇');
+    log('🎇🎇🎇 url: ${data.url}');
+    log('🎇🎇🎇 status code: ${data.statusCode}');
+    log('🎇🎇🎇 response: ${data.body}');
 
     if (data.statusCode == 400) {
       var msg = '';
@@ -54,9 +55,4 @@ class ApiInterceptor implements InterceptorContract {
     }
     return data;
   }
-}
-
-void printWrapped(String text) {
-  final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
-  pattern.allMatches(text).forEach((match) => print(match.group(0)));
 }
